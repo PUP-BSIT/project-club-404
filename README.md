@@ -1,5 +1,6 @@
 <div align="center">
-   <img width=663px height=237px src="./heybleepi/readme_cover.png" />
+   <img width=1063px height=320px src="./heybleepi/readme_cover.png" />
 
-# project-club-404
+# HEYBLEEPI
+
 </div>
