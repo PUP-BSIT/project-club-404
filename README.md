@@ -27,6 +27,7 @@ Join the conversation today! Register and explore HeyBleeepi now.
 
 ### Web Host ⚙️
 - [x] Hostinger
+- [x] Domain: [club-404.com](https://dimgrey-parrot-643194.hostingersite.com/)
 
 <hr>
 
