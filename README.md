@@ -44,15 +44,7 @@ Join the conversation today! Register and explore HeyBleeepi now.
 
 ### The Team:
 
-<div style="color: lightgreen">
 👨‍💻 John Matthew Arroyo - Tech Lead/Developer
-</div>
-<div style="color: mediumpurple">
-   👨‍💻 Justine Delima - Tester/Developer
-</div>
-<div style="color: pink">
-   👩‍💻 Patricia Joy Relente - Project Manager/Developer
-</div>
-<div style="color: lightblue">
-   👩‍💻 Ma. Bea Mae Ynion - UI/UX Designer/Developer
-</div>
+👨‍💻 Justine Delima - Tester/Developer
+👩‍💻 Patricia Joy Relente - Project Manager/Developer
+👩‍💻 Ma. Bea Mae Ynion - UI/UX Designer/Developer
