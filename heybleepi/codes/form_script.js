@@ -17,6 +17,7 @@ tailwind.config = {
     },
   },
 };
+
 // Generate stars
 document.addEventListener("DOMContentLoaded", function () {
   const starsContainer = document.getElementById("stars-container");
