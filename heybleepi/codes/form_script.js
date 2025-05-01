@@ -6,42 +6,42 @@ function showRegisterForm() {
 						type="text" 
 						id="first_name" 
 						class="input-text"
-						placeholder="First Name" 
+						placeholder="👤 First Name" 
 						required>
 
 					<input 
 						type="text" 
 						id="last_name" 
 						class="input-text"
-						placeholder="Last Name" 
+						placeholder="👤 Last Name" 
 						required>
 
 					<input 
 						type="date" 
 						id="birthdate" 
 						class="input-text"
-						placeholder="Birthdate" 
+						placeholder="📅 Birthdate" 
 						required>
 
 					<input 
 						type="text" 
 						id="phone" 
 						class="input-text"
-						placeholder="Phone Number" 
+						placeholder="📞 Phone Number" 
 						required>
 
 					<input 
 						type="text" 
 						id="email_reg"
 						class="email input-text" 
-						placeholder="Email Address"
+						placeholder="✉️ Email Address"
 						required>
 
 					<input 
 						type="password" 
 						id="password_reg"
 						class="password input-text" 
-						placeholder="Password" 
+						placeholder="🔒 Password" 
 						required>
 
 					<div id="terms_and_conditions">
@@ -59,14 +59,14 @@ function showLoginForm() {
 						type="text" 
 						id="email_login"
 						class="email input-text"
-						placeholder="Email" 
+						placeholder="✉️ Email" 
 						required>
 
 				<input 
 						type="password" 
 						id="password_login"
 						class="password input-text" 
-						placeholder="Password" 
+						placeholder="🔒 Password" 
 						required>
 
 					<div id="selections_container">
