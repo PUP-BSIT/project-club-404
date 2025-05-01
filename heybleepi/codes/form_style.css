@@ -3,7 +3,7 @@
 }
 
 body {
-	background: url(/heybleepi/purplesky_bg.jpeg);
+	background: url(./assets/login-register-bg.jpg);
 	background-size: cover;
 	background-repeat: no-repeat;
 	background-position: center;
@@ -175,6 +175,7 @@ body {
 	align-items: center;
 	justify-content: center;
 	cursor: pointer;
+	font-weight: 400;
 }
 
 #terms_and_conditions {
