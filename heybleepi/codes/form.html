@@ -1,5 +1,181 @@
 <!DOCTYPE html>
 <html lang="en">
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HeyBleepi - Connect in the Galaxy</title>
+
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap"
+     rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+
+  <body>
+    <div id="stars-container">
+      <div class="main-container">
+        <div class="glass-container">
+          <div class="content-wrapper">
+
+            <!-- Left panel -->
+            <div class="left-panel">
+              <h1 class="heading">HeyBleepi</h1>
+              <p class="subheading">Connect with friends across the galaxy</p>
+              <div class="image-container">
+                <img src="./assets/heybleepi_mascot.jpg"
+                  alt="HeyBleepi Cat Mascot"
+                  class="mascot" />
+              </div>
+              <p class="description">
+                Join thousands of space explorers connecting across the universe
+              </p>
+            </div>
+
+            <!-- Right panel -->
+            <div class="right-panel">
+              <div class="tab-switcher">
+                <button id="login-tab" class="tab-btn tab-active">Login</button>
+                <button id="register-tab" class="tab-btn">Register</button>
+              </div>
+
+              <!-- Login form -->
+              <div id="login-form" class="form-section">
+                <div class="input-group">
+                  <i class="ri-mail-line input-icon"></i>
+
+                  <input type="email"
+                    placeholder="Email"
+                    class="form-input" />
+                </div>
+
+                <div class="input-group">
+                  <i class="ri-lock-line input-icon"></i>
+
+                  <input type="password"
+                    placeholder="Password"
+                    class="form-input" />
+
+                  <button class="input-toggle">
+                    <i class="ri-eye-line"></i>
+                  </button>
+                </div>
+
+                <!-- Remember me for password -->
+                <div class="form-options">
+                  <label class="checkbox-label">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                    <span>Remember me</span>
+                  </label>
+                  <a href="#" class="link">Forgot password?</a>
+                </div>
+
+                <!-- Login button -->
+                <button class="auth-button">Login</button>
+
+                <!-- Divider -->
+                <div class="divider">
+                  <div class="line"></div>
+                  <span class="divider-text">or continue with</span>
+                  <div class="line"></div>
+                </div>
+
+                <!-- Socials Connection -->
+                <div class="grid grid-cols-3 gap-3">
+                  <button class="auth-social">
+                    <i class="ri-google-fill text-white"></i>
+                  </button>
+                  <button class="auth-social">
+                    <i class="ri-facebook-fill text-white"></i>
+                  </button>
+                  <button class="auth-social">
+                    <i class="ri-twitter-x-fill text-white"></i>
+                  </button>
+                </div>
+              </div> <!-- Login form -->
+
+              <!-- Register form -->
+              <div id="register-form" class="form-section hidden">
+                <div class="name-grid">
+
+                  <div class="input-group">
+                    <i class="ri-user-line input-icon"></i>
+                    <input type="text"
+                      placeholder="First Name"
+                      class="form-input" />
+                  </div>
+
+                  <div class="input-group">
+                    <i class="ri-user-line input-icon"></i>
+
+                    <input type="text"
+                      placeholder="Last Name"
+                      class="form-input" />
+                  </div>
+                </div>
+
+                <div class="input-group">
+                  <i class="ri-calendar-line input-icon"></i>
+                  <input type="text"
+                    placeholder="Birthdate (mm/dd/yyyy)"
+                    class="form-input" />
+                </div>
+
+                <div class="input-group">
+                  <i class="ri-phone-line input-icon"></i>
+
+                  <input type="tel"
+                   placeholder="Phone Number"
+                   class="form-input" />
+                </div>
+
+                <div class="input-group">
+                  <i class="ri-mail-line input-icon"></i>
+
+                  <input type="email"
+                    placeholder="Email Address"
+                    class="form-input" />
+                </div>
+
+                <div class="input-group">
+                  <i class="ri-lock-line input-icon"></i>
+
+                  <input type="password"
+                    placeholder="Password"
+                    class="form-input" />
+
+                  <button class="input-toggle">
+                    <i class="ri-eye-line"></i>
+                  </button>
+                </div>
+
+                <!-- Terms and Privacy -->
+                <label class="checkbox-agreement">
+                  <input type="checkbox" />
+                  <span class="checkmark"></span>
+                  <span class="agreement-text">
+                    I agree to the
+                    <a href="#" class="link">Terms of Service</a>
+                    and
+                    <a href="#" class="link">Privacy Policy</a>
+                  </span>
+                </label>
+
+                <button class="auth-button">Create Account</button>
+              </div> <!-- Register form -->
+            </div> <!-- Right panel -->
+          </div> <!-- Overall panel -->
+        </div> <!-- Glass -->
+      </div> <!-- Background -->
+    </div> <!-- Stars -->
+    <script src="script.js"></script>
+  </body>
+
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -73,4 +249,5 @@
 	</div>
 	<script src="./form_script.js"></script>
 </body>
+
 </html>

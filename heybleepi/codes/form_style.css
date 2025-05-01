@@ -1,198 +1,493 @@
-:root {
-	--background-color: #9c27b0;
-}
-
 body {
-	background: url(./assets/login-register-bg.jpg);
-	background-size: cover;
-	background-repeat: no-repeat;
-	background-position: center;
-	color: white;
-	font-family:  "Roboto", sans-serif;
-	font-weight: 300;
+  font-family: 'Quicksand', sans-serif;
+  background: linear-gradient(135deg, #1a1a2e, #16213e, #1a1a2e);
+  background-attachment: fixed;
+  overflow-x: hidden;
 }
 
-#content_container {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	height: 97vh;
-	text-align: center;
-	gap: 0;
+.main-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  position: relative;
+  z-index: 10;
+  background-image: url('./assets/login_register_bg.jpg')
 }
 
-#heybleepi_container {
-	background-color: rgba(59, 130, 246, 0.1);
-	height: 90vh;
-	width: 25vw;
-	display: flex;
-	flex-direction: column;
-	border-radius: 10px;
-	backdrop-filter: blur(5px);
-	position: absolute;
-	z-index: 1;
-	left: 240px;
+.content-wrapper {
+  display: flex;
+  flex-direction: column;
 }
 
-#cat_container img {
-	position: absolute;
-	width: 85%;
-	border-radius: 50%; /*makes the cat image round/circle*/
-	left: 30px;
-	z-index: 1;
+.glass-container {
+  border-radius: 1rem;
+  width: 100%;
+  max-width: 1024px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  -webkit-backdrop-filter: blur(10px);
 }
 
-#heybleepi_container h1 {
-	text-align: center;
-	font-family: "Pacifico", cursive;
-	font-weight: 400;
-	font-size: 3em;
-	margin: 0;
-	margin-top: 20px;
-	padding: 0;
+/* Left panel heading*/
+.left-panel {
+  width: 50%;
+  padding: 2rem;
+  text-align: center;
+  color: white;
+  background: transparent;
 }
 
-#heybleepi_container #engage-stmt {
-	color: black;
+.heading {
+  font-size: 3rem;
+  font-family: 'Pacifico', cursive;
+  margin-bottom: 1rem;
+  color: white;
 }
 
-#description_container {
-	position: relative;
-	top: 320px;
-	width: 20vw;
-	padding: 0px 33px;
-	text-align: center;
+.subheading {
+  opacity: 0.8;
+  margin-bottom: 1.5rem;
 }
 
-#switch_container {
-	display: flex;
-	background-color: rgba(255, 255, 255, 0.2);
-	margin: 43px 30px 10px 387px;
-	border-radius: 60px;
+.image-container {
+  max-width: 240px;
+  margin: 0 auto;
 }
 
-#switch_container button {
-	background-color: transparent;
-	color: white;
-	border: none;
-	border-radius: 60px;
-	width: 100%;
-	height: 7vh;
-	cursor: pointer;
-	font-size: medium;
+.mascot {
+  width: 100%;
+  height: auto;
+  border-radius: 50%;
 }
 
-#form_container {
-	background-color: rgba(255, 255, 255, 0.3);
-	height: 90vh;
-	border-radius: 10px;
-	width: 65vw;
-	backdrop-filter: blur(5px);
-	position: relative;
-	z-index: 0;
+.description {
+  margin-top: 1.5rem;
+  color: #311862;
 }
 
-#form_container #dynamic_form {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-end;
-	height: 81%;
-	gap: 1em;
-	margin-top: 20px;
-	margin-right: 19px;
+/* Right panel heading*/
+
+.right-panel {
+  width: 75%;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  border-radius: 1rem;
+  color: white;
 }
 
-#dynamic_form .email, .password {
-	width: 34.5vw;
-	height: 7vh;
-	border: 1px solid rgba(255, 255, 255, 0.1);
-	border-radius: 10px;
-	background-color: rgba(255, 255, 255, 0.2);
-	font-size: 1.2em;
-	color: white;
+.star {
+  position: absolute;
+  background-color: white;
+  border-radius: 50%;
+  animation: twinkle 4s infinite;
 }
 
-#dynamic_form .email::placeholder, .password::placeholder,
-.input-text::placeholder {
-	color: rgba(255, 255, 255, 0.5);
+@keyframes twinkle {
+
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+
+  50% {
+    opacity: 1;
+  }
 }
 
-#switch_container button:hover {
-	background-color: rgba(138, 111, 223, 0.5);
+/* Flex container for "Remember me" and link */
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 1.5rem 0;
+  color: white;
+  font-size: 0.9rem;
 }
 
-#selections_container {
-	display: flex;
-	gap: 14em;
+/* Checkbox style */
+
+.checkbox-label input[type="checkbox"] {
+  accent-color: #a855f7;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  position: absolute;
+  opacity: 0;
+  width: 1rem;
+  height: 1rem;
 }
 
-#dynamic_form .input-text {
-	width: 30.5vw;
-	height: 7vh;
-	border: 1px solid rgba(255, 255, 255, 0.1);
-	border-radius: 10px;
-	background-color: rgba(255, 255, 255, 0.2);
-	font-size: 1.2em;
-	color: white;
-	padding-left: 40px;
-	padding-right: 20px;
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  gap: 0.5rem;
 }
 
-#dynamic_form button {
-	width: 35vw;
-	height: 7vh;
-	background-image: linear-gradient(to right, #8A6FDF, #FF9EE5);
-	border: none;
-	border-radius: 10px;
-	color: white;
-	font-size: medium;
-	cursor: pointer;
+.custom-checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
 }
 
-#dynamic_form a {
-	color: white;
-	text-decoration: none;
+.checkmark {
+  height: 20px;
+  width: 20px;
+  border-radius: 4px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  position: relative;
+  transition: all 0.3s;
 }
 
-#dynamic_form p {
-	width: 55%;
-	text-align: center;
-	color: black;
-	margin-top: 50px;
+.checkbox-label input:checked~.checkmark {
+  background-color: #8A6FDF;
+  border-color: #8A6FDF;
 }
 
-#social_media_container {
-	display: flex;
-	gap: 4em;
-	margin-right: 16px;
+.checkbox-label input:checked~.checkmark::after {
+  display: block;
 }
 
-#social_media_container a {
-	width: 8vw;
-	height: 6vh;
-	background-color: rgba(255, 255, 255, 0.1);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	cursor: pointer;
-	font-weight: 400;
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 
-#terms_and_conditions {
-	display: flex;
-	width: 35.5vw;
+.checkbox-label span:last-child {
+  margin-left: 0.5rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
 }
 
-#dynamic_form #create_acc_btn {
-	margin-bottom: 20px;
+/* Container layout */
+.checkbox-agreement {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  margin-top: 1rem;
+  line-height: 1.4;
+  position: relative;
 }
 
-#social_media_container a:hover {
-	background-color: rgba(255, 255, 255, 0.3);
+.checkbox-agreement input[type="checkbox"] {
+  accent-color: #a855f7;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 0;
+  height: 0;
+  border: 2px solid #a855f7;
+  border-radius: 0.25rem;
+  background-color: transparent;
+  position: absolute;
+  margin-top: 0.2rem;
+  cursor: pointer;
+  opacity: 0;
 }
 
-#selections_container a:hover {
-	color: rgba(255, 255, 255, 0.9);
-	text-decoration: underline;
+.checkbox-agreement input[type="checkbox"]:checked {
+  background-color: #a855f7;
 }
 
+.checkbox-agreement input[type="checkbox"]::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  opacity: 0;
+}
+
+.checkbox-agreement input:checked~.checkmark {
+  background-color: #8A6FDF;
+  border-color: #8A6FDF;
+}
+
+.checkbox-agreement input:checked~.checkmark::after {
+  display: block;
+}
+
+/* Link styling */
+.agreement-text .link {
+  color: #311f79;
+  text-decoration: none;
+}
+
+.agreement-text .link:hover {
+  text-decoration: underline;
+}
+
+/* Divider styling */
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.divider-text {
+  margin: 0 1rem;
+  color: white;
+  font-size: 0.85rem;
+}
+
+.line {
+  flex: 1;
+  height: 1px;
+  background-color: white
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.2);
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked+.toggle-slider {
+  background-color: #8A6FDF;
+}
+
+input:checked+.toggle-slider:before {
+  transform: translateX(26px);
+}
+
+/* Regisration form  */
+
+.name-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+/* Layout Panels */
+
+.tab-switcher {
+  display: flex;
+  margin-bottom: 1.5rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 9999px;
+  padding: 0.25rem;
+}
+
+.tab-btn {
+  width: 50%;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.tab-active {
+  background-color: rgba(138, 111, 223, 0.3);
+  color: white;
+}
+
+/* Forms */
+
+.form-section {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.input-group {
+  position: relative;
+}
+
+.form-input::placeholder {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: white;
+  outline: none;
+}
+
+.form-input:focus {
+  box-shadow: 0 0 0 2px rgba(138, 111, 223, 0.5);
+}
+
+.input-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+::placeholder {
+  color: black
+}
+
+.input-toggle {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.auth-button {
+  width: 100%;
+  padding: 0.75rem;
+  background-image: linear-gradient(to right, #8A6FDF, #FF9EE5);
+  color: white;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.auth-button:hover {
+  opacity: 0.9;
+}
+
+/* Social Buttons */
+.auth-social {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.auth-social:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Link styling */
+.link {
+  color: #402d8d;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+/* Hide Edge's built-in password reveal icon */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
+
+/* Hide Safari's built-in password reveal icon */
+input[type="password"]::-webkit-textfield-decoration-container {
+  display: none;
+}
+
+/* Remove clear button from Chrome */
+input[type="password"]::-webkit-clear-button,
+input[type="password"]::-webkit-inner-spin-button {
+  display: none;
+}
+
+/* Mobile Responsiveness */
+@media (min-width: 768px) {
+  .content-wrapper {
+    flex-direction: row;
+  }
+
+  .right-panel {
+    width: 58.333%;
+  }
+}
+
+.tab-switcher {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  justify-content: center;
+}
+
+.tab-btn {
+  padding: 0.75rem 2rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 9999px;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.tab-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.tab-active {
+  background: linear-gradient(to right, #a855f7, #db95b9);
+  color: white;
+  font-weight: bold;
+}
