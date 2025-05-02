@@ -15,7 +15,10 @@ $formData = [
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if (isset($_POST['login'])) {
-    loginUser($_POST['email'], $_POST['password']);
+    $loginError = loginUser($_POST['email'], $_POST['password']);
+    if ($loginError) {
+      $message = $loginError;
+    }
   } else if (isset($_POST['register'])) {
     error_log("Register form submitted: " . print_r($_POST, true));
 
@@ -89,11 +92,13 @@ if (isset($_GET['registration']) && $_GET['registration'] === 'success') {
               <div class="right-panel">
                 <!-- Error message display -->
                 <?php if (!empty($message)): ?>
-                <div class="mb-4 p-4 bg-red-100 
-                    border border-red-400 text-red-700 rounded">
-                  <?php echo htmlspecialchars($message); ?>
-                </div>
-                <?php endif; ?>
+                  <div class="mb-4 p-4 rounded 
+                      <?php echo strpos($message, 'successful') !== false
+                       ? 'bg-green-100 border-green-400 text-green-700'
+                      : 'bg-red-100 border-red-400 text-red-700'; ?>">
+                      <?php echo htmlspecialchars($message); ?>
+                  </div>
+                  <?php endif; ?>
 
                 <div class="tab-switcher">
                   <button
