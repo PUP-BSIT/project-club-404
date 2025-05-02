@@ -19,18 +19,16 @@ function loginUser($email, $password) {
     if ($result && mysqli_num_rows($result) > 0) {
         $user = mysqli_fetch_assoc($result);
 
-        error_log("User found: " . print_r($user, true));
-
         if ($user['password'] === $safePassword) {
           $_SESSION['id'] = $user['id'];
           $_SESSION['email'] = $user['email'];
           header("Location: main.php");
           exit();
         } else {
-          error_log("Password mismatch for email: $safeEmail");
+          return "Invalid password. Please try again.";
         }
     } else {
-      error_log("User not found for email: $safeEmail");
+      return "Email not found. Please register first.";
     }
 
     $message = 'Invalid email or password';
