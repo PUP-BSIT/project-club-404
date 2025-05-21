@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", function () {
   // Like button
   const likeButtons = document.querySelectorAll(".like");
@@ -56,7 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
     postTextarea.addEventListener("input", togglePostButton);
   }
 
-  // Suggestions "See More" button
+  // Suggestions Connection: "See More" button
   const seeMoreBtn = document.getElementById("seeMoreBtn");
   const suggestionList = document.getElementById("suggestionList");
 
@@ -64,7 +63,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const allSuggestions = Array.from(suggestionList.querySelectorAll(".suggestion"));
     let visibleCount = 2; // Show only 2 at a time
 
-    // Hide all except first N
+    // Hide all except first users
     allSuggestions.forEach((item, index) => {
       if (index >= visibleCount) item.classList.add("hidden");
     });
@@ -78,5 +77,49 @@ document.addEventListener("DOMContentLoaded", function () {
         seeMoreBtn.style.display = "none";
       }
     });
+  }
+
+  // Toggle notification dropdown
+  const notificationBtn = document.getElementById("notificationBtn");
+  const notificationDropdown = document.getElementById("notificationDropdown");
+  const markAllReadBtn = document.getElementById("markAllReadBtn");
+  const notificationWrapper = document.getElementById("notificationWrapper");
+  const badge = document.getElementById("notificationCount");
+
+  // Notification Badge
+  if (badge && parseInt(badge.textContent) > 0) {
+    notificationWrapper.classList.add("has-unread");
+  }
+
+  if (markAllReadBtn) {
+    markAllReadBtn.addEventListener("click", () => {
+      badge.style.display = "none";
+      notificationWrapper.classList.remove("has-unread");
+      notificationDropdown.classList.remove("visible");
+    });
+  }
+
+  if (notificationBtn && notificationDropdown) {
+    notificationBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      notificationDropdown.classList.toggle("visible");
+    });
+
+    document.addEventListener("click", function () {
+      notificationDropdown.classList.remove("visible");
+    });
+
+    notificationDropdown.addEventListener("click", function (e) {
+      e.stopPropagation(); // prevent dropdown from closing when clicked inside
+    });
+
+    // Mark as read
+    if (markAllReadBtn) {
+      markAllReadBtn.addEventListener("click", () => {
+        const badge = document.getElementById("notificationCount");
+        if (badge) badge.style.display = "none";
+        notificationDropdown.classList.remove("visible");
+      });
+    }
   }
 });
