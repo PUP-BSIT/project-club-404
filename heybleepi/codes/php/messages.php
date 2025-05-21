@@ -65,7 +65,7 @@ if (isset($_POST['edit_id'])) {
       href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="messages.css" />
+    <link rel="stylesheet" href="./stylesheet/messages.css" />
   </head>
 
   <body>
@@ -123,7 +123,7 @@ if (isset($_POST['edit_id'])) {
       </div>
     </div>
 
-    <script src="messages.js"></script>
+    <script src="./script/messages.js"></script>
   </body>
 </html>
 
