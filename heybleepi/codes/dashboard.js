@@ -39,9 +39,19 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
+  const homeLink = document.querySelector(".home-link");
+  const feed = document.getElementById("mainFeed");
+
+  if (homeLink && feed) {
+    homeLink.addEventListener("click", function (e) {
+      e.preventDefault(); // prevent link reload
+      feed.scrollIntoView({ behavior: "smooth" });
+    });
+  }
+
   // Enable "Post" button only when there's a text
-  const postTextarea = document.querySelector(".create-post__input");
-  const postButton = document.querySelector(".create-post__actions .btn");
+  const postTextarea = document.querySelector(".create-post-input");
+  const postButton = document.querySelector(".create-post-actions .btn");
 
   if (postTextarea && postButton) {
     const togglePostButton = () => {
@@ -55,7 +65,7 @@ document.addEventListener("DOMContentLoaded", function () {
     postTextarea.addEventListener("input", togglePostButton);
   }
 
-  // Suggestions Connection: "See More" button
+  // Suggestions "See More" button
   const seeMoreBtn = document.getElementById("seeMoreBtn");
   const suggestionList = document.getElementById("suggestionList");
 
@@ -63,7 +73,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const allSuggestions = Array.from(suggestionList.querySelectorAll(".suggestion"));
     let visibleCount = 2; // Show only 2 at a time
 
-    // Hide all except first users
+    // Hide all except first N
     allSuggestions.forEach((item, index) => {
       if (index >= visibleCount) item.classList.add("hidden");
     });
@@ -81,10 +91,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Toggle notification dropdown
   const notificationBtn = document.getElementById("notificationBtn");
-  const notificationDropdown = document.getElementById("notificationDropdown");
+  const notificationDropdown = document.getElementById("notification_dropdown");
   const markAllReadBtn = document.getElementById("markAllReadBtn");
-  const notificationWrapper = document.getElementById("notificationWrapper");
-  const badge = document.getElementById("notificationCount");
+  const notificationWrapper = document.getElementById("notification_wrapper");
+  const badge = document.getElementById("notification_count");
 
   // Notification Badge
   if (badge && parseInt(badge.textContent) > 0) {
@@ -116,7 +126,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Mark as read
     if (markAllReadBtn) {
       markAllReadBtn.addEventListener("click", () => {
-        const badge = document.getElementById("notificationCount");
+        const badge = document.getElementById("notification_count");
         if (badge) badge.style.display = "none";
         notificationDropdown.classList.remove("visible");
       });
