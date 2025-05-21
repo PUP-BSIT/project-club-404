@@ -1,0 +1,195 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Quicksand", sans-serif;
+  background: url(./assets/message-background.jpg);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin: 80px;
+  padding: 0;
+}
+
+.container {
+  border-radius: 1rem;
+  width: 100%;
+  max-width: 800px;
+  margin: 80px auto 10px auto;
+  margin-bottom: 10px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  -webkit-backdrop-filter: blur(10px);
+  justify-content: center;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 32px;
+  margin-top: 40px;
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(138, 111, 223, 0.25);
+  font-family: "Quicksand", sans-serif;
+  background: linear-gradient(90deg, #8a6fdf 30%, #ff9ee5 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+    -webkit-text-fill-color: transparent;
+  padding: 0.5rem 0;
+  border-radius: 12px;
+  letter-spacing: 3px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+form textarea {
+  font-family: "Quicksand", sans-serif;
+  width: 93%;
+  min-width: 0;
+  max-width: 93%;
+  padding: 0.75rem 1rem 0.75rem 1rem;
+  margin: 10px 0 16px 0;
+  border-radius: 8px;
+  border: 1px solid rgba(138, 111, 223, 0.18);
+  font-size: 1rem;
+  background: linear-gradient(135deg, #f3e8ff 0%, #e1bee7 100%);
+  color: #4a148c;
+  outline: none;
+  resize: none;
+}
+
+form textarea::placeholder {
+  color: #8a6fdf;
+  opacity: 1;
+  font-style: italic;
+  letter-spacing: 1px;
+}
+
+form button {
+  width: 100%;
+  max-width: 200px;
+  padding: 1.2rem 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  background-image: linear-gradient(to right, #8a6fdf);
+  border: none;
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+  text-align: center;
+  font-family: "Quicksand", sans-serif;
+}
+
+form button:hover {
+  background-image: linear-gradient(to right, #8368db);
+  color: white;
+  box-shadow: 0 4px 16px rgba(138, 111, 223, 0.18);
+}
+
+.comment-box {
+  margin-top: 20px;
+  padding: 24px 20px;
+  background-color: rgba(138, 111, 223, 0.18);
+  border-radius: 1rem;
+  box-shadow: 0 4px 24px rgba(138, 111, 223, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(138, 111, 223, 0.18);
+}
+
+.comment {
+  background: linear-gradient(90deg, #f3e8ff 0%, #ffe0f7 100%);
+  border-left: 5px solid #8a6fdf;
+  padding: 16px 16px 12px 20px;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(138, 111, 223, 0.08);
+  transition: box-shadow 0.2s;
+}
+
+.comment:hover {
+  box-shadow: 0 4px 16px rgba(138, 111, 223, 0.18);
+}
+
+.comment strong {
+  color: #8a6fdf;
+}
+.comment small {
+  color: #b47ac7;
+  font-size: 0.8em;
+}
+
+.comments {
+  margin-top: 8px;
+}
+
+.comment-edit {
+  color: #8a6fdf;
+  cursor: pointer;
+  margin-right: 16px;
+}
+
+.comment-delete {
+  color: #ff5c8a;
+  cursor: pointer;
+}
+
+.cancel {
+  margin-left: 3px;
+}
+
+.button-row {
+  display: flex;
+  gap: 10px;
+  width: 93%;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.button-row button,
+.button-row .cancel {
+  width: 100%;
+  max-width: 200px;
+  padding: 1.2rem 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  background-image: linear-gradient(to right, #8a6fdf);
+  border: none;
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+  text-align: center;
+  font-family: "Quicksand", sans-serif;
+}
+
+.button-row button.cancel,
+.button-row .cancel {
+  background-image: linear-gradient(to right, #8a6fdf);
+  color: white;
+  border: 1px solid #8a6fdf;
+}
+
+.button-row button.cancel:hover,
+.button-row .cancel:hover {
+  background-image: linear-gradient(to right, #8a6fdf);
+  color: white;
+  border: 1px solid #8a6fdf;
+}
