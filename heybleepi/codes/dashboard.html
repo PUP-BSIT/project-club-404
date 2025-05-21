@@ -39,6 +39,17 @@
           <span class="badge" id="notificationCount">3</span>
         </button>
 
+        <div class="notification-dropdown" id="notificationDropdown">
+          <h4>Notifications</h4>
+          <ul>
+            <li><strong>John</strong> liked your post.</li>
+            <li><strong>Alice</strong> followed you.</li>
+            <li><strong>Admin</strong> updated the terms.</li>
+          </ul>
+          <button class="mark-read" id="markAllReadBtn">Mark all as read</button>
+        </div>
+      </div>
+
       <!-- profile -->
       <img
         class="avatar avatar--sm"
@@ -76,6 +87,7 @@
 
     <!-- FEED -->
     <section class="feed">
+
       <!-- stories -->
       <div class="glass stories">
         <article class="story"><img class="avatar avatar--story" src="./assets/profile/chicken.jpg" alt=""><span>John Doe</span></article>
@@ -87,13 +99,10 @@
         <div class="header">
           <img class="avatar avatar--sm" src="./assets/profile/shark.jpg" alt="">
           <div class="poster-info">
-
-            <!-- Link to profile -->
-            <a href="/profile" class="poster-name">Jane Doe</a>
-            <p>@jane_doe</p>
+             <a href="/profile" class="poster-name">Jane Doe</a>
+              <p>@jane_doe</p>
           </div>
         </div>
-
         <textarea class="create-post-input" placeholder="What's happening in your galaxy?"></textarea>
 
         <div class="create-post-actions">
