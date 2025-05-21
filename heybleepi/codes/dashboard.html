@@ -103,7 +103,7 @@
             <button class="icon-btn"><i class="ri-emotion-line"></i></button>
             <button class="icon-btn"><i class="ri-map-pin-line"></i></button>
           </div>
-          <button class="btn btn--primary">Post</button>
+          <button class="btn btn--primary" disabled>Post</button>
         </div>
       </div>
 
@@ -137,6 +137,7 @@
       <section class="glass card">
         <h3 class="card-title">Suggested Connections</h3>
         <ul class="suggestions" id="suggestionList">
+
           <!-- initial visible items -->
           <li class="suggestion">
             <img class="avatar avatar--sm" src="./assets/profile/chick.jpg" alt="">
@@ -151,18 +152,20 @@
           </li>
 
           <!-- hidden initially -->
-          <li class="suggestion hidden">
-            <img class="avatar avatar--sm" src="./assets/profile/penguin.jpg" alt="">
+         <li class="suggestion hidden">
+            <img class="avatar avatar--sm" src="..." alt="">
             <div><h4>Yasmin</h4><p>Developer</p></div>
             <button class="btn btn--primary btn--sm">Connect</button>
           </li>
 
           <li class="suggestion hidden">
-            <img class="avatar avatar--sm" src="./assets/profile/frog.jpg" alt="">
+            <img class="avatar avatar--sm" src="..." alt="">
             <div><h4>Ken</h4><p>Artist</p></div>
             <button class="btn btn--primary btn--sm">Connect</button>
           </li>
         </ul>
+
+        <button class="see-more" id="seeMoreBtn">See More</button>
       </section>
     </aside>
   </main>

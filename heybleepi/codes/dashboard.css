@@ -75,6 +75,32 @@ body.page {
   background: rgba(255, 255, 255, .12);
 }
 
+/* Disabled button state */
+.btn--primary:disabled {
+  background-color: rgba(255, 255, 255, 0.2);
+  cursor: not-allowed;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Pulse animation on hover */
+.btn--primary:hover {
+  animation: pulse 0.4s ease;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
 /*  ====  AVATARS  ==== */
 .avatar {
   border-radius: 50%;
@@ -169,36 +195,35 @@ body.page {
 /*  ====  LAYOUT  ==== */
 .layout {
   display: flex;
-  padding: 1.5rem;
   gap: 1.5rem;
+  padding: 1.5rem;
+  max-width: 1600px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .sidebar {
   display: none;
   flex-direction: column;
+  flex-shrink: 0;
   gap: 1.25rem;
-}
-
-@media (min-width:768px) {
-  .sidebar--left {
-    display: flex;
-    width: 220px;
-  }
-}
-
-@media (min-width:1024px) {
-  .sidebar--right {
-    display: flex;
-    width: 260px;
-  }
 }
 
 .feed {
   flex: 1;
-  max-width: 720px;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+
+.sidebar--left {
+  width: 220px;
+}
+
+.sidebar--right {
+  width: 260px;
 }
 
 /*  ====  LEFT SIDEBAR  ==== */
@@ -272,25 +297,6 @@ body.page {
   padding: 0 .35rem;
   font-size: .6rem;
   margin-left: auto;
-}
-
-.sidebar-heading {
-  margin: 1rem 1rem .4rem;
-  font-size: .9rem;
-  font-weight: 600;
-}
-
-.trend {
-  display: block;
-  padding: .3rem 1rem;
-  font-size: .75rem;
-  color: #fff;
-  text-decoration: none;
-  opacity: .9;
-}
-
-.trend:hover {
-  color: var(--primary);
 }
 
 /*  ====  STORIES  ==== */
@@ -523,7 +529,17 @@ textarea.create-post-input::placeholder {
   }
 }
 
-/*  ====  RIGHT SIDEBAR  ==== */
+/*  ====  Suggestion Connections  ==== */
+.hidden {
+  display: none;
+}
+
+.suggestion.hidden {
+  opacity: 0;
+  max-height: 0;
+  pointer-events: none;
+}
+
 .suggestions {
   list-style: none;
   margin: 0;
@@ -537,10 +553,31 @@ textarea.create-post-input::placeholder {
   display: flex;
   align-items: center;
   gap: .8rem;
+  opacity: 1;
+  max-height: 100px;
+  overflow: hidden;
+  transition: opacity 0.3s ease, max-height 0.3s ease;
 }
 
 .suggestion>.btn {
   margin-left: auto;
+}
+
+.see-more {
+  display: block;
+  width: 100%;
+  margin-top: 1rem;
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-align: center;
+  transition: color 0.2s;
+}
+
+.see-more:hover {
+  color: #7644e0;
 }
 
 /*  ====  MOBILE NAV  ==== */
@@ -577,12 +614,28 @@ textarea.create-post-input::placeholder {
   .mobile-link--active {
     color: var(--primary);
   }
-}
 
-/*  ====  MEDIA QUERIES  (LAYOUT HELPERS)  ==== */
-@media (max-width:767px) {
   .search {
     display: none;
+  }
+}
+
+/* Hide mobile nav on medium screens */
+@media (min-width: 768px) {
+  .mobile-nav {
+    display: none !important;
+  }
+
+  .sidebar--left {
+    display: flex;
+    width: 220px;
+  }
+}
+
+@media (min-width:1024px) {
+  .sidebar--right {
+    display: flex;
+    width: 260px;
   }
 }
 
