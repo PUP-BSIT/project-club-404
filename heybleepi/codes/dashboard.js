@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // Like button toggle
+  // Like button
   const likeButtons = document.querySelectorAll(".like");
 
   likeButtons.forEach((button) => {
@@ -17,15 +17,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
       let count = parseInt(countSpan.textContent.replace(/[^\d]/g, ""));
       count = isLiked ? count - 1 : count + 1;
-
       countSpan.textContent = count >= 1000 ? (count / 1000).toFixed(1) + "K" : count.toString();
+
+      // Trigger heart pulse animation
+      icon.classList.remove("heart-pulse");
+      void icon.offsetWidth; // force reflow
+      icon.classList.add("heart-pulse");
     });
   });
 
-  // Bookmark button toggle
-  const bookmarkButtons = document.querySelectorAll(".ri-bookmark-line, .ri-bookmark-fill");
+  // Bookmark toggle
+  const bookmarkIcons = document.querySelectorAll(".ri-bookmark-line, .ri-bookmark-fill");
 
-  bookmarkButtons.forEach((icon) => {
+  bookmarkIcons.forEach((icon) => {
     icon.parentElement?.addEventListener("click", function () {
       const isFilled = icon.classList.contains("ri-bookmark-fill");
 

@@ -14,18 +14,20 @@
 }
 
 body.page {
-  margin: 0;
+  background: url(./assets/dark_mode.jpg);
+  background-size: cover;
+  background-attachment: fixed;
   min-height: 100vh;
   font-family: system-ui, sans-serif;
-  background: url("./assets/dark_mode.jpg") center/cover fixed var(--bg);
-  color: #fff;
+  color: white;
+  margin: 0;
 }
 
 /*  ====  UTILITIES  ==== */
 .glass {
-  background: var(--glass);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 20px;
 }
 
@@ -272,7 +274,7 @@ body.page {
   margin-left: auto;
 }
 
-.sidebar__heading {
+.sidebar-heading {
   margin: 1rem 1rem .4rem;
   font-size: .9rem;
   font-weight: 600;
@@ -310,6 +312,13 @@ body.page {
 
 /*  ====  CREATE POST  ==== */
 .create-post {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+
   padding: 1rem;
   display: flex;
   flex-direction: column;
@@ -333,6 +342,39 @@ body.page {
   align-items: center;
 }
 
+textarea.create-post-input {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: none;
+  color: white;
+  border-radius: 12px;
+  resize: none;
+  min-height: 60px;
+  padding: 0.75rem;
+  font-size: 0.9rem;
+}
+
+textarea.create-post-input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.create-post-actions .btn {
+  background-color: #8A4FFF;
+  border-radius: 9999px;
+  color: white;
+}
+
+.create-post-actions .icon-btn i {
+  color: white;
+  font-size: 1.1rem;
+  transition: color 0.2s ease;
+}
+
+.create-post-actions .btn:hover {
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.3);
+  background-color: #7644e0;
+  color: #FF6BC4;
+}
+
 .action-group {
   display: flex;
   gap: .45rem;
@@ -340,24 +382,62 @@ body.page {
 
 /*  ====  POST CARD  ==== */
 .post {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   padding: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .post-header {
   display: flex;
   align-items: flex-start;
-  gap: .75rem;
+  gap: 0.75rem;
+}
+
+
+.post-header .user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  line-height: 1.2;
+  font-size: 0.85rem;
+  flex: 1;
+}
+
+.post-header h4 {
+  font-weight: 700;
+  margin: 0;
+  font-size: 1rem;
 }
 
 .post-header time {
-  font-size: .7rem;
-  opacity: .7;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.7rem;
+  opacity: 0.7;
 }
 
 .post-image {
   width: 100%;
   border-radius: 14px;
   margin: .8rem 0;
+}
+
+/* Reaction Icons (like, comment, share, bookmark) */
+
+.post-footer .icon-btn i {
+  color: white;
+  font-size: 1.1rem;
+  transition: color 0.2s ease;
+}
+
+/* Reaction counts */
+.post-footer .icon-btn span {
+  color: white;
+  margin-left: 0.35rem;
+  font-size: 0.9rem;
 }
 
 .post-footer {
@@ -368,7 +448,8 @@ body.page {
 
 .post-actions {
   display: flex;
-  gap: 1rem;
+  gap: 1.25rem;
+  align-items: center;
 }
 
 .post-actions span {
@@ -380,6 +461,29 @@ body.page {
   color: var(--primary);
 }
 
+/* Active state: red like, yellow bookmark */
+.post-footer .icon-btn i.ri-heart-fill {
+  color: red;
+}
+
+.post-footer .icon-btn i.ri-bookmark-fill {
+  color: gold;
+}
+
+/* Comment input */
+.post input[type="text"] {
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  width: 100%;
+}
+
+.post input[type="text"]::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
 /* like animation placeholder */
 .like {
   transition: transform .2s;
@@ -387,6 +491,36 @@ body.page {
 
 .like:hover {
   transform: scale(1.12);
+}
+
+.heart-pulse {
+  animation: heart-pulse 0.4s ease;
+}
+
+@keyframes heart-pulse {
+  0% {
+    transform: scale(1);
+  }
+
+  20% {
+    transform: scale(1.3);
+  }
+
+  40% {
+    transform: scale(0.9);
+  }
+
+  60% {
+    transform: scale(1.2);
+  }
+
+  80% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 /*  ====  RIGHT SIDEBAR  ==== */
@@ -445,6 +579,7 @@ body.page {
   }
 }
 
+/*  ====  MEDIA QUERIES  (LAYOUT HELPERS)  ==== */
 @media (max-width:767px) {
   .search {
     display: none;
