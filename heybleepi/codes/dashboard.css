@@ -419,7 +419,7 @@ textarea.create-post-input::placeholder {
   font-size: 1rem;
 }
 
-.post-header time {
+.post__header time {
   color: rgba(255, 255, 255, 0.7);
   font-size: 0.7rem;
   opacity: 0.7;
