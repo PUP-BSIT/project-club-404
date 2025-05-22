@@ -1,259 +1,259 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HEYBLEEPI! – Social Media Dashboard</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HEYBLEEPI! – Social Media Dashboard</title>
 
-  <link rel="stylesheet" href="./stylesheet/dashboard.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
-</head>
+    <link rel="stylesheet" href="./stylesheet/dashboard.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
+  </head>
 
-<body class="page">
-  <!-- ☰ TOP BAR -->
-  <header class="top-nav glass">
-    <h1 class="brand">HEYBLEEPI</h1>
+  <body class="page">
+    <!-- ☰ TOP BAR -->
+    <header class="top-nav glass">
+      <h1 class="brand">HEYBLEEPI</h1>
 
-    <div class="nav-actions">
-      <!-- Search -->
-      <form class="search">
-        <input class="search-input"
-          type="text"
-          placeholder="Search in space…" />
-        <i class="ri-search-line search-icon"></i>
-      </form>
+      <div class="nav-actions">
+        <!-- Search -->
+        <form class="search">
+          <input class="search-input"
+            type="text"
+            placeholder="Search in space…" />
+          <i class="ri-search-line search-icon"></i>
+        </form>
 
-      <!-- Create Post -->
-      <button class="icon-btn icon-btn--primary" aria-label="Create post">
-        <i class="ri-add-line ri-lg"></i>
-      </button>
-
-      <!-- Notification Wrapper -->
-      <div class="notification-wrapper" id="notification_wrapper">
-        <button class="icon-btn" id="notificationBtn" aria-label="Notifications">
-          <i class="ri-notification-3-line ri-lg"></i>
-          <span class="badge" id="notification_count">3</span>
+        <!-- Create Post -->
+        <button class="icon-btn icon-btn--primary" aria-label="Create post">
+          <i class="ri-add-line ri-lg"></i>
         </button>
 
-        <div class="notification-dropdown" id="notification_dropdown">
-          <h4>Notifications</h4>
-          <ul>
-            <li><strong>John</strong> liked your post.</li>
-            <li><strong>Alice</strong> followed you.</li>
-            <li><strong>Jane</strong> liked your post.</li>
-          </ul>
-          <button class="mark-read" id="markAllReadBtn">Mark all as read</button>
-        </div>
-      </div>
-
-      <!-- Profile -->
-      <img
-        class="avatar avatar--sm"
-        src="./assets/profile/shark.jpg"
-        alt="Profile" />
-    </div>
-  </header>
-
-  <!-- ☰ MAIN LAYOUT -->
-  <main class="layout">
-
-    <!-- LEFT SIDEBAR -->
-    <aside class="sidebar sidebar--left">
-
-      <!-- Profile Card -->
-      <section class="glass card card--profile">
-        <img class="avatar avatar--lg" src="./assets/profile/shark.jpg" alt="" />
-        <h3 class="card-title">Jane Doe</h3>
-        <p class="card-subtitle">@jane_doe</p>
-        <ul class="stats">
-          <li><strong>248</strong><span>Posts</span></li>
-          <li><strong>15.2 K</strong><span>Followers</span></li>
-          <li><strong>1.8 K</strong><span>Following</span></li>
-        </ul>
-      </section>
-
-      <!-- Navigation -->
-      <nav class="glass card nav-list">
-        <a class="nav-item" href="#">
-          <i class="ri-home-4-line"></i>
-          Home
-        </a>
-
-        <a class="nav-item" href="messages.html">
-          <i class="ri-message-3-line"></i>
-          Messages
-        </a>
-
-        <a class="nav-item" href="profile.html">
-          <i class="ri-user-line"></i>
-          Profile
-        </a>
-
-        <a class="nav-item" href="settings.html"> <!-- Link to settings & privacy -->
-          <i class="ri-settings-4-line"></i> <!-- TO DO: DELIMA -->
-          Settings & Privacy
-        </a>
-
-        <a class="nav-item" href="bookmarks.html"> <!-- Link to saved items -->
-          <i class="ri-bookmark-line"></i>
-          Saved
-        </a>
-      </nav>
-    </aside>
-
-    <!-- FEED -->
-    <section class="feed" id="mainFeed">
-
-      <!-- Stories -->
-      <div class="glass stories">
-        <article class="story">
-          <img class="avatar avatar--story"
-          src="./assets/profile/chicken.jpg"
-          alt=""><span>John Doe</span>
-        </article>
-        <!-- repeat if needed -->
-      </div>
-
-      <!-- Create Post -->
-      <div class="glass create-post">
-        <div class="create-post-header">
-          <img class="avatar avatar--sm"
-            src="./assets/profile/shark.jpg"
-            alt="">
-          <div class="poster-info">
-
-            <!-- Link to profile -->
-            <a href="/profile" class="poster-name">Jane Doe</a>
-            <p>@jane_doe</p>
-          </div>
-        </div>
-
-        <textarea class="create-post-input"
-          placeholder="What's happening in your galaxy?">
-        </textarea>
-
-        <div class="create-post-actions">
-          <div class="action-group">
-            <button class="icon-btn"><i class="ri-image-line"></i></button>
-            <button class="icon-btn"><i class="ri-vidicon-line"></i></button>
-            <button class="icon-btn"><i class="ri-emotion-line"></i></button>
-            <button class="icon-btn"><i class="ri-map-pin-line"></i></button>
-          </div>
-          <button class="btn btn--primary" disabled>Post</button>
-        </div>
-      </div>
-
-      <!-- POSTS (example post card) -->
-      <article class="glass post">
-        <header class="post-header">
-          <img class="avatar avatar--sm"
-            src="./assets/profile/chicken.jpg"
-            alt="">
-          <div>
-            <h4>John Doe</h4><time>3h ago</time>
-          </div>
-          <button class="icon-btn"><i class="ri-more-fill"></i></button>
-        </header>
-
-        <p>Artist Adam Lister remixes old art masterpieces
-          into 8-bit watercolours…
-          <span class="tag">#Masterpiece</span>
-        </p>
-
-        <img class="post-image" src="./assets/post/8bit.jpg" alt="8-bit art">
-
-        <footer class="post-footer">
-          <div class="post-actions">
-
-            <button class="icon-btn like">
-              <i class="ri-heart-line"></i>
-              <span>201</span>
-            </button>
-
-            <button class="icon-btn">
-              <i class="ri-chat-1-line"></i>
-              <span>342</span>
-            </button>
-
-            <button class="icon-btn">
-              <i class="ri-share-forward-line"></i>
-              <span>128</span>
-            </button>
-          </div>
-
-          <button class="icon-btn">
-            <i class="ri-bookmark-line"></i>
+        <!-- Notification Wrapper -->
+        <div class="notification-wrapper" id="notification_wrapper">
+          <button class="icon-btn" id="notificationBtn" aria-label="Notifications">
+            <i class="ri-notification-3-line ri-lg"></i>
+            <span class="badge" id="notification_count">3</span>
           </button>
 
-        </footer>
-      </article>
-    </section>
+          <div class="notification-dropdown" id="notification_dropdown">
+            <h4>Notifications</h4>
+            <ul>
+              <li><strong>John</strong> liked your post.</li>
+              <li><strong>Alice</strong> followed you.</li>
+              <li><strong>Jane</strong> liked your post.</li>
+            </ul>
+            <button class="mark-read" id="markAllReadBtn">Mark all as read</button>
+          </div>
+        </div>
 
-    <!-- RIGHT SIDEBAR -->
-    <aside class="sidebar sidebar--right">
+        <!-- Profile -->
+        <img
+          class="avatar avatar--sm"
+          src="./assets/profile/shark.jpg"
+          alt="Profile" />
+      </div>
+    </header>
 
-      <!-- Suggested Friends -->
-      <section class="glass card">
-        <h3 class="card-title">Suggested Connections</h3>
-        <ul class="suggestions" id="suggestion_list">
+    <!-- ☰ MAIN LAYOUT -->
+    <main class="layout">
 
+      <!-- LEFT SIDEBAR -->
+      <aside class="sidebar sidebar--left">
 
-          <!-- Initial Visible Users -->
-          <li class="suggestion">
-            <img class="avatar avatar--sm" src="./assets/profile/chick.jpg" alt="">
-            <div class="user-meta">
-              <h4>Mingyu</h4>
-              <p>Rapper</p>
+        <!-- Profile Card -->
+        <section class="glass card card--profile">
+          <img class="avatar avatar--lg" src="./assets/profile/shark.jpg" alt="" />
+          <h3 class="card-title">Jane Doe</h3>
+          <p class="card-subtitle">@jane_doe</p>
+          <ul class="stats">
+            <li><strong>248</strong><span>Posts</span></li>
+            <li><strong>15.2 K</strong><span>Followers</span></li>
+            <li><strong>1.8 K</strong><span>Following</span></li>
+          </ul>
+        </section>
+
+        <!-- Navigation -->
+        <nav class="glass card nav-list">
+          <a class="nav-item" href="#">
+            <i class="ri-home-4-line"></i>
+            Home
+          </a>
+
+          <a class="nav-item" href="messages.html">
+            <i class="ri-message-3-line"></i>
+            Messages
+          </a>
+
+          <a class="nav-item" href="profile.html">
+            <i class="ri-user-line"></i>
+            Profile
+          </a>
+
+          <a class="nav-item" href="settings.html"> <!-- Link to settings & privacy -->
+            <i class="ri-settings-4-line"></i> <!-- TO DO: DELIMA -->
+            Settings & Privacy
+          </a>
+
+          <a class="nav-item" href="bookmarks.html"> <!-- Link to saved items -->
+            <i class="ri-bookmark-line"></i>
+            Saved
+          </a>
+        </nav>
+      </aside>
+
+      <!-- FEED -->
+      <section class="feed" id="mainFeed">
+
+        <!-- Stories -->
+        <div class="glass stories">
+          <article class="story">
+            <img class="avatar avatar--story"
+            src="./assets/profile/chicken.jpg"
+            alt=""><span>John Doe</span>
+          </article>
+          <!-- repeat if needed -->
+        </div>
+
+        <!-- Create Post -->
+        <div class="glass create-post">
+          <div class="create-post-header">
+            <img class="avatar avatar--sm"
+              src="./assets/profile/shark.jpg"
+              alt="">
+            <div class="poster-info">
+
+              <!-- Link to profile -->
+              <a href="/profile" class="poster-name">Jane Doe</a>
+              <p>@jane_doe</p>
             </div>
-            <button class="btn btn--primary btn--sm">Connect</button>
-          </li>
+          </div>
 
-          <li class="suggestion">
-            <img class="avatar avatar--sm" src="assets/profile/cat.jpg" alt="">
-            <div class="user-meta">
-              <h4>Hoshi</h4>
-              <p>RAWRRRRRR</p>
+          <textarea class="create-post-input"
+            placeholder="What's happening in your galaxy?">
+          </textarea>
+
+          <div class="create-post-actions">
+            <div class="action-group">
+              <button class="icon-btn"><i class="ri-image-line"></i></button>
+              <button class="icon-btn"><i class="ri-vidicon-line"></i></button>
+              <button class="icon-btn"><i class="ri-emotion-line"></i></button>
+              <button class="icon-btn"><i class="ri-map-pin-line"></i></button>
             </div>
-            <button class="btn btn--primary btn--sm">Connect</button>
-          </li>
+            <button class="btn btn--primary" disabled>Post</button>
+          </div>
+        </div>
 
-          <!-- Hidden Initially -->
-          <li class="suggestion hidden">
-            <img class="avatar avatar--sm" src="./assets/profile/penguin.jpg" alt="">
-            <div class="user-meta">
-              <h4>Yasmin</h4>
-              <p>Developer</p>
+        <!-- POSTS (example post card) -->
+        <article class="glass post">
+          <header class="post-header">
+            <img class="avatar avatar--sm"
+              src="./assets/profile/chicken.jpg"
+              alt="">
+            <div>
+              <h4>John Doe</h4><time>3h ago</time>
             </div>
-            <button class="btn btn--primary btn--sm">Connect</button>
-          </li>
+            <button class="icon-btn"><i class="ri-more-fill"></i></button>
+          </header>
 
-          <li class="suggestion hidden">
-            <img class="avatar avatar--sm" src="./assets/profile/frog.jpg" alt="">
-            <div class="user-meta">
-              <h4>Ken</h4>
-              <p>Artist</p>
+          <p>Artist Adam Lister remixes old art masterpieces
+            into 8-bit watercolours…
+            <span class="tag">#Masterpiece</span>
+          </p>
+
+          <img class="post-image" src="./assets/post/8bit.jpg" alt="8-bit art">
+
+          <footer class="post-footer">
+            <div class="post-actions">
+
+              <button class="icon-btn like">
+                <i class="ri-heart-line"></i>
+                <span>201</span>
+              </button>
+
+              <button class="icon-btn">
+                <i class="ri-chat-1-line"></i>
+                <span>342</span>
+              </button>
+
+              <button class="icon-btn">
+                <i class="ri-share-forward-line"></i>
+                <span>128</span>
+              </button>
             </div>
-            <button class="btn btn--primary btn--sm">Connect</button>
-          </li>
-        </ul>
 
-        <button class="see-more" id="seeMoreBtn">See More</button>
+            <button class="icon-btn">
+              <i class="ri-bookmark-line"></i>
+            </button>
+
+          </footer>
+        </article>
       </section>
-    </aside>
-  </main>
 
-  <!-- ☰ MOBILE NAV -->
-  <nav class="mobile-nav">
-    <a class="mobile-link mobile-link--active" href="#"><i class="ri-home-4-fill"></i><span>Home</span></a>
-    <a class="mobile-link" href="#"><i class="ri-compass-3-line"></i><span>Explore</span></a>
-    <a class="mobile-link" href="#"><i class="ri-message-3-line"></i><span>Messages</span></a>
-    <a class="mobile-link" href="#"><i class="ri-notification-3-line"></i><span>Alerts</span></a>
-    <a class="mobile-link" href="#"><i class="ri-user-line"></i><span>Profile</span></a>
-  </nav>
+      <!-- RIGHT SIDEBAR -->
+      <aside class="sidebar sidebar--right">
 
-  <script src="./script/dashboard.js"></script>
-</body>
+        <!-- Suggested Friends -->
+        <section class="glass card">
+          <h3 class="card-title">Suggested Connections</h3>
+          <ul class="suggestions" id="suggestion_list">
+
+
+            <!-- Initial Visible Users -->
+            <li class="suggestion">
+              <img class="avatar avatar--sm" src="./assets/profile/chick.jpg" alt="">
+              <div class="user-meta">
+                <h4>Mingyu</h4>
+                <p>Rapper</p>
+              </div>
+              <button class="btn btn--primary btn--sm">Connect</button>
+            </li>
+
+            <li class="suggestion">
+              <img class="avatar avatar--sm" src="assets/profile/cat.jpg" alt="">
+              <div class="user-meta">
+                <h4>Hoshi</h4>
+                <p>RAWRRRRRR</p>
+              </div>
+              <button class="btn btn--primary btn--sm">Connect</button>
+            </li>
+
+            <!-- Hidden Initially -->
+            <li class="suggestion hidden">
+              <img class="avatar avatar--sm" src="./assets/profile/penguin.jpg" alt="">
+              <div class="user-meta">
+                <h4>Yasmin</h4>
+                <p>Developer</p>
+              </div>
+              <button class="btn btn--primary btn--sm">Connect</button>
+            </li>
+
+            <li class="suggestion hidden">
+              <img class="avatar avatar--sm" src="./assets/profile/frog.jpg" alt="">
+              <div class="user-meta">
+                <h4>Ken</h4>
+                <p>Artist</p>
+              </div>
+              <button class="btn btn--primary btn--sm">Connect</button>
+            </li>
+          </ul>
+
+          <button class="see-more" id="seeMoreBtn">See More</button>
+        </section>
+      </aside>
+    </main>
+
+    <!-- ☰ MOBILE NAV -->
+    <nav class="mobile-nav">
+      <a class="mobile-link mobile-link--active" href="#"><i class="ri-home-4-fill"></i><span>Home</span></a>
+      <a class="mobile-link" href="#"><i class="ri-compass-3-line"></i><span>Explore</span></a>
+      <a class="mobile-link" href="#"><i class="ri-message-3-line"></i><span>Messages</span></a>
+      <a class="mobile-link" href="#"><i class="ri-notification-3-line"></i><span>Alerts</span></a>
+      <a class="mobile-link" href="#"><i class="ri-user-line"></i><span>Profile</span></a>
+    </nav>
+
+    <script src="./script/dashboard.js"></script>
+  </body>
 </html>

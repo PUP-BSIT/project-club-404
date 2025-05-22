@@ -457,20 +457,27 @@ body.page {
 }
 
 .create-post-input {
-  flex: 1;
-  min-height: 60px;
+  width: 100%;
+  min-height: 80px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 0.75rem;
+  color: white;
+  font-size: 0.95rem;
   resize: none;
-  border: none;
-  border-radius: 12px;
-  padding: .75rem;
-  background: rgba(255, 255, 255, .07);
-  color: #fff;
+  transition: border 0.2s, box-shadow 0.2s;
 }
 
 .create-post-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.create-post-input:focus {
+  outline: none;
+  border-color: white;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.4);
 }
 
 textarea.create-post-input {
@@ -893,8 +900,8 @@ textarea:focus {
 }
 
 .profile-avatar {
-  width: 120px;
-  height: 120px;
+  width: 150px;
+  height: 150px;
   border-radius: 9999px;
   object-fit: cover;
   border: 3px solid rgba(255, 255, 255, 0.3);
