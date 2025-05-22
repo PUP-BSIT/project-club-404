@@ -15,7 +15,7 @@
 
 body.page {
   /*background: linear-gradient(135deg, #8A4FFF 0%, #FF6BC4 100%);*/
-  background: url(assets/dark_mode.jpg);
+  background: url(../assets/dark_mode.jpg);
   background-size: cover;
   background-attachment: fixed;
   min-height: 100vh;
@@ -149,7 +149,7 @@ body.page {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem;
+  gap: 1rem;
   position: relative;
   justify-content: flex-end;
   flex: 1;
@@ -251,14 +251,31 @@ body.page {
   display: none;
 }
 
+.icon-btn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
 .icon-btn i {
   color: white;
   transition: color 0.3s ease;
+  font-size: 1.8rem;
 }
 
 /* badge color*/
 .icon-btn:hover i {
   color: white;
+}
+
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 /* Mark read button */
@@ -325,7 +342,8 @@ body.page {
 
 /*  ====  LEFT SIDEBAR  ==== */
 .card {
-  padding: 1rem;
+  padding: 1rem 1.25rem;
+  border-radius: 20px;
 }
 
 .card--profile {
@@ -333,8 +351,10 @@ body.page {
 }
 
 .card-title {
-  margin: .5rem 0 0;
+  margin: 0 0 1rem;
+  font-size: 1rem;
   font-weight: 700;
+  color: white;
 }
 
 .card-subtitle {
@@ -690,6 +710,25 @@ textarea.create-post-input::placeholder {
   transition: opacity 0.3s ease, max-height 0.3s ease;
 }
 
+.user-meta {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.suggestion h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.suggestion p {
+  margin: 0.1rem 0 0;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.2;
+}
+
 .suggestion>.btn {
   margin-left: auto;
 }
@@ -766,12 +805,31 @@ textarea.create-post-input::placeholder {
     display: flex;
     width: 220px;
   }
+
+  .profile-avatar {
+    width: 90px;
+    height: 90px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .photo-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (min-width:1024px) {
   .sidebar--right {
     display: flex;
     width: 260px;
+  }
+
+  .profile-main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .photo-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -792,4 +850,198 @@ input:focus,
 textarea:focus {
   outline: none;
   border-color: rgba(255, 255, 255, 0.5);
+}
+
+/*  ====  PROFILE DASHBOARD ==== */
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  box-sizing: border-box;
+}
+
+.profile-info-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: -40px;
+  padding: 1.5rem 1rem;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  border-radius: 0 0 10px 10px;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.profile-main-grid {
+  display: grid;
+  grid-template-columns: 25% 75%;
+  gap: 2rem;
+  margin-top: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.profile-tabs {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.profile-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 9999px;
+  object-fit: cover;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+/* ==== USER ==== */
+.user-name {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.user-handle {
+  margin: 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.user-bio {
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.user-profile-info h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: white;
+  font-weight: bold;
+}
+
+.user-basic-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: white;
+  gap: 0.25rem;
+}
+
+.user-basic-info p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/*  ====  COVER PHOTO ==== */
+.banner-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+/*  ====  PROFILE STATUS ==== */
+.profile-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+
+.profile-buttons .btn {
+  padding: 0.6rem 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-radius: 9999px;
+}
+
+.tab {
+  color: white;
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+.tab.active {
+  font-weight: bold;
+  border-bottom: 2px solid #FF6BC4;
+}
+
+/* ==== LEFT COLUMN ==== */
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.photo-grid img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.photos-card {
+  padding: 1rem;
+  max-width: 100%;
+}
+
+.photos-card .card-title {
+  margin-bottom: 0.6rem;
+}
+
+.left-column .card,
+.right-column .post {
+  margin-bottom: 1rem;
+}
+
+.create-post textarea {
+  width: 100%;
+  height: 80px;
+  background: transparent;
+  border: none;
+  color: white;
+  resize: none;
+  font-size: 0.9rem;
+}
+
+.create-post .post-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
+
+/*  ====  PROFILE BUTTONS ==== */
+.btn {
+  padding: 0.4rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border: none;
+}
+
+.btn--primary {
+  background-color: #8A4FFF;
+  color: white;
+}
+
+.btn--primary:hover {
+  background-color: #7644e0;
+}
+
+.btn--secondary {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn--secondary:hover {
+  background-color: rgba(255, 255, 255, 0.15);
 }

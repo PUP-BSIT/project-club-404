@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Suggestions "See More" button
   const seeMoreBtn = document.getElementById("seeMoreBtn");
-  const suggestionList = document.getElementById("suggestionList");
+  const suggestionList = document.getElementById("suggestion_list");
 
   if (seeMoreBtn && suggestionList) {
     const allSuggestions = Array.from(suggestionList.querySelectorAll(".suggestion"));
