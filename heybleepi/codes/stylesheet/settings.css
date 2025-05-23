@@ -24,7 +24,7 @@ body {
 
 #navigation h3 {
   font-family: 'Pacifico', cursive;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   color: white;
   margin: 0;
 }
@@ -38,7 +38,7 @@ body {
   border-radius: 10px;
   padding: 0.5rem 1rem;
   margin: 5px 0;
-}
+} 
 
 #buttons_container button {
   background-color: transparent;
@@ -84,7 +84,7 @@ body {
   padding: 2rem;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  height: 80vh;
+  height: 120vh;
 }
 
 #account_information_container {
@@ -92,9 +92,10 @@ body {
   flex-direction: column;
   width: 100%;
   max-width: 600px;
-  margin: 0 auto;
+  margin: 100px auto;
   align-items: center;
   gap: 1rem;
+  padding-top: 1em;
 }
 
 #account_information_container form {
@@ -166,7 +167,6 @@ body {
   color: rgb(255, 255, 255);
   font-weight: bold;
   cursor: pointer;
-  margin-left: 90px;
 }
 
 #account_information_container input:focus {
@@ -264,6 +264,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding-bottom: 8em;
 }
 
 #privacy_settings_container form {
@@ -286,6 +287,9 @@ body {
 #privacy_settings_container #change_password_btn {
   margin-top: 20px;
   background-color: #4CAF50;
+  border: none;
+  border-radius: 9999px;
+  padding: 10px;
   color: white;
   cursor: pointer;
 }
@@ -312,6 +316,9 @@ body {
   background-color: #f44336;
   color: white;
   cursor: pointer;
+  border: none;
+  border-radius: 9999px;
+  padding: 10px;
 }
 
 #delete_account_btn:hover {
@@ -327,9 +334,14 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-left: 0px;
+    padding: 0;
     gap: 0;
     width: 100vw;
+  }
+
+  #navigation h3 {
+    margin: 1em 0;
+    font-size: 1.2rem;
   }
 
   #buttons_container {
@@ -340,8 +352,10 @@ body {
 
   #section {
     margin: 0;
-    margin-top: 10px;
-    height: 100vh;
+    margin-top: 20px;
+    height: 151vh;
+    width: 100vw;
+    padding: 1em 1em 9em 1em;
   }
 
   #account_information_container {
@@ -349,6 +363,11 @@ body {
     flex-direction: column;
     flex-wrap: wrap;
     align-items: flex-start;
+    margin-top: 10px;
+  }
+
+  #account_information_container h2, p {
+    text-align: center;
   }
 
   #account_information_container form {
@@ -356,6 +375,9 @@ body {
     display: flex;
     flex-direction: column;
     gap: 5px;
+    margin-left: 0px;
+    width: 86vw;
+    padding: 5px;
   }
 
   #account_information_container input {
@@ -364,7 +386,8 @@ body {
 
   #account_information_container #save_btn {
     margin-top: 20px;
-    width: 30vw;
+    margin-left: 4em;
+    width: 50vw;
   }
 
   #first_name {
@@ -393,6 +416,7 @@ body {
 
   #privacy_settings_container {
     align-items: flex-start;
+    padding-bottom: 9em;
   }
 
   #privacy_settings_container form {
@@ -400,10 +424,39 @@ body {
     flex-direction: column;
     align-items: flex-start;
     gap: 1em;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
   }
 
   #privacy_settings_container form input {
-    width: 21vw;
+    width: 16vw;
+  }
+
+  #privacy_settings_container 
+  #change_password_btn
+  {
+    margin-left: 60px;
+    width: 45vw;
+  }
+
+  #delete_account_btn {
+    margin-left: 70px;
+    width: 45vw;
+  }
+
+  #old_password {
+   margin-left: 80px;
+  }
+
+  #new_password {
+    margin-left: 75px;
+  }
+
+  #confirm_new_password {
+    margin-left: 15px;
   }
 }
 
@@ -415,9 +468,15 @@ body {
     padding-left: 0px;
     gap: 0;
     width: 100vw;
+    padding: 0;
   }
 
-  #buttons_container {
+  #navigation h3 {
+    margin: 1em 0;
+    font-size: 1.2rem;
+  }
+
+   #buttons_container {
     flex-direction: column;
     width: 94vw;
     padding: 5px;
@@ -426,14 +485,20 @@ body {
   #section {
     margin: 0;
     margin-top: 10px;
-    height: 100vh;
+    height: 151vh;
+    width: 100vw;
+    padding: 0 1em 6em 1em;
   }
 
   #account_information_container {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
-    align-items: flex-start;
+    align-items: center;
+  }
+
+  #account_information_container h2, p {
+    text-align: center;
   }
 
   #account_information_container form {
@@ -441,6 +506,9 @@ body {
     display: flex;
     flex-direction: column;
     gap: 5px;
+    margin-left: 0px;
+    width: 86vw;
+    padding: 5px;
   }
 
   #account_information_container input {
@@ -449,35 +517,36 @@ body {
 
   #account_information_container #save_btn {
     margin-top: 20px;
-    width: 30vw;
+    width: 40vw;
   }
 
   #first_name {
-    margin-left: 50px;
+    margin-left: 30px;
   }
 
   #middle_name {
-    margin-left: 33px;
+    margin-left: 16px;
   }
 
   #last_name {
-    margin-left: 50px;
+    margin-left: 33px;
   }
 
   #username {
-    margin-left: 55px;
+    margin-left: 38px;
   }
 
   #email {
-    margin-left: 90px;
+    margin-left: 68px;
   }
 
   #birthdate {
-    margin-left: 65px;
+    margin-left: 45px;
   }
 
   #privacy_settings_container {
     align-items: flex-start;
+    padding-bottom: 6em;
   }
 
   #privacy_settings_container form {
@@ -485,18 +554,25 @@ body {
     flex-direction: column;
     align-items: flex-start;
     gap: 1em;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
   }
 
   #privacy_settings_container form input {
-    width: 30vw;
+    width: 25vw;
   }
 
   #privacy_settings_container #change_password_btn {
-    margin-left: 30px;
+    margin-left: 70px;
+    width: 45vw;
   }
 
   #delete_account_btn {
-    margin-left: 30px;
+    margin-left: 85px;
+    width: 45vw;
   }
 }
 
@@ -506,14 +582,28 @@ body {
     top: 0;
     overflow: hidden;
     padding-left: 50px;
-    gap: 1rem;
+    gap: 2rem;
     flex-direction: column;
     align-items: flex-start;
+    z-index: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  #navigation h3 {
+    margin: 1em 0;
+    font-size: 1rem;
+  }
+
+  #buttons_container {
+    gap: 0;
+   align-content: center;
   }
 
   #section {
-    margin: 10px 60px;
-    height: 90vh;
+    margin: 10px 40px;
+    height: 130vh;
     padding: 1rem;
   }
 
@@ -522,16 +612,80 @@ body {
     justify-content: flex-start;
     width: 100%;
   }
+
+  #account_information_container #save_btn {
+    margin-left: 156px;
+  }
+
+  #privacy_settings_container {
+    padding-bottom: 9em;
+  }
+
+  #privacy_settings_container form {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+  }
 }
 
 @media (min-width: 769px) and (max-width: 1024px) {
   #navigation {
-    gap: 300px;
+    gap: 200px;
+  }
+
+  #navigation h3 {
+    margin: 1em 0;
+    font-size: 1.2rem;
+  } 
+
+  #section {
+    margin: 10px 51px;
+    height: 130vh;
+    padding-bottom: 4rem;
+  }
+
+  #account_information_container #save_btn {
+    margin-left: 155px;
+  }
+
+  #privacy_settings_container {
+    padding-bottom: 8em;
+  }
+
+  #privacy_settings_container form {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
   }
 }
 
 @media (min-width: 1025px) {
   #navigation {
-    gap: 600px;
+    gap: 500px;
+  }
+
+  #account_information_container #save_btn {
+    margin-left: 150px;
+  }
+
+  #privacy_settings_container form {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
   }
 }
