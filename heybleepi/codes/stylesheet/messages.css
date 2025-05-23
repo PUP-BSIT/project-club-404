@@ -4,74 +4,176 @@
 
 body {
   font-family: "Quicksand", sans-serif;
-  background: url(../assets/message-background.jpg);
+  background: url(../assets/dark_mode.jpg);
   background-size: cover;
   background-position: center;
-  background-repeat: no-repeat;
-  margin: 80px;
-  padding: 0;
+  background-attachment: fixed;
+  margin: 0;
+  padding: 2rem;
+  color: white;
 }
 
-.container {
-  border-radius: 1rem;
-  width: 100%;
-  max-width: 800px;
-  margin: 80px auto 10px auto;
-  margin-bottom: 10px;
-  overflow: hidden;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-  background: rgba(255, 255, 255, 0.1);
+/* TOP NAVIGATION BAR */
+.top-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  z-index: 1000;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.brand {
+  font-family: 'Pacifico', cursive;
+  font-size: 1.5rem;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.icon-btn {
+  display: flex;
+  align-items: center;
   justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 0.5rem;
+  width: 40px;
+  height: 40px;
+  color: white;
+  transition: background 0.2s;
+  position: relative;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background-color: #ef4444;
+  color: white;
+  border-radius: 9999px;
+  padding: 2px 6px;
+  font-size: 0.75rem;
+}
+
+.notification-wrapper {
+  position: relative;
+}
+
+.notification-dropdown {
+  position: absolute;
+  top: 110%;
+  right: 0;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 1rem;
+  border-radius: 8px;
+  display: none;
+  width: 250px;
+}
+
+.notification-wrapper:hover .notification-dropdown {
+  display: block;
+}
+
+.mark-read {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #a78bfa;
+  color: white;
+  border: none;
+  border-radius: 9999px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-size: 0.875rem;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.mark-read:hover {
+  background-color: #8b5cf6;
+}
+
+/* Main Container */
+.container {
+  max-width: 600px;
+  margin: 120px auto 40px auto;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.container h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.75rem;
+  color: #fff;
 }
 
 h2 {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 1.5rem;
   margin-top: 40px;
-  font-size: 2.2rem;
-  font-weight: 800;
-  letter-spacing: 2px;
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 3px;
   color: #fff;
-  text-shadow: 0 2px 8px rgba(138, 111, 223, 0.25);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   font-family: "Quicksand", sans-serif;
-  /* background: linear-gradient(90deg, #8a6fdf 30%, #ff9ee5 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-    -webkit-text-fill-color: transparent; */
   padding: 0.5rem 0;
   border-radius: 12px;
-  letter-spacing: 3px;
+  text-align: center;
 }
 
 form {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 1rem;
 }
 
 form textarea {
   font-family: "Quicksand", sans-serif;
-  width: 93%;
+  width: 100%;
+  height: 120px;
   min-width: 0;
-  max-width: 93%;
-  padding: 0.75rem 1rem 0.75rem 1rem;
+  max-width: 100%;
+  padding: 0.75rem 1rem;
   margin: 10px 0 16px 0;
-  border-radius: 8px;
-  border: 1px solid rgba(138, 111, 223, 0.18);
+  margin-bottom: 1rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   font-size: 1rem;
-  background: linear-gradient(135deg, #f3e8ff 0%, #e1bee7 100%);
-  color: #4a148c;
+  background: rgba(255, 255, 255, 0.07);
+  color: white;
   outline: none;
   resize: none;
 }
 
 form textarea::placeholder {
-  color: #8a6fdf;
+  color: rgba(255, 255, 255, 0.6);
   opacity: 1;
   font-style: italic;
   letter-spacing: 1px;
@@ -80,19 +182,22 @@ form textarea::placeholder {
 form button {
   width: 100%;
   max-width: 200px;
-  padding: 1.2rem 1rem;
+  padding: 0.75rem 1.5rem;
   font-size: 1rem;
   font-weight: 500;
   background-image: linear-gradient(to right, #8a6fdf);
+  background-color: #8A4FFF;
   border: none;
   color: white;
-  border-radius: 10px;
+  border-radius: 9999px;
   cursor: pointer;
   transition: opacity 0.3s ease;
   margin-bottom: 20px;
   letter-spacing: 1px;
   text-align: center;
   font-family: "Quicksand", sans-serif;
+  transition: background 0.2s;
+  align-self: center;
 }
 
 form button:hover {
@@ -101,22 +206,29 @@ form button:hover {
   box-shadow: 0 4px 16px rgba(138, 111, 223, 0.18);
 }
 
+form button:hover,
+.button-row button:hover {
+  background-color: #7644e0;
+}
+
 .comment-box {
-  margin-top: 20px;
-  padding: 24px 20px;
+  margin-top: 2rem;
+  padding: 1rem;
   background-color: rgba(138, 111, 223, 0.18);
-  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
   box-shadow: 0 4px 24px rgba(138, 111, 223, 0.1);
   backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(138, 111, 223, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .comment {
   background: linear-gradient(90deg, #f3e8ff 0%, #ffe0f7 100%);
   border-left: 5px solid #8a6fdf;
-  padding: 16px 16px 12px 20px;
-  margin-bottom: 16px;
+  border-radius: 16px 16px 16px 4px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  color: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(138, 111, 223, 0.08);
   transition: box-shadow 0.2s;
@@ -129,6 +241,7 @@ form button:hover {
 .comment strong {
   color: #8a6fdf;
 }
+
 .comment small {
   color: #b47ac7;
   font-size: 0.8em;
@@ -153,12 +266,99 @@ form button:hover {
   margin-left: 3px;
 }
 
+/* Message Preview*/
+.message-preview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.07);
+  margin-bottom: 0.75rem;
+  transition: background 0.2s, transform 0.2s;
+  color: white;
+}
+
+.message-preview:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
+  cursor: pointer;
+}
+
+.preview-text {
+  flex: 1;
+  margin-left: 0.75rem;
+  overflow: hidden;
+}
+
+.preview-text h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+}
+
+.preview-text p {
+  margin: 2px 0 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.timestamp {
+  font-size: 0.90rem;
+  color: #facc15;
+  font-weight: 500;
+  margin-left: 0.5rem;
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.avatar {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.avatar--sm {
+  width: 48px;
+  height: 48px;
+}
+
+.avatar--lg {
+  width: 64px;
+  height: 64px;
+}
+
 .button-row {
   display: flex;
   gap: 10px;
   width: 93%;
   justify-content: center;
   margin-bottom: 20px;
+}
+
+/* Messagge reaction */
+.message-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.message-actions button {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  padding: 0.5rem;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.message-actions button:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .button-row button,
