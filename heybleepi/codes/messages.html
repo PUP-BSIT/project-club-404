@@ -21,7 +21,33 @@
     <link rel="stylesheet" href="./stylesheet/messages.css" />
   </head>
 
-  <body>
+  <body class="page">
+    <!-- TOP NAVIGATION BAR -->
+    <header class="top-nav glass">
+      <h1 class="brand">HEYBLEEPI</h1>
+      <nav class="nav-actions">
+        <a class="icon-btn" href="dashboard.html" title="Home"><i class="ri-home-4-line"></i></a>
+        <a class="icon-btn" href="messages.html" title="Messages"><i class="ri-message-3-line"></i></a>
+
+        <div class="notification-wrapper" id="notificationWrapper">
+          <button class="icon-btn" id="notificationBtn" aria-label="Notifications">
+            <i class="ri-notification-3-line"></i>
+            <span class="badge" id="notificationCount">3</span>
+          </button>
+          <div class="notification-dropdown hidden" id="notificationDropdown">
+            <h4>Notifications</h4>
+            <ul>
+              <li><strong>John</strong> liked your post.</li>
+              <li><strong>Alice</strong> followed you.</li>
+              <li><strong>Jane</strong> commented.</li>
+            </ul>
+            <button class="mark-read" id="markAllReadBtn">Mark all as read</button>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!--  MESSAGE CONTAINER -->
     <div class="container">
       <h2>Messages</h2>
       <form method="POST" id="commentForm">
@@ -35,6 +61,22 @@
         <button type="submit">Add Message</button>
       </form>
     </div>
+
+    <div class="message-preview">
+      <img src="./assets/profile/chick.jpg" class="avatar avatar--sm" />
+      <div class="preview-text">
+        <h4>John Doe</h4>
+        <p>Hey, are you free to hang out?</p>
+      </div>
+      <span class="timestamp">2m ago</span>
+    </div>
+
+    <div class="message-actions">
+      <button><i class="ri-emotion-line"></i></button>
+      <button><i class="ri-image-line"></i></button>
+      <button><i class="ri-attachment-line"></i></button>
+    </div>
+
     <script src="./script/messages.js"></script>
   </body>
 </html>
