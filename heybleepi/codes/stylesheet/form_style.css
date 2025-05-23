@@ -68,7 +68,7 @@ body {
 
 .description {
   margin-top: 1.5rem;
-  color: #311862;
+  color: white;
 }
 
 /* Right panel heading*/
@@ -236,6 +236,10 @@ body {
 
 .agreement-text .link:hover {
   text-decoration: underline;
+}
+
+a.link {
+  color: white;
 }
 
 /* Divider styling */
@@ -410,19 +414,34 @@ input:checked+.toggle-slider:before {
 }
 
 /* Social Buttons */
-.auth-social {
+.social-connection {
+  margin-top: 1rem;
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding: 0.5rem;
-  background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  transition: background-color 0.3s ease;
+  gap: 1rem;
 }
 
-.auth-social:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+.account-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-weight: 500;
+}
+
+.account-btn img {
+  width: 20px;
+  height: 20px;
+}
+
+.account-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* Link styling */
