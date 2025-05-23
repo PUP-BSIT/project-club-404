@@ -100,13 +100,19 @@ let privacySettingsHTML = `<div id="privacy_settings_container">
                             </button>
                           </div>`
 let section = document.querySelector('#section'); 
+let accountInformationBtn = document.querySelector('#acct_info_btn');
+let privacySettingsBtn = document.querySelector('#privacy_btn');
 
 function switchToAccountInformation() {
   section.innerHTML = accountInformationHTML;
+  accountInformationBtn.disabled = true;
+  privacySettingsBtn.disabled = false;
 }
 
 function switchToPrivacySettings() {
   section.innerHTML = privacySettingsHTML;
+  accountInformationBtn.disabled = false;
+  privacySettingsBtn.disabled = true;
 }
 
 
