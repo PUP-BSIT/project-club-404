@@ -1,63 +1,78 @@
 let accountInformationHTML = `<div id="account_information_container">
                                 <h2>Account Information</h2>
-                                <p>Here you can view and edit your account information.</p>
+                                <p>Here you can view and edit your account 
+                                  information.</p>
                                 <form>
                                   <div>
                                     <label for="first_name">First Name</label>
-                                    <input 
-                                      type="text" 
+                                    <input
+                                      type="text"
                                       placeholder="First Name"
                                       id="first_name">
                                   </div>
 
                                   <div>
                                     <label>Middle Name</label>
-                                    <input 
-                                      type="text" 
+                                    <input
+                                      type="text"
                                       placeholder="Middle Name"
                                       id="middle_name">
                                   </div>
 
                                   <div>
                                     <label>Last Name</label>
-                                    <input 
-                                      type="text" 
+                                    <input
+                                      type="text"
                                       placeholder="Last Name"
                                       id="last_name">
                                   </div>
 
                                   <div>
                                     <label>Username</label>
-                                    <input 
-                                      type="text" 
+                                    <input
+                                      type="text"
                                       placeholder="Username"
                                       id="username">
                                   </div>
 
                                   <div>
                                     <label>Email</label>
-                                    <input 
-                                      type="email" 
+                                    <input
+                                      type="email"
                                       placeholder="Email"
                                       id="email">
                                   </div>
-                                  
+
                                   <div>
                                     <label>Birthdate</label>
-                                    <input 
-                                      type="text" 
+                                    <input
+                                      type="text"
                                       placeholder="Birthdate"
                                       id="birthdate">
                                   </div>
 
-                                  <button 
+                                  <button
                                     type="button"
-                                    id="save_btn">Save Changes</button>
+                                    id="save_btn">
+                                      Save Changes
+                                  </button>
                                 </form>
                                 <div id="connected_accts_container">
-                                  <label id="connected_accts">
-                                    Connected Accounts
-                                  </label>  
+                                  <h4>Connected Accounts</h4>
+                                  <div class="account-buttons">
+                                    <button class="account-btn">
+                                      <img 
+                                        src="./assets/connected_accounts/devhive.jpg" 
+                                        alt="devhive">
+                                          Connect to Devhive
+                                    </button>
+                                    <button class="account-btn">
+                                      <img 
+                                        src="./assets/connected_accounts/hershell.png" 
+                                        alt="hershell">
+                                          Connect to Hershell
+                                    </button>
+                                  </div>
                                 </div>
                               </div>`
 let privacySettingsHTML = `<div id="privacy_settings_container">
