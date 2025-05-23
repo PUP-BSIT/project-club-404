@@ -4,7 +4,7 @@
 
 body {
   font-family: "Quicksand", sans-serif;
-  background: url(./assets/message-background.jpg);
+  background: url(../assets/message-background.jpg);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -38,11 +38,11 @@ h2 {
   color: #fff;
   text-shadow: 0 2px 8px rgba(138, 111, 223, 0.25);
   font-family: "Quicksand", sans-serif;
-  background: linear-gradient(90deg, #8a6fdf 30%, #ff9ee5 100%);
+  /* background: linear-gradient(90deg, #8a6fdf 30%, #ff9ee5 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-    -webkit-text-fill-color: transparent;
+    -webkit-text-fill-color: transparent; */
   padding: 0.5rem 0;
   border-radius: 12px;
   letter-spacing: 3px;
@@ -192,4 +192,58 @@ form button:hover {
   background-image: linear-gradient(to right, #8a6fdf);
   color: white;
   border: 1px solid #8a6fdf;
+}
+
+@media (max-width: 600px) {
+  body {
+    margin: 8px;
+  }
+
+  .container {
+    max-width: 100vw;
+    margin: 24px auto 8px auto;
+    padding: 0 2vw;
+  }
+
+  h2 {
+    font-size: 1.3rem;
+    margin-top: 18px;
+    margin-bottom: 18px;
+    padding: 0.3rem 0;
+    letter-spacing: 1.5px;
+  }
+
+  form textarea {
+    width: 100%;
+    max-width: 100%;
+    font-size: 0.98rem;
+    padding: 0.6rem 0.7rem;
+  }
+
+  .button-row {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 12px;
+  }
+
+  .button-row button,
+  .button-row .cancel,
+  form button {
+    max-width: 100%;
+    padding: 1rem 0.5rem;
+    font-size: 1rem;
+    margin-bottom: 0;
+  }
+
+  .comment-box {
+    padding: 12px 2vw;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .comment {
+    padding: 12px 8px 10px 12px;
+    font-size: 0.97rem;
+  }
 }
