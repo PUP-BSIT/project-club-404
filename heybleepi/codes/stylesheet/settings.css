@@ -1,8 +1,12 @@
 body {
-  background: url(/heybleepi/codes/assets/settings-gradient-bg.jpeg) 
-    no-repeat center fixed;
+  background: url(../assets/dark_mode.jpg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-attachment: fixed;
+  background-size: 100% 100%;
   margin: 0;
   font-family: "Roboto", sans-serif;
+  color: white;
 }
 
 /* Navigation CSS */
@@ -10,17 +14,17 @@ body {
 #navigation {
   display: flex;
   gap: 500px;
-  background-color: rgba(255, 255, 255, .4);
+  background-color: rgba(255, 255, 255, .3);
   padding-left: 100px;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  backdrop-filter: blur(8px);
 }
 
 #buttons_container {
   display: flex;
   gap: 1em;
   align-items: center;
-}
-
-#buttons_container {
   background-color: rgba(255, 255, 255, .4);
   border-radius: 10px;
   padding: 10px;
@@ -33,6 +37,7 @@ body {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-family: "Roboto", sans-serif;
 }
 
 #buttons_container button:hover {
@@ -48,11 +53,12 @@ body {
 /* Account Information CSS */
 #section {
   margin: 10px 200px;
-  background-color: rgba(255, 255, 255, .4);
+  background-color: rgba(255, 255, 255, .3);
   padding: 15px;
   border-radius: 10px;
   border: 1px solid #ccc;
   height: 80vh;
+  backdrop-filter: blur(8px);
 }
 
 #account_information_container {
@@ -369,6 +375,7 @@ body {
     overflow: hidden;
     padding-left: 50px;
     gap: 5em;
+    z-index: 1;
   }
 
   #section {
