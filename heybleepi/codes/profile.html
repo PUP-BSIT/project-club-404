@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="./stylesheet/dashboard.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
   </head>
-
   <body class="page">
 
     <!-- Top Navbar -->
@@ -95,18 +94,18 @@
           </section>
         </aside>
 
-        <!-- RIGHT COLUMN -->
+        <!-- Create Post -->
         <section class="right-column">
           <div class="glass create-post">
             <div class="create-post-header">
               <img class="avatar avatar--sm" src="./assets/profile/rawr.png" alt="">
               <div class="poster-info">
-                <a href="/profile" class="poster-name">Jane Doe</a>
+                <a href="profile.html" class="poster-name">Jane Doe</a>
                 <p>@jane_doe</p>
               </div>
             </div>
 
-            <textarea class="create-post-input" placeholder="What's happening in your galaxy?"></textarea>
+            <textarea class="create-post-input" id="postInput" placeholder="What's happening in your galaxy?"></textarea>
 
             <div class="create-post-actions">
               <div class="action-group">
@@ -115,49 +114,52 @@
                 <button class="icon-btn"><i class="ri-emotion-line"></i></button>
                 <button class="icon-btn"><i class="ri-map-pin-line"></i></button>
               </div>
-              <button class="btn btn--primary" disabled>Post</button>
+              <button class="btn btn--primary" onclick="createPost()">Post</button>
             </div>
           </div>
 
-          <article class="glass post">
-            <!--  Post Header -->
-            <header class="post-header">
-              <img class="avatar avatar--sm" src="./assets/profile/rawr.png" alt="">
-              <div>
-                <h4>Jane Doe</h4>
-                <time>3h ago</time>
-              </div>
-              <button class="icon-btn"><i class="ri-more-fill"></i></button>
-            </header>
+          <!-- Posts will appear here -->
+          <div id="postsContainer">
+            <article class="glass post">
+              <!--  Post Header -->
+              <header class="post-header">
+                <img class="avatar avatar--sm" src="./assets/profile/rawr.png" alt="">
+                <div>
+                  <h4>Jane Doe</h4>
+                  <time>3h ago</time>
+                </div>
+                <button class="icon-btn"><i class="ri-more-fill"></i></button>
+              </header>
 
-            <!--- Post Content -->
-            <p>MEOW MEOW MEOW MEOW✨ <span class="tag">#SpaceLife</span></p>
-            <img class="post-image" src="./assets/post/cc_cat.jpg" alt="Moon">
+              <!--- Post Content -->
+              <p>MEOW MEOW MEOW MEOW✨ <span class="tag">#SpaceLife</span></p>
+              <img class="post-image" src="./assets/post/cc_cat.jpg" alt="Moon">
 
-            <!-- Post Footer -->
-            <footer class="post-footer">
-              <div class="post-actions">
-                <button class="icon-btn like">
-                  <i class="ri-heart-line"></i>
-                  <span>201</span>
-                </button>
+              <!-- Post Footer -->
+              <footer class="post-footer">
+                <div class="post-actions">
+                  <button class="icon-btn like">
+                    <i class="ri-heart-line"></i>
+                    <span>201</span>
+                  </button>
+
+                  <button class="icon-btn">
+                    <i class="ri-chat-1-line"></i>
+                    <span>342</span>
+                  </button>
+
+                  <button class="icon-btn">
+                    <i class="ri-share-forward-line"></i>
+                    <span>128</span>
+                  </button>
+                </div>
 
                 <button class="icon-btn">
-                  <i class="ri-chat-1-line"></i>
-                  <span>342</span>
+                  <i class="ri-bookmark-line"></i>
                 </button>
-
-                <button class="icon-btn">
-                  <i class="ri-share-forward-line"></i>
-                  <span>128</span>
-                </button>
-              </div>
-
-              <button class="icon-btn">
-                <i class="ri-bookmark-line"></i>
-              </button>
-            </footer>
-          </article>
+              </footer>
+            </article>
+          </div>
         </section>
       </div>
     </main>
