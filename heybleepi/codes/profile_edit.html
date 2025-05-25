@@ -1,68 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&family=Quicksand&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./stylesheet/profile_edit.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Edit Your Profile!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./stylesheet/profile_edit.css" />
   </head>
+
   <body>
-    <!--Main Container-->
     <div class="container">
-      <!--Profile Picture -->
+      <!-- Cover Preview -->
+      <div class="cover-preview-div" id="cover_preview_div"></div>
+      <button class="change-profile-pic" onclick="changeCover()">Change Cover Photo</button>
+      <input type="file" id="cover_input" accept="image/*" hidden>
+
+      <!-- Profile Picture -->
       <div class="profile-picture">
-        <img id="profile_image" src="./assets/profile/rawr.png" alt="Shark">
+        <img id="profile_image" src="./assets/profile/rawr.png" alt="Shark" />
         <label for="file_input" class="change-profile-image">+</label>
-        <input type="file" id="file_input" accept="image/*" hidden>
-        <!--Cover Picture-->
-        <div id="cover_preview_div" class="cover-preview-div"></div>
-        <button class="change-profile-pic" 
-          onClick="changeCover()">
-          Change Cover Photo
-        </button>
-        <input type="file" id="cover_input" accept="image/*" hidden>
+        <input type="file" id="file_input" accept="image/*" hidden />
         <h2>Edit Profile</h2>
       </div>
-      <div class="cover-picture"></div>
-      <!--Profile Form-->
+
+      <!-- Form Fields -->
       <form id="profile_form">
         <div id="edit_profile_form">
           <div class="input-group">
-            <label id="label_first_name" for="first-name">First Name</label>
-            <input type="text" id="first_name" name="first-name">
+            <label for="first_name">First Name</label>
+            <input type="text" id="first_name" name="first_name" />
           </div>
           <div class="input-group">
-            <label id="label_last_name" for="last-name">Last Name</label>
-            <input type="text" id="last_name" name="last-name">
+            <label for="last_name">Last Name</label>
+            <input type="text" id="last_name" name="last_name" />
           </div>
           <div class="input-group">
-            <label id="label_username" for="username">Username</label>
-            <input type="text" id="username" name="username">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" />
           </div>
           <div class="input-group">
-            <label id="label_email" for="email">Email</label>
-            <input type="email" id="email" name="email">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" />
           </div>
         </div>
       </form>
-      <!--Bio-->
+
+      <!-- Bio -->
       <div class="bio-section">
-        <label for="bio"></label>
-        <textarea id="bio" 
-          name="bio" 
-          disabled>Hi! I’m Alex, a passionate software developer and design enthusiast who loves turning ideas into interactive, meaningful digital experiences. Over the past few years, I've worked on a wide range of projects, from simple landing pages to complex web applications. 
+        <label for="bio">Bio</label>
+        <textarea id="bio" name="bio" disabled>
+          Hi! I’m Alex, a passionate software developer and design enthusiast who loves turning ideas into interactive, meaningful digital experiences.
         </textarea>
-        <button class="change-bio" 
-          onClick="enableTextArea()">
-            Change Bio
-        </button>
-        <button class="save-changes" 
-          onClick="alertUserOnSave()">
-            Save Changes
-        </button>
+
+        <!-- Buttons -->
+        <button class="change-bio" onclick="enableTextArea()">Change Bio</button>
+        <button class="save-changes" onclick="alertUserOnSave()">Save Changes</button>
       </div>
     </div>
+
     <script src="../codes/script/profile_edit.js"></script>
   </body>
 </html>

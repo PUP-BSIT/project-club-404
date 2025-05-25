@@ -1,204 +1,208 @@
 @keyframes bounce {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Quicksand', sans-serif;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Quicksand', sans-serif;
 }
 
 body {
-    background-image: url("../assets/settings-gradient-bg.jpeg");
-    background-repeat: no-repeat;
-    background-size: cover;
-    color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;    
+  font-family: "Quicksand", sans-serif;
+  background: url(../assets/dark_mode.jpg);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  margin: 0;
+  padding: 2rem;
+  color: white;
 }
 
-.profile-picture {
-    text-align: center;
-    margin-bottom: 20px;  
+/* Container (glass style) */
+.container {
+  max-width: 800px;
+  margin: auto;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
-.profile-picture > h2 {
-    color: rgb(39, 38, 38);
-    position: relative;
-    left: -522px;
-    bottom: -66px;
+/* Cover Photo Preview */
+.cover-preview-div {
+  width: 100%;
+  height: 150px;
+  background-image: url("../assets/profile/banner.jpg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-radius: 12px;
+  margin-bottom: 1rem;
 }
 
-.profile-picture > img {
-    width: 174px;
-    height: 165px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid rgb(255, 255, 255);
-    position: relative;
-    left: -525px;
-    bottom: -56px;
-}
-
+/* Change Cover Button */
 .change-profile-pic {
-    margin-top: 10px;
-    background-color: rgb(225, 190, 231);
-    color: rgb(0, 0, 0);
-    padding: 5px 10px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    position: absolute;
-    left: 1056px;
-    top: 193px;
-    width: 214px;
-    height: 35px;
-    font-size: 16px;
+  display: block;
+  margin: 0 auto 1.5rem auto;
+  background-color: #facc15;
+  color: black;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
 }
 
 .change-profile-pic:hover {
-    animation: bounce 0.5s;
+  background-color: #fbbf24;
+  animation: bounce 0.5s;
 }
 
-.input-group {
-    display: inline-block;
-    width: 47%;
-    margin: 10px 1%;
-    position: relative;
-    bottom: 129px;
-    left: -25px;
+/* Profile Picture & Label */
+.profile-picture {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  position: relative;
 }
 
-.input-group label {
-    display: block;
-    margin-bottom: 5px;
-    color: #fff;
+.profile-picture img {
+  width: 130px;
+  height: 130px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid white;
 }
 
-.input-group input {
-    width: 100%;
-    padding: 10px;
-    border-radius: 10px;
-    border: none;
-    background-color: rgba(255, 255, 255, 0.1);
-    color: #fff;
+.profile-picture h2 {
+  margin-top: 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #facc15;
 }
 
-.bio-section {
-    margin-top: 20px;
-    text-align: center;
-}
-
-.bio-section > textarea {
-    width: 140%;
-    height: 154px;
-    padding: 15px;
-    border-radius: 15px;
-    border: none;
-    resize: none;
-    background-color: rgba(255, 255, 255, 0.1);
-    color: black;
-    position: relative;
-    top: -85px;
-    left: -153px;
-    font-size: 20px;
-}
-
-button {
-    margin: 10px 5px 0;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 15px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.change-bio {
-    background-color: #ce93d8;
-    color: #000;
-    position: relative;
-    top: -108px;
-    left: 48px;
-}
-
-.change-bio:hover {
-    animation: bounce 0.5s;
-}
-
-.save-changes {
-    background-color: #80cbc4;
-    color: #000;
-    position: relative;
-    left: -83px;
-}
-
-.save-changes:hover {
-    animation: bounce 0.5s;
-}
-
-.cover-photo {
-    text-align: center;
-    margin: 20px 0;
-}
-
-.cover-photo > img {
-    width: 100%;
-    max-height: 150px;
-    object-fit: cover;
-    border-radius: 15px;
-}
-
-#first_name, #last_name, #email, #username {
-    background-color: #ffffffe0;
-    color: black;
-}
-
-.input-group > #label_first_name, #label_last_name, #label_email, #label_username {
-    color: #000;
-    text-align: center; 
-    font-weight: bold;
-}
-
+/* Small circle edit button */
 .change-profile-image {
-    position: absolute;
-    left: 192px;
-    top: 183px;
-    width: 35px;
-    height: 35px;
-    background-color: #7e57c2;
-    color: white;
-    font-size: 22px;
-    text-align: center;
-    line-height: 35px;
-    border-radius: 50%;
-    border: 2px solid white;
-    cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-    transition: transform 0.2s;
+  position: absolute;
+  right: calc(50% - 65px);
+  background-color: #8A4FFF;
+  color: white;
+  border: none;
+  font-size: 1.2rem;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 .change-profile-image:hover {
   animation: bounce 0.5s;
 }
 
-.cover-preview-div {
-    width: 300px;
-    height: 120px;
-    background-color: #ddd;
-    border-radius: 8px;
-    background-image: url("../assets/profile/banner.jpg");
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    position: absolute;
-    left: 1021px;
-    top: 67px;
+/* Form Layout */
+#edit_profile_form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+  margin-top: 1rem;
 }
 
+.input-group label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+}
 
+.input-group input {
+  width: 100%;
+  padding: 0.6rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.05);
+  color: white;
+}
 
-    
+/* Bio Section */
+.bio-section {
+  margin-top: 2rem;
+  text-align: left;
+}
+
+.bio-section label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.bio-section textarea {
+  width: 100%;
+  height: 120px;
+  padding: 1rem;
+  border-radius: 10px;
+  font-size: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.05);
+  color: white;
+  resize: none;
+  margin-bottom: 1rem;
+}
+
+/* Base button style for all major actions */
+button,
+.change-profile-pic,
+.change-bio,
+.save-changes {
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+/* Buttons */
+.bio-section button {
+  padding: 0.6rem 1.2rem;
+  font-size: 0.9rem;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  margin-right: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.change-bio {
+  background-color: #fbbf24;
+  color: black;
+}
+
+.change-bio:hover {
+  animation: bounce 0.5s;
+}
+
+.save-changes {
+  background-color: #47cc6d;
+  color: black;
+}
+
+.save-changes:hover {
+  animation: bounce 0.5s;
+}
