@@ -648,6 +648,17 @@ textarea.create-post-input::placeholder {
   color: rgba(255, 255, 255, 0.5);
 }
 
+.comment-form textarea {
+  font-family: 'Quicksand', sans-serif;
+}
+
+.comment-list p {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  margin: 0.3rem 0;
+}
+
 /* like animation placeholder */
 .like {
   transition: transform .2s;
@@ -816,6 +827,24 @@ textarea.create-post-input::placeholder {
   .profile-avatar {
     width: 90px;
     height: 90px;
+  }
+
+  .left-column {
+    flex: 0 0 30%;
+  }
+
+  .right-column {
+    flex: 0 0 70%;
+    width: 100%;
+    padding: 1rem;
+  }
+
+  .create-post-input {
+    font-size: 1rem;
+  }
+
+  .post-footer .icon-btn span {
+    font-size: 0.85rem;
   }
 }
 
@@ -1007,6 +1036,11 @@ textarea:focus {
 .left-column .card,
 .right-column .post {
   margin-bottom: 1rem;
+}
+
+.left-column,
+.right-column {
+  flex: 1 1 100%;
 }
 
 .create-post textarea {
