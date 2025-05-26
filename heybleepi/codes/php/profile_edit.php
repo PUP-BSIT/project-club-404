@@ -1,3 +1,39 @@
+<?php
+session_start();
+require_once 'configuration.php';
+
+if (!isset($_SESSION['user_name'])) {
+    header("Location: index.php");
+    exit();
+}
+
+$user_name = $_SESSION['user_name'];
+$success_message = "";
+
+// Handle form submission
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $first = $_POST['first_name'];
+    $last = $_POST['last_name'];
+    $email = $_POST['email'];
+    $bio = $_POST['bio'];
+
+    $stmt = $conn->prepare("UPDATE users SET first_name=?, last_name=?, email=?, bio=? WHERE user_name=?");
+    $stmt->bind_param("sssss", $first, $last, $email, $bio, $user_name);
+    $stmt->execute();
+    $stmt->close();
+
+    $success_message = "Profile updated successfully!";
+}
+
+// Fetch user info
+$stmt = $conn->prepare("SELECT * FROM users WHERE user_name=?");
+$stmt->bind_param("s", $user_name);
+$stmt->execute();
+$result = $stmt->get_result();
+$user = $result->fetch_assoc();
+$stmt->close();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -30,14 +66,17 @@
             <label for="first_name">First Name</label>
             <input type="text" id="first_name" name="first_name" />
           </div>
+
           <div class="input-group">
             <label for="last_name">Last Name</label>
             <input type="text" id="last_name" name="last_name" />
           </div>
+
           <div class="input-group">
             <label for="username">Username</label>
             <input type="text" id="username" name="username" />
           </div>
+
           <div class="input-group">
             <label for="email">Email</label>
             <input type="email" id="email" name="email" />
@@ -49,7 +88,7 @@
       <div class="bio-section">
         <label for="bio">Bio</label>
         <textarea id="bio" name="bio" disabled>
-          Hi! I’m Alex, a passionate software developer and design enthusiast who loves turning ideas into interactive, meaningful digital experiences.
+          <?= htmlspecialchars($user['bio']) ?>
         </textarea>
 
         <!-- Buttons -->
