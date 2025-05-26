@@ -1,8 +1,35 @@
+<?php
+session_start();
+require_once 'configuration.php';
+
+// Check if user is logged in
+if (!isset($_SESSION['username'])) {
+  header("Location: index.php");
+  exit();
+}
+
+$username = $_SESSION['username'];
+
+// Fetch user data by username
+$sql = "SELECT * FROM users WHERE username = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("s", $username);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows === 0) {
+  echo "User not found.";
+  exit();
+}
+
+$user = $result->fetch_assoc();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>HEYBLEEPI | Profile</title>
+    <title>HEYBLEEPI | <?php echo htmlspecialchars($user['username']); ?>'s Profile</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="stylesheet" href="./stylesheet/dashboard.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
@@ -44,8 +71,8 @@
           <img class="avatar profile-avatar" src="./assets/profile/rawr.png" alt="Profile" />
 
           <div class="user-basic-info">
-            <h2>Jane Doe</h2>
-            <p>@jane_doe · 81 friends</p>
+            <h2><?php echo htmlspecialchars($user['first_name']) . ' ' . htmlspecialchars($user['last_name']); ?></h2>
+            <p>@<?php echo htmlspecialchars($user['username']); ?> · 81 friends</p>
           </div>
 
           <div class="profile-buttons">
@@ -100,8 +127,8 @@
             <div class="create-post-header">
               <img class="avatar avatar--sm" src="./assets/profile/rawr.png" alt="">
               <div class="poster-info">
-                <a href="profile.html" class="poster-name">Jane Doe</a>
-                <p>@jane_doe</p>
+                <a href="profile.html" class="poster-name"><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></a>
+                <p>@<?php echo htmlspecialchars($user['username']); ?></p>
               </div>
             </div>
 
