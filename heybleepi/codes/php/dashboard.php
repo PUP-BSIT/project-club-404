@@ -1,3 +1,11 @@
+<?php
+session_start();
+if (!isset($_SESSION['user_email'])) {
+  header("Location: index.php"); // Redirect if not logged in
+  exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -24,6 +32,11 @@
             type="text"
             placeholder="Search in space…" />
           <i class="ri-search-line search-icon"></i>
+        </form>
+
+        <!-- Logout -->
+        <form action="logout.php" method="POST" style="margin-top: 1rem;">
+          <button class="btn btn--primary btn--sm">Logout</button>
         </form>
 
         <!-- Create Post -->
@@ -82,22 +95,22 @@
             Home
           </a>
 
-          <a class="nav-item" href="messages.html">
+          <a class="nav-item" href="messages.php">
             <i class="ri-message-3-line"></i>
             Messages
           </a>
 
-          <a class="nav-item" href="profile.html">
+          <a class="nav-item" href="profile.php">
             <i class="ri-user-line"></i>
             Profile
           </a>
 
-          <a class="nav-item" href="settings.html"> <!-- Link to settings & privacy -->
+          <a class="nav-item" href="settings.php">
             <i class="ri-settings-4-line"></i>
             Settings & Privacy
           </a>
 
-          <a class="nav-item" href="bookmarks.html"> <!-- Link to saved items -->
+          <a class="nav-item" href="bookmarks.php">
             <i class="ri-bookmark-line"></i>
             Saved
           </a>
