@@ -140,3 +140,36 @@ document.addEventListener("DOMContentLoaded", function () {
     history.replaceState({}, document.title, window.location.pathname);
   }
 });
+
+// Checks username status
+document.addEventListener("DOMContentLoaded", function () {
+  const usernameInput = document.getElementById("username");
+  const status = document.getElementById("username_status");
+
+  usernameInput.addEventListener("input", function () {
+    const username = this.value.trim();
+    if (username.length < 3) {
+      status.textContent = "Username must be at least 3 characters.";
+      status.style.color = "orange";
+      return;
+    }
+
+    fetch(`check_username.php?username=${encodeURIComponent(username)}`)
+      .then(res => res.text())
+      .then(data => {
+        if (data === "taken") {
+          status.textContent = "Username is already taken.";
+          status.style.color = "red";
+        } else if (data === "available") {
+          status.textContent = "Username is available!";
+          status.style.color = "green";
+        } else {
+          status.textContent = "";
+        }
+      })
+      .catch(() => {
+        status.textContent = "Could not check username.";
+        status.style.color = "gray";
+      });
+  });
+});
