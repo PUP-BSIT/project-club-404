@@ -38,7 +38,7 @@ body {
   border-radius: 10px;
   padding: 0.5rem 1rem;
   margin: 5px 0;
-} 
+}
 
 #buttons_container button {
   background-color: transparent;
@@ -129,6 +129,15 @@ body {
 #account_information_container h2,
 #account_information_container p {
   margin: 0 0 0.5rem 0;
+}
+
+.update-success {
+  background-color: rgba(76, 175, 80, 0.2);
+  border-left: 4px solid #4CAF50;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  color: #dcedc8;
+  font-weight: bold;
 }
 
 #first_name {
@@ -366,7 +375,8 @@ body {
     margin-top: 10px;
   }
 
-  #account_information_container h2, p {
+  #account_information_container h2,
+  p {
     text-align: center;
   }
 
@@ -435,9 +445,7 @@ body {
     width: 16vw;
   }
 
-  #privacy_settings_container 
-  #change_password_btn
-  {
+  #privacy_settings_container #change_password_btn {
     margin-left: 60px;
     width: 45vw;
   }
@@ -448,7 +456,7 @@ body {
   }
 
   #old_password {
-   margin-left: 80px;
+    margin-left: 80px;
   }
 
   #new_password {
@@ -476,7 +484,7 @@ body {
     font-size: 1.2rem;
   }
 
-   #buttons_container {
+  #buttons_container {
     flex-direction: column;
     width: 94vw;
     padding: 5px;
@@ -497,7 +505,8 @@ body {
     align-items: center;
   }
 
-  #account_information_container h2, p {
+  #account_information_container h2,
+  p {
     text-align: center;
   }
 
@@ -598,7 +607,7 @@ body {
 
   #buttons_container {
     gap: 0;
-   align-content: center;
+    align-content: center;
   }
 
   #section {
@@ -641,7 +650,7 @@ body {
   #navigation h3 {
     margin: 1em 0;
     font-size: 1.2rem;
-  } 
+  }
 
   #section {
     margin: 10px 51px;
