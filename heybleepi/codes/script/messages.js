@@ -13,3 +13,16 @@ document.querySelectorAll(".comment-delete").forEach(function (span) {
     }
   });
 });
+
+// Show selected image or file names
+document.getElementById('imageInput').addEventListener('change', function () {
+  if (this.files.length > 0) {
+    alert("Selected image: " + this.files[0].name);
+  }
+});
+
+document.getElementById('fileInput').addEventListener('change', function () {
+  if (this.files.length > 0) {
+    alert("Selected file: " + this.files[0].name);
+  }
+});
