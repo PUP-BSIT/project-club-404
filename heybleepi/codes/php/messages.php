@@ -72,14 +72,6 @@ if (isset($_POST['edit_id'])) {
     <div class="container">
       <h2>Messages</h2>
       <form method="POST" id="commentForm">
-        <!-- <input
-          class="input"
-          type="text"
-          name="username"
-          placeholder="Your username"
-          required
-          value="<?= $edit_comment ? htmlspecialchars($edit_comment['username']) : '' ?>"
-        /> -->
         <textarea
           class="input"
           name="comment"
