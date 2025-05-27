@@ -7,6 +7,38 @@ body {
   color: white;
 }
 
+.show-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, .8);
+  z-index: 2;
+}
+
+.hide-overlay {
+  display: none;
+} 
+
+.show-delete-acc-prompt {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, .8);
+  z-index: 2;
+}
+
+.hide-delete-acc-prompt {
+  display: none;
+}
+
 /* Navigation CSS */
 #navigation {
   gap: 500px;
@@ -87,7 +119,8 @@ body {
   height: 120vh;
 }
 
-#account_information_container {
+/* Account Information Container */
+.show-account-info { 
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -96,6 +129,10 @@ body {
   align-items: center;
   gap: 1rem;
   padding-top: 1em;
+}
+
+.hide-account-info {
+  display: none;
 }
 
 #account_information_container form {
@@ -269,11 +306,16 @@ body {
   box-sizing: border-box;
 }
 
-#privacy_settings_container {
+/* Privacy & Settings Container */
+.show-privacy-settings {
   display: flex;
   flex-direction: column;
   align-items: center;
   padding-bottom: 8em;
+}
+
+.hide-privacy-settings {
+  display: none;
 }
 
 #privacy_settings_container form {
@@ -335,6 +377,98 @@ body {
   font-weight: bold;
 }
 
+.show-logout-question {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 20px 50px;
+  position: fixed;
+  z-index: 1;
+  top: 35%;
+  left: 34%;
+}
+
+.show-logout-question h2 {
+  text-align: center;
+}
+
+#logout_question .logout-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 3em;
+}
+
+.hide-logout-question {
+  display: none;
+}
+
+.buttons {
+  width: 7em;
+  height: 2.5em;
+}
+
+.logout-btn {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 9999px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background-color: #d32f2f;
+  font-weight: bold;
+}
+
+.cancel-btn {
+  background-color: #8A4FFF;
+  color: white;
+  border: none;
+  border-radius: 9999px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.delete-acc-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 20px 50px;
+  position: fixed;
+  z-index: 1;
+  top: 35%;
+  left: 23%;
+  gap: 1em;
+}
+
+.delete-acc-prompt h2 {
+  text-align: center;
+}
+
+.delete-acc-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 3em;
+}
+
+.delete-btn {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 9999px;
+  padding: 10px;
+  cursor: pointer;
+}
+
 /* Responsiveness */
 
 /* Mobile S */
@@ -367,12 +501,12 @@ body {
     padding: 1em 1em 9em 1em;
   }
 
-  #account_information_container {
+  .show-account-info {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
     align-items: flex-start;
-    margin-top: 10px;
+    margin-top: 100px;
   }
 
   #account_information_container h2,
@@ -466,9 +600,20 @@ body {
   #confirm_new_password {
     margin-left: 15px;
   }
+
+  .show-logout-question {
+    width: 50vw;
+    left: 30px;
+  }
+
+  .delete-acc-prompt {
+    width: 50vw;
+    top: 25%;
+    left: 27px;
+  }
 }
 
-@media (min-width: 321px) and (max-width: 425px) {
+@media (min-width: 321px) and (max-width: 375px) {
   #navigation {
     display: flex;
     flex-direction: column;
@@ -498,7 +643,7 @@ body {
     padding: 0 1em 6em 1em;
   }
 
-  #account_information_container {
+  .show-account-info {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
@@ -583,6 +728,145 @@ body {
     margin-left: 85px;
     width: 45vw;
   }
+
+  .show-logout-question {
+    width: 55vw;
+    left: 35px;
+  }
+
+  .delete-acc-prompt {
+    width: 50vw;
+    top: 25%;
+    left: 11%;
+  }
+}
+
+@media (min-width: 376px) and (max-width: 425px) {
+  #navigation {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-left: 0px;
+    gap: 0;
+    width: 100vw;
+    padding: 0;
+  }
+
+  #navigation h3 {
+    margin: 1em 0;
+    font-size: 1.2rem;
+  }
+
+  #buttons_container {
+    flex-direction: column;
+    width: 94vw;
+    padding: 5px;
+  }
+
+  #section {
+    margin: 0;
+    margin-top: 10px;
+    height: 151vh;
+    width: 100vw;
+    padding: 0 1em 6em 1em;
+  }
+
+  .show-account-info {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  #account_information_container h2,
+  p {
+    text-align: center;
+  }
+
+  #account_information_container form {
+    margin-top: 1em;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-left: 0px;
+    width: 86vw;
+    padding: 5px;
+  }
+
+  #account_information_container input {
+    width: 50vw;
+  }
+
+  #account_information_container #save_btn {
+    margin-top: 20px;
+    width: 40vw;
+  }
+
+  #first_name {
+    margin-left: 30px;
+  }
+
+  #middle_name {
+    margin-left: 16px;
+  }
+
+  #last_name {
+    margin-left: 33px;
+  }
+
+  #username {
+    margin-left: 38px;
+  }
+
+  #email {
+    margin-left: 68px;
+  }
+
+  #birthdate {
+    margin-left: 45px;
+  }
+
+  #privacy_settings_container {
+    align-items: flex-start;
+    padding-bottom: 6em;
+  }
+
+  #privacy_settings_container form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1em;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+  }
+
+  #privacy_settings_container form input {
+    width: 25vw;
+  }
+
+  #privacy_settings_container #change_password_btn {
+    margin-left: 70px;
+    width: 45vw;
+  }
+
+  #delete_account_btn {
+    margin-left: 85px;
+    width: 45vw;
+  }
+
+  .show-logout-question {
+    width: 60vw;
+    left: 40px;
+  }
+
+  .delete-acc-prompt {
+    width: 50vw;
+    top: 25%;
+    left: 14%;
+  }
 }
 
 @media (min-width: 426px) and (max-width: 768px) {
@@ -640,6 +924,17 @@ body {
     border-radius: 8px;
     backdrop-filter: blur(10px);
   }
+
+  .show-logout-question {
+    width: auto;
+    left: 170px;
+  }
+
+  .delete-acc-prompt {
+    width: 50vw;
+    top: 35%;
+    left: 20%;
+  }
 }
 
 @media (min-width: 769px) and (max-width: 1024px) {
@@ -676,6 +971,17 @@ body {
     border-radius: 8px;
     backdrop-filter: blur(10px);
   }
+
+  .show-logout-question {
+    width: auto;
+    left: 280px;
+  }
+
+  .delete-acc-prompt {
+    width: 50vw;
+    top: 35%;
+    left: 20%;
+  }
 }
 
 @media (min-width: 1025px) {
@@ -696,5 +1002,10 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 8px;
     backdrop-filter: blur(10px);
+  }
+
+  .show-logout-question {
+    width: auto;
+    left: 450px;
   }
 }
