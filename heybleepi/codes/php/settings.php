@@ -35,6 +35,54 @@ if ($result->num_rows > 0) {
   </head>
 
   <body>
+    <!-- Logout & Delete Account Prompt -->
+    <div id="logout_prompt" class="hide-overlay">
+      <div id="logout_question" class="show-logout-question">
+        <h2>Are you sure you want to logout?</h2>
+        <div class="logout-buttons">
+          <form>
+            <button 
+              type="button"
+              class="buttons logout-btn"
+              onClick="window.location.href='logout.php'">
+                Logout
+            </button>
+          </form>
+          
+          <button 
+            type="button"
+            class="buttons cancel-btn"
+            onClick="hideLogoutPrompt()">
+              Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="delete_acc" class="hide-delete-acc-prompt">
+      <div class="delete-acc-prompt">
+        <h2>Are you sure you want to permanently delete your account?</h2>
+        <div class="delete-acc-buttons">
+          <form> <!--to test delete account php-->
+            <button 
+              type="button"
+              class="buttons delete-btn">
+                Delete
+            </button>
+          </form>
+
+          <button 
+            type="button"
+            class="buttons cancel-btn"
+            onClick="hideDeleteAccountPrompt()">
+              Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- End of Logout & Delete Account Prompt -->
+
+    <!-- Navigation: Acc Info, Privacy Settings, Logout-->
     <div id="navigation">
       <div>
         <h3>HeyBleepi | Settings & Privacy</h3>
@@ -43,20 +91,28 @@ if ($result->num_rows > 0) {
       <div id="buttons_container">
         <button
           type="button"
+          id="acct_info_btn"
           onClick="switchToAccountInformation()">
             Account Information
         </button>
         <button
           type="button"
+          id="privacy_settings_btn"
           onClick="switchToPrivacySettings()">
             Privacy & Security
         </button>
-        <button type="button" id="logout_btn" onclick="window.location.href='logout.php'">Logout</button>
+        <button 
+          type="button" 
+          id="logout_btn"
+          onClick="showLogoutPrompt()">Logout</button>
       </div>
     </div>
+    <!-- End of Navigation-->
 
+    <!-- Start of Section -->
     <div id="section">
-      <div id="account_information_container">
+      <div id="account_information_container" 
+        class="show-account-info">
         <h2>Account Information</h2>
 
         <?php if (isset($_GET['status']) && $_GET['status'] === 'success'): ?>
@@ -66,7 +122,7 @@ if ($result->num_rows > 0) {
         <?php endif; ?>
 
         <p>Here you can view and edit your account information.</p>
-        <form method="POST" action="update_settings.php">
+        <form>
           <div>
             <label for="first_name">First Name</label>
             <input
@@ -85,8 +141,7 @@ if ($result->num_rows > 0) {
               placeholder="Middle Name"
               id="middle_name"
               name="middle_name"
-              value="<?php echo htmlspecialchars($user['middle_name']); ?>"
-            >
+              value="<?php echo htmlspecialchars($user['middle_name']); ?>">
           </div>
 
           <div>
@@ -97,8 +152,7 @@ if ($result->num_rows > 0) {
               id="last_name"
               name="last_name"
               value="<?php echo htmlspecialchars($user['last_name']); ?>"
-              required
-            >
+              required>
           </div>
 
           <div>
@@ -109,8 +163,7 @@ if ($result->num_rows > 0) {
               id="username"
               name="username"
               value="<?php echo htmlspecialchars($user['user_name']); ?>"
-              required
-            >
+              required>
           </div>
 
           <div>
@@ -119,10 +172,8 @@ if ($result->num_rows > 0) {
               type="email"
               placeholder="Email"
               id="email"
-              name="email"
               value="<?php echo htmlspecialchars($user['email']); ?>"
-              required
-            >
+              required>
           </div>
 
           <div>
@@ -133,8 +184,7 @@ if ($result->num_rows > 0) {
               id="birthdate"
               name="birthdate"
               value="<?php echo htmlspecialchars($user['birthdate']); ?>"
-              required
-            >
+              required>
           </div>
 
           <button
@@ -149,18 +199,65 @@ if ($result->num_rows > 0) {
           <div class="account-buttons">
 
             <button class="account-btn">
-              <img src="./assets/connected_accounts/devhive.jpg" alt="devhive">
-              Connect to Devhive
+              <img 
+                src="./assets/connected_accounts/devhive.jpg" 
+                alt="devhive">
+                  Connect to Devhive
             </button>
 
             <button class="account-btn">
-              <img src="./assets/connected_accounts/hershell.png" alt="hershell">
-              Connect to Hershell
+              <img 
+                src="./assets/connected_accounts/hershell.png" 
+                alt="hershell">
+                  Connect to Hershell
             </button>
           </div>
         </div>
       </div>
+
+      <div id="privacy_settings_container" 
+        class="hide-privacy-settings">
+        <h2>Privacy & Security</h2>
+        <p>Here you can manage your password.</p>
+        <form>
+          <div>
+            <label>Old Password</label>
+            <input 
+              type="text" 
+              placeholder="Old Password"
+              id="old_password">
+          </div>
+
+          <div>
+            <label>New Password</label>
+            <input 
+              type="text" 
+              placeholder="New Password"
+              id="new_password">
+          </div>
+
+          <div>
+            <label>Confirm New Password</label>
+            <input 
+              type="text" 
+              placeholder="Confirm New Password"
+              id="confirm_new_password">
+          </div>
+          <button 
+            type="button"
+            id="change_password_btn">
+              Change Password
+          </button>
+        </form>
+        <button 
+          type="button"
+          id="delete_account_btn"
+          onClick="showDeleteAccountPrompt()">
+            Delete Account
+        </button>
+      </div>
     </div>
+    <!-- End of Section -->
 
     <script src="./script/settings.js"></script>
   </body>
