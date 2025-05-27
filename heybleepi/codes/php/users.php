@@ -1,98 +1,70 @@
 <?php
-require_once './configuration.php';
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-function isUserLoggedIn() {
-    return isset($_SESSION['id']);
-}
+session_start();
+include 'configuration.php';
 
-function loginUser($email, $password) {
-    global $conn;
+// Handle register
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register'])) {
+    $username = trim($_POST['username']);
+    $fname = $_POST['first_name'];
+    $mname = $_POST['middle_name'];
+    $lname = $_POST['last_name'];
+    $email = $_POST['email'];
+    $birthdate = $_POST['birthdate'];
+    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
-    // Sanitize inputs
-    $safeEmail = mysqli_real_escape_string($conn, $email);
-    $safePassword = mysqli_real_escape_string($conn, $password);
+    // Check if username exists
+    $stmt = $conn->prepare("SELECT * FROM users WHERE user_name = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $check_result = $stmt->get_result();
 
-    // Fetch user from the database
-    $query = "SELECT * FROM users WHERE email = '$safeEmail'";
-    $result = mysqli_query($conn, $query);
-
-    if ($result && mysqli_num_rows($result) > 0) {
-        $user = mysqli_fetch_assoc($result);
-
-        if ($user['password'] === $safePassword) {
-          $_SESSION['id'] = $user['id'];
-          $_SESSION['email'] = $user['email'];
-          header("Location: main.php");
-          exit();
-        } else {
-          return "Invalid password. Please try again.";
-        }
-    } else {
-      return "Email not found. Please register first.";
-    }
-
-    $message = 'Invalid email or password';
-    header("Location: index.php?message=" . urlencode($message));
-    exit();
-}
-
-function getUser($email) {
-    global $conn;
-
-    $safeEmail = mysqli_real_escape_string($conn, $email);
-
-    // Fetch user from the database
-    $query = "SELECT * FROM users WHERE email = '$safeEmail'";
-    $result = mysqli_query($conn, $query);
-
-    if ($result && mysqli_num_rows($result) > 0) {
-        return mysqli_fetch_assoc($result);
-    }
-    return false;
-}
-
-function registerUser($email, $password, $firstName, $lastName, 
-                        $middleName = null, $birthdate = null) {
-    global $conn;
-
-    $safeEmail = mysqli_real_escape_string($conn, $email);
-    $safePassword = mysqli_real_escape_string($conn, $password);
-    $safeFirstName = mysqli_real_escape_string($conn, $firstName);
-    $safeLastName = mysqli_real_escape_string($conn, $lastName);
-    $safeMiddleName = $middleName ? "'" . 
-      mysqli_real_escape_string($conn, $middleName) . "'" : "NULL";
-    $safeBirthdate = $birthdate ? "'" . 
-      mysqli_real_escape_string($conn, $birthdate) . "'" : "NULL";
-
-    // Check if email exists
-    $check = mysqli_query($conn, "SELECT id FROM users 
-                                  WHERE email = '$safeEmail'");
-    if (mysqli_num_rows($check) > 0) {
-        error_log("Email already exists: $safeEmail");
-        return false; // Email already exists
+    if ($check_result->num_rows > 0) {
+        echo "Username already taken!";
+        exit();
     }
 
     // Insert new user
-    $query = "INSERT INTO users 
-              (email, password, first_name, last_name, middle_name, birthdate)
-              VALUES ('$safeEmail', '$safePassword', '$safeFirstName', 
-                      '$safeLastName', $safeMiddleName, $safeBirthdate)";
+    $stmt = $conn->prepare("INSERT INTO users (user_name, first_name, middle_name, last_name, email, birthdate, password) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssssss", $username, $fname, $mname, $lname, $email, $birthdate, $password);
 
-    $result = mysqli_query($conn, $query);
-    if ($result) {
-        return true;
+    if ($stmt->execute()) {
+        $_SESSION['username'] = $username;
+        $_SESSION['user_email'] = $email;
+        header("Location: dashboard.php");
+        exit();
     } else {
-        error_log("Registration failed: " . mysqli_error($conn));
-        return false;
+        echo "Error: " . $stmt->error;
     }
 }
 
-// Logout function
-// This function will destroy the session and redirect to the login page
-function logoutUser() {
-    session_unset();
-    session_destroy();
-    header("Location: index.php");
-    exit();
+// Handle login
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+
+    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows === 1) {
+        $row = $result->fetch_assoc();
+        if (password_verify($password, $row["password"])) {
+            $_SESSION['username'] = $row['user_name'];
+            $_SESSION['user_email'] = $row['email'];
+            header("Location: dashboard.php");
+            exit();
+        } else {
+            echo "Invalid password!";
+        }
+    } else {
+        echo "No user found!";
+    }
 }
+
+$conn->close();
 ?>
