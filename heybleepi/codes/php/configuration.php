@@ -1,19 +1,14 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "loginregister";
+$database = "localhost";
+$username = "u937067793_club_404_mem";
+$password = "Club-404-!_!";
+$dbname = "u937067793_club_404";
 
 // Create connection
-$conn = mysqli_connect($servername, $username, $password, $dbname);
+$conn = new mysqli($database, $username, $password, $dbname);
 
 // Check connection
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
-
-//Database: loginregister
-//Table: users
-//Column: id, username, first_name, middle_name, last_name, birthdate, email, password
 ?>
-
