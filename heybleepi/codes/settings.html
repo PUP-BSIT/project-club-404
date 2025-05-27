@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link href="./stylesheet/settings.css" rel="stylesheet">
+    <title>Settings</title>
+  </head>
+
+  <body>
+    <!-- Logout & Delete Account Prompt -->
+    <div id="logout_prompt" class="hide-overlay">
+      <div id="logout_question" class="show-logout-question">
+        <h2>Are you sure you want to logout?</h2>
+        <div class="logout-buttons">
+          <form>
+            <button 
+              type="button"
+              class="buttons logout-btn">
+                Logout
+            </button>
+          </form>
+          
+          <button 
+            type="button"
+            class="buttons cancel-btn"
+            onClick="hideLogoutPrompt()">
+              Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="delete_acc" class="hide-delete-acc-prompt">
+      <div class="delete-acc-prompt">
+        <h2>Are you sure you want to permanently delete your account?</h2>
+        <div class="delete-acc-buttons">
+          <form> <!--to test delete account php-->
+            <button 
+              type="button"
+              class="buttons delete-btn">
+                Delete
+            </button>
+          </form>
+
+          <button 
+            type="button"
+            class="buttons cancel-btn"
+            onClick="hideDeleteAccountPrompt()">
+              Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- End of Logout & Delete Account Prompt -->
+
+    <!-- Navigation: Acc Info, Privacy Settings, Logout-->
+    <div id="navigation">
+      <div>
+        <h3>HeyBleepi | Settings & Privacy</h3>
+      </div>
+
+      <div id="buttons_container">
+        <button
+          type="button"
+          id="acct_info_btn"
+          onClick="switchToAccountInformation()">
+            Account Information
+        </button>
+        <button
+          type="button"
+          id="privacy_settings_btn"
+          onClick="switchToPrivacySettings()">
+            Privacy & Security
+        </button>
+        <button 
+          type="button" 
+          id="logout_btn"
+          onClick="showLogoutPrompt()">Logout</button>
+      </div>
+    </div>
+    <!-- End of Navigation-->
+
+    <!-- Start of Section -->
+    <div id="section">
+      <div id="account_information_container" 
+        class="show-account-info">
+        <h2>Account Information</h2>
+        <p>Here you can view and edit your account information.</p>
+        <form>
+          <div>
+            <label for="first_name">First Name</label>
+            <input
+              type="text"
+              placeholder="First Name"
+              id="first_name"
+              name="first_name"
+              required>
+          </div>
+
+          <div>
+            <label>Middle Name</label>
+            <input
+              type="text"
+              placeholder="Middle Name"
+              id="middle_name"
+              name="middle_name">
+          </div>
+
+          <div>
+            <label>Last Name</label>
+            <input
+              type="text"
+              placeholder="Last Name"
+              id="last_name"
+              name="last_name"
+              required>
+          </div>
+
+          <div>
+            <label>Username</label>
+            <input
+              type="text"
+              placeholder="Username"
+              id="username"
+              name="username"
+              required>
+          </div>
+
+          <div>
+            <label>Email</label>
+            <input
+              type="email"
+              placeholder="Email"
+              id="email"
+              required>
+          </div>
+
+          <div>
+            <label>Birthdate</label>
+            <input
+              type="text"
+              placeholder="Birthdate"
+              id="birthdate"
+              name="birthdate"
+              required>
+          </div>
+
+          <button
+            type="button"
+            id="save_btn">
+              Save Changes
+          </button>
+        </form>
+
+        <div id="connected_accts_container">
+          <h4>Connected Accounts</h4>
+          <div class="account-buttons">
+
+            <button class="account-btn">
+              <img src="./assets/connected_accounts/devhive.jpg" alt="devhive">
+              Connect to Devhive
+            </button>
+
+            <button class="account-btn">
+              <img src="./assets/connected_accounts/hershell.png" alt="hershell">
+              Connect to Hershell
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="privacy_settings_container" 
+        class="hide-privacy-settings">
+        <h2>Privacy & Security</h2>
+        <p>Here you can manage your password.</p>
+        <form>
+          <div>
+            <label>Old Password</label>
+            <input 
+              type="text" 
+              placeholder="Old Password"
+              id="old_password">
+          </div>
+
+          <div>
+            <label>New Password</label>
+            <input 
+              type="text" 
+              placeholder="New Password"
+              id="new_password">
+          </div>
+
+          <div>
+            <label>Confirm New Password</label>
+            <input 
+              type="text" 
+              placeholder="Confirm New Password"
+              id="confirm_new_password">
+          </div>
+          <button 
+            type="button"
+            id="change_password_btn">
+              Change Password
+          </button>
+        </form>
+        <button 
+          type="button"
+          id="delete_account_btn"
+          onClick="showDeleteAccountPrompt()">
+            Delete Account
+        </button>
+      </div>
+    </div>
+    <!-- End of Section -->
+
+    <script src="./script/settings.js"></script>
+  </body>
+</html>
