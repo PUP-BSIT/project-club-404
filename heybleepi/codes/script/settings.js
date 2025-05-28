@@ -5,6 +5,7 @@ let accountInformationBtn = document.querySelector('#acct_info_btn');
 let privacySettingsBtn = document.querySelector('#privacy_settings_btn');
 let logoutPrompt = document.querySelector('#logout_prompt');
 let deleteAccPrompt = document.querySelector('#delete_acc');
+
 // change this from delete_account.php endpoint to web domain
 const deleteEndpointLocation = "delete_account.php" 
 // change this from update_settings.php endpoint to web domain
