@@ -93,9 +93,9 @@ function createPost() {
   const newPost = `
     <article class="glass post">
       <header class="post-header">
-        <img class="avatar avatar--sm" src="./assets/profile/rawr.png" alt="">
+        <img class="avatar avatar--sm" src="${CURRENT_USER_AVATAR}" alt="">
         <div>
-          <h4>Jane Doe</h4>
+          <h4>${CURRENT_USER_NAME}</h4>
           <time>Just now</time>
         </div>
         <button class="icon-btn"><i class="ri-more-fill"></i></button>
@@ -109,18 +109,10 @@ function createPost() {
             <i class="ri-heart-line"></i>
             <span>0</span>
           </button>
-          <button class="icon-btn">
-            <i class="ri-chat-1-line"></i>
-            <span>0</span>
-          </button>
-          <button class="icon-btn">
-            <i class="ri-share-forward-line"></i>
-            <span>0</span>
-          </button>
+          <button class="icon-btn"><i class="ri-chat-1-line"></i><span>0</span></button>
+          <button class="icon-btn"><i class="ri-share-forward-line"></i><span>0</span></button>
         </div>
-        <button class="icon-btn">
-          <i class="ri-bookmark-line"></i>
-        </button>
+        <button class="icon-btn"><i class="ri-bookmark-line"></i></button>
       </footer>
     </article>
   `;
