@@ -62,6 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
             $_SESSION['first_name'] = $user['first_name'];
             $_SESSION['middle_name'] = $user['middle_name'];
             $_SESSION['last_name'] = $user['last_name'];
+            $_SESSION['password'] = $user['password'];
             header("Location: dashboard.php");
             exit();
         } else {

@@ -113,6 +113,7 @@ if ($result->num_rows > 0) {
 
     <!-- Start of Section -->
     <div id="section">
+      <!-- Account Information -->
       <div id="account_information_container" 
         class="show-account-info">
         <h2>Account Information</h2>
@@ -191,7 +192,8 @@ if ($result->num_rows > 0) {
 
           <button
             type="button"
-            id="save_btn">
+            id="save_btn"
+            onClick="updateAccountInformation()">
               Save Changes
           </button>
         </form>
@@ -247,7 +249,8 @@ if ($result->num_rows > 0) {
           </div>
           <button 
             type="button"
-            id="change_password_btn">
+            id="change_password_btn"
+            onClick="changePassword()">
               Change Password
           </button>
         </form>
