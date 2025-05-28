@@ -79,8 +79,8 @@ if (!isset($_SESSION['user_email'])) {
         <!-- Profile Card -->
         <section class="glass card card--profile">
           <img class="avatar avatar--lg" src="./assets/profile/shark.jpg" alt="" />
-          <h3 class="card-title">Jane Doe</h3>
-          <p class="card-subtitle">@jane_doe</p>
+          <h3 class="card-title"><?php echo htmlspecialchars($_SESSION['first_name'] . " " . $_SESSION['last_name']);?></h3>
+          <p class="card-subtitle"><?php echo htmlspecialchars($_SESSION['username'])?></p>
           <ul class="stats">
             <li><strong>248</strong><span>Posts</span></li>
             <li><strong>15.2 K</strong><span>Followers</span></li>
@@ -105,12 +105,12 @@ if (!isset($_SESSION['user_email'])) {
             Profile
           </a>
 
-          <a class="nav-item" href="settings.php">
+          <a class="nav-item" href="settings.php"> <!-- Link to settings & privacy -->
             <i class="ri-settings-4-line"></i>
             Settings & Privacy
           </a>
 
-          <a class="nav-item" href="bookmarks.php">
+          <a class="nav-item" href="bookmarks.php"> <!-- Link to saved items -->
             <i class="ri-bookmark-line"></i>
             Saved
           </a>
@@ -139,14 +139,14 @@ if (!isset($_SESSION['user_email'])) {
             <div class="poster-info">
 
               <!-- Link to profile -->
-              <a href="/profile" class="poster-name">Jane Doe</a>
-              <p>@jane_doe</p>
+              <a href="profile.php" class="poster-name"><?php echo htmlspecialchars($_SESSION['first_name'] . " " . $_SESSION['last_name']);?></a>
+              <p><?php echo htmlspecialchars($_SESSION['username']);?></p>
             </div>
           </div>
 
           <textarea class="create-post-input"
-            placeholder="What's happening in your galaxy?">
-          </textarea>
+            placeholder="What's happening in your galaxy?"
+          ></textarea>
 
           <div class="create-post-actions">
             <div class="action-group">
@@ -155,7 +155,7 @@ if (!isset($_SESSION['user_email'])) {
               <button class="icon-btn"><i class="ri-emotion-line"></i></button>
               <button class="icon-btn"><i class="ri-map-pin-line"></i></button>
             </div>
-            <button class="btn btn--primary" disabled>Post</button>
+            <button class="btn btn--primary" onClick="createPost()" disabled>Post</button>
           </div>
         </div>
 

@@ -3,38 +3,41 @@ session_start();
 require_once 'users.php';
 
 $message = '';
-
-if (isset($_SESSION['id'])) {
-  header("Location: main.php");
-  exit();
-}
+$activeTab = 'login'; // Default tab
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  if (isset($_POST['login'])) {
-    $message = loginUser($_POST['email'], $_POST['password']);
-  } elseif (isset($_POST['register'])) {
-    $success = registerUser(
-      $_POST['email'],
-      $_POST['password'],
-      $_POST['first_name'],
-      $_POST['last_name'],
-      $_POST['middle_name'],
-      $_POST['birthdate']
-    );
-    if ($success) {
-      header("Location: index.php?registration=success");
-      exit();
-    } else {
-      $message = "Registration failed. Please try again.";
-    }
-  }
-}
+    if (isset($_POST['login'])) {
+        $result = loginUser($_POST['email'], $_POST['password']);
+        if ($result === true) {
+            header('Location: dashboard.php');
+            exit();
+        } else {
+            $message = $result;
+        }
+        $activeTab = 'login';
+    } elseif (isset($_POST['register'])) {
+        $result = registerUser(
+            $_POST['username'],
+            $_POST['email'],
+            $_POST['password'],
+            $_POST['first_name'],
+            $_POST['last_name'],
+            $_POST['middle_name'],
+            $_POST['birthdate']
+        );
 
-if (isset($_GET['registration']) && $_GET['registration'] === 'success') {
-  $message = "Registration successful! Please log in.";
+        if ($result === true) {
+            $_SESSION['username'] = $_POST['username'];
+            $_SESSION['user_email'] = $_POST['email'];
+            header('Location: dashboard.php');
+            exit();
+        } else {
+            $message = $result;
+        }
+        $activeTab = 'register';
+    }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -47,8 +50,7 @@ if (isset($_GET['registration']) && $_GET['registration'] === 'success') {
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap"
-     rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./stylesheet/form_style.css" />
   </head>
 
@@ -63,9 +65,7 @@ if (isset($_GET['registration']) && $_GET['registration'] === 'success') {
               <h1 class="heading">HeyBleepi</h1>
               <p class="subheading">Connect with friends across the galaxy</p>
               <div class="image-container">
-                <img src="./assets/heybleepi-mascot.jpg"
-                  alt="HeyBleepi Cat Mascot"
-                  class="mascot" />
+                <img src="./assets/heybleepi-mascot.jpg" alt="HeyBleepi Cat Mascot" class="mascot" />
               </div>
               <p class="description">
                 Join thousands of space explorers connecting across the universe
@@ -79,8 +79,13 @@ if (isset($_GET['registration']) && $_GET['registration'] === 'success') {
                 <button id="register-tab" class="tab-btn">Register</button>
               </div>
 
+              <!-- Message Display -->
+              <?php if ($message): ?>
+                <div class="mb-4 text-red-500 text-sm text-center"><?php echo $message; ?></div>
+              <?php endif; ?>
+
               <!-- Login form -->
-              <form id="login-form" class="form-section" method="POST" action="users.php">
+              <form id="login-form" class="form-section" method="POST" action="index.php">
                 <div class="input-group">
                   <i class="ri-mail-line input-icon"></i>
                   <input type="email" name="email" placeholder="Email" class="form-input" required />
@@ -94,7 +99,6 @@ if (isset($_GET['registration']) && $_GET['registration'] === 'success') {
                   </button>
                 </div>
 
-                <!-- Remember me for password -->
                 <div class="form-options">
                   <label class="checkbox-label">
                     <input type="checkbox" name="remember_me" />
@@ -104,17 +108,14 @@ if (isset($_GET['registration']) && $_GET['registration'] === 'success') {
                   <a href="#" class="link">Forgot password?</a>
                 </div>
 
-                <!-- Login button -->
                 <button type="submit" name="login" class="auth-button">Login</button>
 
-                <!-- Divider -->
                 <div class="divider">
                   <div class="line"></div>
                   <span class="divider-text">or continue with</span>
                   <div class="line"></div>
                 </div>
 
-                <!-- Socials Connection -->
                 <div class="social-connection">
                   <button type="button" class="account-btn">
                     <img src="./assets/connected_accounts/devhive.jpg" alt="Devhive logo">
@@ -125,49 +126,41 @@ if (isset($_GET['registration']) && $_GET['registration'] === 'success') {
                     Hershell
                   </button>
                 </div>
-              </form> <!-- Login form -->
+              </form>
 
               <!-- Register form -->
-              <form id="register-form" class="form-section hidden" method="POST" action="users.php">
-
-                <!-- Username -->
+              <form id="register-form" class="form-section hidden" method="POST" action="index.php">
                 <div class="input-group">
                   <i class="ri-user-line input-icon"></i>
                   <input type="text" name="username" placeholder="Username (must be unique)" class="form-input" required />
                   <small id="username_status"></small>
                 </div>
 
-                <!-- Name Fields -->
                 <div class="name-grid">
                   <div class="input-group">
                     <i class="ri-user-line input-icon"></i>
                     <input type="text" name="first_name" placeholder="First Name" class="form-input" required />
                   </div>
-
                   <div class="input-group">
                     <i class="ri-user-line input-icon"></i>
                     <input type="text" name="middle_name" placeholder="Middle Name" class="form-input" />
                   </div>
-
                   <div class="input-group">
                     <i class="ri-user-line input-icon"></i>
                     <input type="text" name="last_name" placeholder="Last Name" class="form-input" required />
                   </div>
                 </div>
 
-                 <!-- Email -->
                 <div class="input-group">
                   <i class="ri-mail-line input-icon"></i>
                   <input type="email" name="email" placeholder="Email Address" class="form-input" required />
                 </div>
 
-                 <!-- Birthdate -->
                 <div class="input-group">
                   <i class="ri-calendar-line input-icon"></i>
                   <input type="text" name="birthdate" placeholder="Birthdate (mm/dd/yyyy)" class="form-input" required />
                 </div>
 
-                <!-- Password -->
                 <div class="input-group">
                   <i class="ri-lock-line input-icon"></i>
                   <input type="password" name="password" placeholder="Password" class="form-input" required />
@@ -176,7 +169,6 @@ if (isset($_GET['registration']) && $_GET['registration'] === 'success') {
                   </button>
                 </div>
 
-                <!-- Terms and Privacy -->
                 <label class="checkbox-agreement">
                   <input type="checkbox" name="agree_terms" required />
                   <span class="checkmark"></span>
@@ -189,12 +181,13 @@ if (isset($_GET['registration']) && $_GET['registration'] === 'success') {
                 </label>
 
                 <button type="submit" name="register" class="auth-button">Create Account</button>
-              </form><!-- Register form -->
-            </div> <!-- Right panel -->
-          </div> <!-- Overall panel -->
-        </div> <!-- Glass -->
-      </div> <!-- Background -->
-    </div> <!-- Stars -->
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="./script/form_script.js"></script>
   </body>
 </html>

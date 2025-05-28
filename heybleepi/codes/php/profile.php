@@ -11,7 +11,7 @@ if (!isset($_SESSION['username'])) {
 $username = $_SESSION['username'];
 
 // Fetch user data by username
-$sql = "SELECT * FROM users WHERE username = ?";
+$sql = "SELECT * FROM users WHERE user_name = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $username);
 $stmt->execute();
@@ -40,7 +40,7 @@ $user = $result->fetch_assoc();
     <header class="top-nav glass">
       <h1 class="brand">HEYBLEEPI</h1>
       <nav class="nav-actions">
-        <a class="icon-btn" href="dashboard.html" title="Home"><i class="ri-home-4-line"></i></a>
+        <a class="icon-btn" href="dashboard.php" title="Home"><i class="ri-home-4-line"></i></a>
         <a class="icon-btn" href="messages.php" title="Messages"><i class="ri-message-3-line"></i></a>
 
         <div class="notification-wrapper" id="notification_wrapper">
@@ -66,19 +66,18 @@ $user = $result->fetch_assoc();
     <main class="profile-container">
       <!-- Banner + Profile info -->
       <div class="profile-top glass">
-        <img class="banner-img" src="./assets/profile/banner.jpg" alt="Banner" />
+        <img class="banner-img" src="<?php echo $user['banner.jpg']; ?>" alt="Banner" />
         <div class="profile-info-bar">
-          <img class="avatar profile-avatar" src="./assets/profile/rawr.png" alt="Profile" />
-
+          <img class="avatar profile-avatar" src="<?php echo $user['rawr.jpg']; ?>" alt="Profile" />
           <div class="user-basic-info">
-            <h2><?php echo htmlspecialchars($user['first_name']) . ' ' . htmlspecialchars($user['last_name']); ?></h2>
-            <p>@<?php echo htmlspecialchars($user['username']); ?> · 81 friends</p>
+            <h2><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></h2>
+            <p>@<?php echo htmlspecialchars($user['username']); ?> · <?php echo $user['friends']; ?> friends</p>
           </div>
 
           <div class="profile-buttons">
             <button class="btn btn--primary">Add to Story</button>
               <button class="btn btn--secondary"
-                onclick="window.location.href='profile_edit.html'">
+                onclick="window.location.href='profile_edit.php'">
                 Edit Profile
             </button>
           </div>
@@ -127,8 +126,8 @@ $user = $result->fetch_assoc();
             <div class="create-post-header">
               <img class="avatar avatar--sm" src="./assets/profile/rawr.png" alt="">
               <div class="poster-info">
-                <a href="profile.html" class="poster-name"><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></a>
-                <p>@<?php echo htmlspecialchars($user['username']); ?></p>
+                <a href="profile.php" class="poster-name"><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></a>
+                <p>@<?php echo htmlspecialchars($user['user_name']); ?></p>
               </div>
             </div>
 
@@ -152,7 +151,7 @@ $user = $result->fetch_assoc();
               <header class="post-header">
                 <img class="avatar avatar--sm" src="./assets/profile/rawr.png" alt="">
                 <div>
-                  <h4>Jane Doe</h4>
+                  <h4><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']);?></h4>
                   <time>3h ago</time>
                 </div>
                 <button class="icon-btn"><i class="ri-more-fill"></i></button>

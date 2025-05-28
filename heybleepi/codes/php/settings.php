@@ -3,12 +3,12 @@ session_start();
 require_once 'configuration.php';
 
 // Ensure user is logged in
-if (!isset($_SESSION['user_name'])) {
+if (!isset($_SESSION['username'])) {
   header("Location: index.php");
   exit();
 }
 
-$user_name = $_SESSION['user_name'];
+$user_name = $_SESSION['username'];
 $user = [];
 
 // Fetch user data
