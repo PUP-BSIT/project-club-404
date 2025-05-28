@@ -3,47 +3,49 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// session_start();
-include 'configuration.php';
+//session_start();
+require_once 'configuration.php';
 
-// Handle register
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register'])) {
-    $username = trim($_POST['username']);
-    $fname = $_POST['first_name'];
-    $mname = $_POST['middle_name'];
-    $lname = $_POST['last_name'];
-    $email = $_POST['email'];
+function redirectWithMessage($message, $type = "error") {
+    header("Location: index.php?message=" . urlencode($message) . "&type=" . $type);
+    exit();
+}
+
+// Handle registration
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['register'])) {
+    $username  = trim($_POST['username']);
+    $fname     = trim($_POST['first_name']);
+    $mname     = trim($_POST['middle_name']);
+    $lname     = trim($_POST['last_name']);
+    $email     = trim($_POST['email']);
     $birthdate = $_POST['birthdate'];
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $password  = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
-    // Check if username exists
-    $stmt = $conn->prepare("SELECT * FROM users WHERE user_name = ?");
+    // Check for existing username
+    $stmt = $conn->prepare("SELECT 1 FROM users WHERE user_name = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
-    $check_result = $stmt->get_result();
-
-    if ($check_result->num_rows > 0) {
-        echo "Username already taken!";
-        exit();
+    $stmt->store_result();
+    if ($stmt->num_rows > 0) {
+        redirectWithMessage("Username already taken!");
     }
 
-    // Insert new user
+    // Insert user
     $stmt = $conn->prepare("INSERT INTO users (user_name, first_name, middle_name, last_name, email, birthdate, password) VALUES (?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("sssssss", $username, $fname, $mname, $lname, $email, $birthdate, $password);
 
     if ($stmt->execute()) {
-        $_SESSION['username'] = $username;
-        $_SESSION['user_email'] = $email;
-        header("Location: dashboard.php");
+        // Optional: redirect to login form instead of auto-login
+        header("Location: index.php?registration=success");
         exit();
     } else {
-        echo "Error: " . $stmt->error;
+        redirectWithMessage("Error: " . $stmt->error);
     }
 }
 
 // Handle login
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
-    $email = $_POST['email'];
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
+    $email    = trim($_POST['email']);
     $password = $_POST['password'];
 
     $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
@@ -51,18 +53,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
     $stmt->execute();
     $result = $stmt->get_result();
 
-    if ($result->num_rows === 1) {
-        $row = $result->fetch_assoc();
-        if (password_verify($password, $row["password"])) {
-            $_SESSION['username'] = $row['user_name'];
-            $_SESSION['user_email'] = $row['email'];
+    if ($result && $result->num_rows === 1) {
+        $user = $result->fetch_assoc();
+        if (password_verify($password, $user["password"])) {
+            $_SESSION['id'] = $user['id'];
+            $_SESSION['username']    = $user['user_name'];
+            $_SESSION['user_email']  = $user['email'];
+            $_SESSION['first_name'] = $user['first_name'];
+            $_SESSION['middle_name'] = $user['middle_name'];
+            $_SESSION['last_name'] = $user['last_name'];
             header("Location: dashboard.php");
             exit();
         } else {
-            echo "Invalid password!";
+            redirectWithMessage("Invalid password.");
         }
     } else {
-        echo "No user found!";
+        redirectWithMessage("User not found.");
     }
 }
 

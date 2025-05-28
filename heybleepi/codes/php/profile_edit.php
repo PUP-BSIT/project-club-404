@@ -2,12 +2,12 @@
 session_start();
 require_once 'configuration.php';
 
-if (!isset($_SESSION['user_name'])) {
+if (!isset($_SESSION['username'])) {
     header("Location: index.php");
     exit();
 }
 
-$user_name = $_SESSION['user_name'];
+$user_name = $_SESSION['username'];
 $success_message = "";
 
 // Handle form submission
@@ -64,22 +64,19 @@ $stmt->close();
         <div id="edit_profile_form">
           <div class="input-group">
             <label for="first_name">First Name</label>
-            <input type="text" id="first_name" name="first_name" />
+            <input type="text" id="first_name" name="first_name" value="<?= htmlspecialchars($user['first_name']) ?>" />
           </div>
-
           <div class="input-group">
             <label for="last_name">Last Name</label>
-            <input type="text" id="last_name" name="last_name" />
+            <input type="text" id="last_name" name="last_name" value="<?= htmlspecialchars($user['last_name']) ?>" />
           </div>
-
           <div class="input-group">
             <label for="username">Username</label>
-            <input type="text" id="username" name="username" />
+            <input type="text" id="username" name="username" value="<?= htmlspecialchars($user['user_name']) ?>" />
           </div>
-
           <div class="input-group">
             <label for="email">Email</label>
-            <input type="email" id="email" name="email" />
+            <input type="email" id="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" />
           </div>
         </div>
       </form>
