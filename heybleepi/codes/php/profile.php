@@ -29,13 +29,18 @@ $user = $result->fetch_assoc();
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>HEYBLEEPI | <?php echo htmlspecialchars($user['username']); ?>'s Profile</title>
+    <title>HEYBLEEPI | <?php echo htmlspecialchars($user['user_name']); ?>'s Profile</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="stylesheet" href="./stylesheet/dashboard.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
+    <script>
+      const CURRENT_USER_NAME = <?= json_encode($user['first_name'] . ' ' . $user['last_name']) ?>;
+      const CURRENT_USER_USERNAME = <?= json_encode($user['user_name']) ?>;
+      const CURRENT_USER_AVATAR = <?= json_encode("./assets/profile/" . ($user['avatar'] ?? "rawr.png")) ?>;
+    </script>
   </head>
-  <body class="page">
 
+  <body class="page">
     <!-- Top Navbar -->
     <header class="top-nav glass">
       <h1 class="brand">HEYBLEEPI</h1>
@@ -66,12 +71,12 @@ $user = $result->fetch_assoc();
     <main class="profile-container">
       <!-- Banner + Profile info -->
       <div class="profile-top glass">
-        <img class="banner-img" src="<?php echo $user['banner.jpg']; ?>" alt="Banner" />
+        <img class="banner-img" src="./assets/profile/banner.jpg" alt="Banner" />
         <div class="profile-info-bar">
-          <img class="avatar profile-avatar" src="<?php echo $user['rawr.jpg']; ?>" alt="Profile" />
+          <img class="avatar avatar--sm" src="./assets/profile/<?= htmlspecialchars($user['avatar'] ?? 'rawr.png') ?>" alt="">
           <div class="user-basic-info">
             <h2><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></h2>
-            <p>@<?php echo htmlspecialchars($user['username']); ?> · <?php echo $user['friends']; ?> friends</p>
+            <p>@<?php echo htmlspecialchars($user['user_name']); ?> · 81</p>
           </div>
 
           <div class="profile-buttons">
