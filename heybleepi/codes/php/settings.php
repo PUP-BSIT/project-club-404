@@ -30,7 +30,8 @@ if ($result->num_rows > 0) {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <link href="./stylesheet/settings.css" rel="stylesheet">
+    <link href="http://localhost/project-club-404/heybleepi/codes/stylesheet/settings.css" rel="stylesheet">
+    <!-- change the css filepath later. -->
     <title>Settings</title>
   </head>
 
@@ -63,10 +64,11 @@ if ($result->num_rows > 0) {
       <div class="delete-acc-prompt">
         <h2>Are you sure you want to permanently delete your account?</h2>
         <div class="delete-acc-buttons">
-          <form> <!--to test delete account php-->
+          <form action="./delete_account.php" method="delete"> <!--to test delete account php-->
             <button 
               type="button"
-              class="buttons delete-btn">
+              class="buttons delete-btn"
+              onClick="deleteAccount(<?php htmlspecialchars($user['id']);?>)">
                 Delete
             </button>
           </form>
@@ -258,7 +260,8 @@ if ($result->num_rows > 0) {
       </div>
     </div>
     <!-- End of Section -->
-
-    <script src="./script/settings.js"></script>
+    
+    <!-- change the script path later -->
+    <script src="http://localhost/project-club-404/heybleepi/codes/script/settings.js"></script>
   </body>
 </html>

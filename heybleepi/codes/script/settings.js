@@ -5,6 +5,7 @@ let accountInformationBtn = document.querySelector('#acct_info_btn');
 let privacySettingsBtn = document.querySelector('#privacy_settings_btn');
 let logoutPrompt = document.querySelector('#logout_prompt');
 let deleteAccPrompt = document.querySelector('#delete_acc');
+const endpoint = "delete_account.php" // change the endpoint to web domain
 
 function switchToAccountInformation() {
   privacySettings.classList.add('hide-privacy-settings');
@@ -42,5 +43,21 @@ function showDeleteAccountPrompt() {
 function hideDeleteAccountPrompt() {
   deleteAccPrompt.classList.add('hide-delete-acc-prompt');
   deleteAccPrompt.classList.remove('show-delete-acc-prompt');
+}
+
+// Function to find and delete the account in the database.
+function deleteAccount(id) {
+  fetch(endpoint, {
+    method: "POST",
+    headers: {
+      "Content-type": "application/x-www-form-urlencoded",
+    },
+    body: `id=${id}`,
+  })
+  .then((response) => response.text())
+  .then((responseText) => {
+    alert(responseText);
+    window.location.reload(); // reloads the window.
+  })
 }
 
