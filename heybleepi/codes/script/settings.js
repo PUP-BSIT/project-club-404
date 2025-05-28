@@ -5,7 +5,13 @@ let accountInformationBtn = document.querySelector('#acct_info_btn');
 let privacySettingsBtn = document.querySelector('#privacy_settings_btn');
 let logoutPrompt = document.querySelector('#logout_prompt');
 let deleteAccPrompt = document.querySelector('#delete_acc');
-const endpoint = "delete_account.php" // change the endpoint to web domain
+
+// change this from delete_account.php endpoint to web domain
+const deleteEndpointLocation = "delete_account.php" 
+// change this from update_settings.php endpoint to web domain
+const updateEndpointLocation = "update_settings.php"; 
+// change this from update_password.php endpoint to web domain
+const updatePasswordEndpoint = "update_password.php";
 
 function switchToAccountInformation() {
   privacySettings.classList.add('hide-privacy-settings');
@@ -47,7 +53,7 @@ function hideDeleteAccountPrompt() {
 
 // Function to find and delete the account in the database.
 function deleteAccount(id) {
-  fetch(endpoint, {
+  fetch(deleteEndpointLocation, {
     method: "POST",
     headers: {
       "Content-type": "application/x-www-form-urlencoded",
@@ -61,3 +67,55 @@ function deleteAccount(id) {
   })
 }
 
+function updateAccountInformation() {
+  const firstNameInput = document.querySelector("#first_name");
+  const middleNameInput = document.querySelector("#middle_name");
+  const lastNameInput = document.querySelector("#last_name");
+  const usernameInput = document.querySelector("#username");
+  const emailInput = document.querySelector("#email");
+  const birthdateInput = document.querySelector("#birthdate");
+
+  fetch(updateEndpointLocation, {
+    method: "PATCH",
+    headers: {
+      "Content-type": "application/x-www-form-urlencoded",  
+    },
+    body: `user_name=${usernameInput.value}&first_name=${firstNameInput.value}&` +
+          `middle_name=${middleNameInput.value}&last_name=${lastNameInput.value}&` +
+          `email=${emailInput.value}&birthdate=${birthdateInput.value}`
+  })
+  .then((response) => response.text())
+  .then(responseText => {
+    alert(responseText);
+    window.location.reload();
+  })
+}
+
+function changePassword() {
+  const currentPasswordInput = document.querySelector("#old_password");
+  const newPasswordInput = document.querySelector("#new_password");
+  const confirmPasswordInput = document.querySelector("#confirm_new_password");
+
+  fetch(updatePasswordEndpoint, {
+    method: "POST",
+    headers: {
+      "Content-type": "application/x-www-form-urlencoded",  
+    },
+    body: `password=${currentPasswordInput.value}&` +
+          `new_password=${newPasswordInput.value}`
+  })
+  .then((response) => response.text())
+  .then(responseText => {
+    if(!newPasswordInput.value && !confirmPasswordInput.value) {
+          alert("Please fill the fields.")
+    }
+
+    if (newPasswordInput.value != confirmPasswordInput.value) {
+      alert("New password and Confirm password are not the same.");
+      return;
+    }
+
+    alert(responseText);
+    window.location.reload();
+  })
+}

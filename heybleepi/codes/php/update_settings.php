@@ -2,33 +2,44 @@
 session_start();
 require_once 'configuration.php';
 
-if (!isset($_SESSION['user_name'])) {
+if (!isset($_SESSION['username'])) {
   header("Location: index.php");
   exit();
 }
+// Get raw values.
+parse_str(file_get_contents('php://input'), $_PATCH);
 
-$user_name = $_SESSION['user_name'];
+// Get the current username using the session.
+$currentUsername = $_SESSION['username'];
 
 // Get form values
-$first_name = $_POST['first_name'] ?? '';
-$middle_name = $_POST['middle_name'] ?? '';
-$last_name = $_POST['last_name'] ?? '';
-$email = $_POST['email'] ?? '';
-$birthdate = $_POST['birthdate'] ?? '';
+$updatedFirstName = $_PATCH['first_name'] ?? "";
+$updatedMiddleName = $_PATCH['middle_name'] ?? "";
+$updatedLastName = $_PATCH['last_name'] ?? "";
+$updatedUsername = $_PATCH['user_name'] ?? "";
+$updatedEmail = $_PATCH['email'] ?? "";
+$updatedBirthdate = $_PATCH['birthdate'] ?? "";
 
 // Update query
-$sql = "UPDATE users SET first_name=?, middle_name=?, last_name=?, email=?, birthdate=? WHERE user_name=?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("ssssss", $first_name, $middle_name, $last_name, $email, $birthdate, $user_name);
-
-if ($stmt->execute()) {
-  // Success message and redirect
-  header("Location: settings.php?status=success");
-  exit();
-} else {
-  echo "Error updating profile: " . $stmt->error;
+$sql = "UPDATE users 
+        SET user_name ='${updatedUsername}', 
+        first_name='${updatedFirstName}', 
+        middle_name='${updatedMiddleName}', 
+        last_name='${updatedLastName}',
+        email='${updatedEmail}', 
+        birthdate='${updatedBirthdate}' 
+        WHERE user_name='${currentUsername}'";
+      
+if(!mysqli_query($conn, $sql)) {
+  // echo "Error:" . $sql . "<br>" . mysqli_error($conn); 
+  echo "Failed to update account information";
 }
 
-$stmt->close();
-$conn->close();
+echo "Account Information Updated!";
+$_SESSION['username'] = $updatedUsername;
+$_SESSION['email'] = $updatedEmail;
+$_SESSION['first_name'] = $updatedFirstName;
+$_SESSION['middle_name'] = $updatedMiddleName;
+$_SESSION['last_name'] = $updatedLastName;
+mysqli_close($conn);
 ?>
