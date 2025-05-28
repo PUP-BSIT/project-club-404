@@ -9,7 +9,7 @@
 
   $user_id = $_SESSION['id'];
 
-  $sql = "SELECT * FROM users WHERE id = {$user_id}";
+  $sql = "DELETE FROM users WHERE id = {$user_id}";
   if (!mysqli_query($conn, $sql)) {
     echo "Error: " .  $sql . "<br>" . mysqli_error($conn);
   }
