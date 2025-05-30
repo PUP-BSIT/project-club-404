@@ -380,13 +380,13 @@ form button:hover,
 .button-row .cancel {
   width: 100%;
   max-width: 200px;
-  padding: 1.2rem 1rem;
+  padding: 0.75rem 1.5rem;
   font-size: 1rem;
   font-weight: 500;
   background-image: linear-gradient(to right, #8a6fdf);
   border: none;
   color: white;
-  border-radius: 10px;
+  border-radius: 9999px;
   cursor: pointer;
   transition: opacity 0.3s ease;
   margin-bottom: 20px;
