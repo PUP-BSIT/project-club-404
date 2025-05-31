@@ -10,116 +10,135 @@
 
   <body>
     <div class="container">
-      <!-- Cover Preview -->
-      <div class="cover-preview-div" id="cover_preview_div"></div>
-      <button class="change-profile-pic" 
-        onclick="changeCover()">
-          Change Cover Photo
-      </button>
-      <input type="file" id="cover_input" accept="image/*" hidden>
+      <!-- FORM -->
+      <form id="profile_form" method="POST" enctype="multipart/form-data">
+        <!-- Cover Preview -->
+        <div class="cover-preview-div"
+          style="background-image: url('./assets/profile/default_cover.jpg');" 
+          id="cover_preview_div">
+        </div>
+        <button class="change-profile-pic" 
+          type="button"
+          onclick="changeCover()">
+            Change Cover Photo
+        </button>
+        <input type="file" 
+          name="cover_input" 
+          id="cover_input" 
+          accept="image/*" 
+          hidden >
 
-      <!-- Profile Picture -->
-      <div class="profile-picture">
-        <img id="profile_image" src="./assets/profile/rawr.png" alt="Shark" />
-        <label for="file_input" class="change-profile-image">+</label>
-        <input type="file" id="file_input" accept="image/*" hidden />
-        <h2>Edit Profile</h2>
-      </div>
-
-      <!-- Form Fields -->
-      <form id="profile_form">
+        <!-- Profile Picture -->
+        <div class="profile-picture">
+          <img id="profile_image" 
+            src="./assets/profile/cat.png" 
+            alt="Profile Picture" />
+          <label for="file_input" class="change-profile-image">+</label>
+          <input type="file" 
+            name="file_input" 
+            id="file_input" 
+            accept="image/*" 
+            hidden />
+            <h2>Edit Profile</h2>
+        </div>
+        
+        <!-- Profile Name -->
         <div id="edit_profile_form">
           <div class="input-group">
             <label for="first_name">First Name</label>
-            <input type="text" id="first_name" name="first_name" />
+            <input type="text" 
+              id="first_name" 
+              name="first_name" />
           </div>
-
           <div class="input-group">
             <label for="last_name">Last Name</label>
-            <input type="text" id="last_name" name="last_name" />
+            <input type="text" 
+            id="last_name" 
+            name="last_name" />
           </div>
-
           <div class="input-group">
             <label for="username">Username</label>
-            <input type="text" id="username" name="username" />
+            <input type="text" 
+            id="username" 
+            name="username" />
           </div>
-
           <div class="input-group">
             <label for="email">Email</label>
-            <input type="email" id="email" name="email" />
+            <input type="email" 
+              id="email" 
+              name="email" />
           </div>
         </div>
-      </form>
 
-      <!-- Bio -->
-      <div class="bio-section">
-        <label for="bio">Bio</label>
-        <textarea id="bio" name="bio" disabled></textarea>
+        <!-- Bio -->
+        <div class="bio-section">
+          <label for="bio">Bio</label>
+          <textarea id="bio" 
+            name="bio" 
+            readonly></textarea>
+          <button type="button" 
+            class="change-bio" 
+            onclick="enableTextArea()">
+              Change Bio
+          </button>
+        </div>
 
-        <!-- Buttons -->
-        <button class="change-bio" 
-          onclick="enableTextArea()">
-            Change Bio
-        </button>
-        <button class="save-changes" 
-          onclick="alertUserOnSave()">
-            Save Changes
-        </button>
-      </div>
-      <!-- Profile Details -->
-      <div class="profile-details">
-        <h2 class="profile-details-title">Profile Details</h2>
-      </div>
-
-      <!-- Form Fields For Details-->
-      <form id="profile_details_form">
+        <!-- Profile Details -->
         <div id="edit_profile_details_form">
           <div class="input-group-2">
             <label for="work">💼Works at:</label>
-            <input type="work" id="work" name="work" />
+            <input type="text" 
+              id="work" 
+              name="work" />
           </div>
           <div class="input-group-2">
             <label for="school">🎓Studies at:</label>
-            <input type="school" id="school" name="school" />
+            <input type="text" 
+              id="school" 
+              name="school" />
           </div>
           <div class="input-group-2">
             <label id="home_label" for="home">🏠Lives in:</label>
-            <input type="home" id="home" name="home" />
+            <input type="text" 
+              id="home" 
+              name="home" />
           </div>
           <div class="input-group-2">
             <p id="relationship_label">❤️Relationship Status:</p>
             <label id="single">
               <input type="radio" 
                 name="relationship" 
-                value="single">
+                value="single"> 
                   Single
             </label>
             <label id="in_a_relationship">
               <input type="radio" 
                 name="relationship" 
-                value="in_a_relationship">
+                value="in_a_relationship"> 
                   In a Relationship
             </label>
             <label id="married">
               <input type="radio" 
                 name="relationship" 
-                value="married">
+                value="married"> 
                   Married
             </label>
             <label id="complicated">
               <input type="radio" 
                 name="relationship" 
-                value="complicated">
+                value="complicated"> 
                   It's Complicated
             </label>
           </div>
           <div class="input-group-2">
             <label id="religion_label" for="religion">✝️Religion:</label>
-            <input type="religion" id="religion" name="religion" />
+            <input type="text" 
+              id="religion" 
+              name="religion" />
           </div>
         </div>
       </form>
     </div>
-    <script src="../codes/script/profile_edit.js"></script>
+    <script src="./script/profile_edit.js"></script>
   </body>
 </html>
