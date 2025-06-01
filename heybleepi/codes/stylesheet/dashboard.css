@@ -616,6 +616,10 @@ textarea.create-post-input::placeholder {
   color: gold;
 }
 
+.ri-heart-fill {
+  color: red !important;
+}
+
 /* Comment input */
 .post input[type="text"] {
   background: rgba(255, 255, 255, 0.05);
