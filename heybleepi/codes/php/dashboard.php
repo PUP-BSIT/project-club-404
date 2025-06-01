@@ -84,6 +84,37 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['share_post_id'])) {
   header("Location: dashboard.php");
   exit();
 }
+
+// DELETE COMMENT
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_comment_id'])) {
+  $commentId = intval($_POST['delete_comment_id']);
+  $userId = $_SESSION['id'];
+
+  $stmt = $conn->prepare("DELETE FROM comments WHERE id = ? AND user_id = ?");
+  $stmt->bind_param("ii", $commentId, $userId);
+  $stmt->execute();
+  $stmt->close();
+
+  header("Location: dashboard.php");
+  exit();
+}
+
+// EDIT COMMENT
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_comment_id'], $_POST['new_comment_text'])) {
+  $commentId = intval($_POST['edit_comment_id']);
+  $newText = trim($_POST['new_comment_text']);
+  $userId = $_SESSION['id'];
+
+  if (!empty($newText)) {
+    $stmt = $conn->prepare("UPDATE comments SET comment_text = ? WHERE id = ? AND user_id = ?");
+    $stmt->bind_param("sii", $newText, $commentId, $userId);
+    $stmt->execute();
+    $stmt->close();
+  }
+
+  header("Location: dashboard.php");
+  exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -194,7 +225,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['share_post_id'])) {
             <i class="ri-logout-box-line"></i>
             Logout
           </a>
-
         </nav>
       </aside>
 
@@ -305,10 +335,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['share_post_id'])) {
                   $comments = $conn->query("SELECT comments.*, users.first_name, users.last_name FROM comments JOIN users ON comments.user_id = users.id WHERE post_id = {$post['id']} ORDER BY commented_at ASC");
                   while ($comment = $comments->fetch_assoc()):
                 ?>
-                  <div style="margin-bottom: 8px;">
+                  <div class="comment" data-comment-id="<?= $comment['id'] ?>" style="margin-bottom: 8px;">
                     <strong><?= htmlspecialchars($comment['first_name'] . ' ' . $comment['last_name']) ?>:</strong>
-                    <?= htmlspecialchars($comment['comment_text']) ?>
+                    <span class="comment-text"><?= htmlspecialchars($comment['comment_text']) ?></span>
                     <small style="color:gray;"> – <?= date("M d, g:i A", strtotime($comment['commented_at'])) ?></small>
+
+                    <?php if ($comment['user_id'] == $_SESSION['id']): ?>
+                      <button class="btn--sm btn-edit-comment" data-id="<?= $comment['id'] ?>">Edit</button>
+                      <button class="btn--sm btn-delete-comment" data-id="<?= $comment['id'] ?>">Delete</button>
+                    <?php endif; ?>
                   </div>
                 <?php endwhile; ?>
               </div>
