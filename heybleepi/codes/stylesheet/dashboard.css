@@ -118,12 +118,6 @@ body.page {
   height: 48px;
 }
 
-.avatar--story {
-  width: 64px;
-  height: 64px;
-  border: 2px solid #fff;
-}
-
 /*  ====  HEADER  ==== */
 .top-nav {
   position: sticky;
@@ -153,6 +147,11 @@ body.page {
   position: relative;
   justify-content: flex-end;
   flex: 1;
+  pointer-events: auto;
+}
+
+.nav-actions form {
+  margin-right: 0.75rem;
 }
 
 /* search */
@@ -415,23 +414,6 @@ body.page {
   padding: 0 .35rem;
   font-size: .6rem;
   margin-left: auto;
-}
-
-/*  ====  STORIES  ==== */
-.stories {
-  display: flex;
-  gap: 1.25rem;
-  overflow-x: auto;
-  padding: .8rem 1rem;
-}
-
-.story {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-size: .65rem;
-  gap: .25rem;
-  min-width: 68px;
 }
 
 /*  ====  CREATE POST  ==== */

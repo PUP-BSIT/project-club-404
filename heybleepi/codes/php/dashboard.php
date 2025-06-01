@@ -1,7 +1,87 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_email'])) {
-  header("Location: index.php"); // Redirect if not logged in
+require_once 'configuration.php';
+
+if (!isset($_SESSION['username'])) {
+  header("Location: index.php");
+  exit();
+}
+
+// POST CREATION
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['post_content'])) {
+  $user_id = $_SESSION['id'];
+  $post_content = trim($_POST['post_content']);
+
+  if (!empty($post_content)) {
+    $stmt = $conn->prepare("INSERT INTO posts (user_id, content) VALUES (?, ?)");
+    $stmt->bind_param("is", $user_id, $post_content);
+    $stmt->execute();
+    $stmt->close();
+  }
+
+  header("Location: dashboard.php");
+  exit();
+}
+
+// LIKE A POST
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['like_post_id'])) {
+  $user_id = $_SESSION['id'];
+  $post_id = intval($_POST['like_post_id']);
+
+  // Check if already liked
+  $check = $conn->prepare("SELECT id FROM likes WHERE user_id = ? AND post_id = ?");
+  $check->bind_param("ii", $user_id, $post_id);
+  $check->execute();
+  $check->store_result();
+
+  if ($check->num_rows === 0) {
+    $like = $conn->prepare("INSERT INTO likes (user_id, post_id) VALUES (?, ?)");
+    $like->bind_param("ii", $user_id, $post_id);
+    $like->execute();
+    $like->close();
+  }
+
+  $check->close();
+  header("Location: dashboard.php");
+  exit();
+}
+
+// COMMENT ON A POST
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['comment_post_id'], $_POST['comment_text'])) {
+  $user_id = $_SESSION['id'];
+  $post_id = intval($_POST['comment_post_id']);
+  $comment = trim($_POST['comment_text']);
+
+  if (!empty($comment)) {
+    $stmt = $conn->prepare("INSERT INTO comments (user_id, post_id, comment_text) VALUES (?, ?, ?)");
+    $stmt->bind_param("iis", $user_id, $post_id, $comment);
+    $stmt->execute();
+    $stmt->close();
+  }
+
+  header("Location: dashboard.php");
+  exit();
+}
+
+// SHARE A POST
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['share_post_id'])) {
+  $user_id = $_SESSION['id'];
+  $post_id = intval($_POST['share_post_id']);
+
+  $check = $conn->prepare("SELECT id FROM shares WHERE user_id = ? AND post_id = ?");
+  $check->bind_param("ii", $user_id, $post_id);
+  $check->execute();
+  $check->store_result();
+
+  if ($check->num_rows === 0) {
+    $stmt = $conn->prepare("INSERT INTO shares (user_id, post_id) VALUES (?, ?)");
+    $stmt->bind_param("ii", $user_id, $post_id);
+    $stmt->execute();
+    $stmt->close();
+  }
+
+  $check->close();
+  header("Location: dashboard.php");
   exit();
 }
 ?>
@@ -32,11 +112,6 @@ if (!isset($_SESSION['user_email'])) {
             type="text"
             placeholder="Search in space…" />
           <i class="ri-search-line search-icon"></i>
-        </form>
-
-        <!-- Logout -->
-        <form action="logout.php" method="POST" style="margin-top: 1rem;">
-          <button class="btn btn--primary btn--sm">Logout</button>
         </form>
 
         <!-- Create Post -->
@@ -120,89 +195,120 @@ if (!isset($_SESSION['user_email'])) {
       <!-- FEED -->
       <section class="feed" id="mainFeed">
 
-        <!-- Stories -->
-        <div class="glass stories">
-          <article class="story">
-            <img class="avatar avatar--story"
-            src="./assets/profile/chicken.jpg"
-            alt=""><span>John Doe</span>
-          </article>
-          <!-- repeat if needed -->
-        </div>
-
         <!-- Create Post -->
-        <div class="glass create-post">
-          <div class="create-post-header">
-            <img class="avatar avatar--sm"
-              src="./assets/profile/shark.jpg"
-              alt="">
-            <div class="poster-info">
+        <form method="POST" action="dashboard.php">
+          <div class="glass create-post">
+            <div class="create-post-header">
+              <img class="avatar avatar--sm" src="<?= $_SESSION['avatar'] ?? './assets/profile/default.png' ?>" alt="">
+              <div class="poster-info">
+                <a href="profile.php" class="poster-name"><?= $_SESSION['first_name'] . ' ' . $_SESSION['last_name'] ?></a>
+                <p>@<?= $_SESSION['username'] ?></p>
+              </div>
+            </div>
 
-              <!-- Link to profile -->
-              <a href="profile.php" class="poster-name"><?php echo htmlspecialchars($_SESSION['first_name'] . " " . $_SESSION['last_name']);?></a>
-              <p><?php echo htmlspecialchars($_SESSION['username']);?></p>
+            <textarea class="create-post-input" name="post_content"
+              placeholder="What's happening in your galaxy?"
+              required
+            ></textarea>
+
+            <div class="create-post-actions">
+              <div class="action-group">
+                <button class="icon-btn" type="button"><i class="ri-image-line"></i></button>
+                <button class="icon-btn" type="button"><i class="ri-vidicon-line"></i></button>
+                <button class="icon-btn" type="button"><i class="ri-emotion-line"></i></button>
+                <button class="icon-btn" type="button"><i class="ri-map-pin-line"></i></button>
+              </div>
+              <button class="btn btn--primary" onClick="submit">Post</button>
             </div>
           </div>
-
-          <textarea class="create-post-input"
-            placeholder="What's happening in your galaxy?"
-          ></textarea>
-
-          <div class="create-post-actions">
-            <div class="action-group">
-              <button class="icon-btn"><i class="ri-image-line"></i></button>
-              <button class="icon-btn"><i class="ri-vidicon-line"></i></button>
-              <button class="icon-btn"><i class="ri-emotion-line"></i></button>
-              <button class="icon-btn"><i class="ri-map-pin-line"></i></button>
-            </div>
-            <button class="btn btn--primary" onClick="createPost()" disabled>Post</button>
-          </div>
-        </div>
+        </form>
 
         <!-- POSTS (example post card) -->
-        <article class="glass post">
-          <header class="post-header">
-            <img class="avatar avatar--sm"
-              src="./assets/profile/chicken.jpg"
-              alt="">
-            <div>
-              <h4>John Doe</h4><time>3h ago</time>
+        <?php
+        // FETCH POSTS FROM DATABASE
+        $fetchPosts = $conn->query("
+          SELECT posts.*, users.first_name, users.last_name, users.user_name
+          FROM posts
+          JOIN users ON posts.user_id = users.id
+          ORDER BY posts.created_at DESC
+        ");
+        ?>
+
+        <?php while ($post = $fetchPosts->fetch_assoc()): ?>
+          <article class="glass post">
+            <header class="post-header">
+              <img class="avatar avatar--sm" src="./assets/profile/default.png" alt="">
+              <div>
+                <h4><?= htmlspecialchars($post['first_name'] . ' ' . $post['last_name']) ?></h4>
+                <time><?= date("g:i A", strtotime($post['created_at'])) ?></time>
+              </div>
+              <button class="icon-btn"><i class="ri-more-fill"></i></button>
+            </header>
+
+            <p><?= htmlspecialchars($post['content']) ?></p>
+
+            <footer class="post-footer">
+              <div class="post-actions">
+                <!-- LIKE FORM -->
+                <form method="POST" style="display:inline;">
+                  <input type="hidden" name="like_post_id" value="<?= $post['id'] ?>">
+                  <button type="submit" class="icon-btn">
+                    <i class="ri-heart-line"></i>
+                    <?php
+                      $countLikes = $conn->query("SELECT COUNT(*) AS total FROM likes WHERE post_id = {$post['id']}")->fetch_assoc();
+                      echo "<span>{$countLikes['total']}</span>";
+                    ?>
+                  </button>
+                </form>
+
+                <!-- COMMENT TOGGLE + COUNT -->
+                <button class="icon-btn" onclick="document.getElementById('comment-form-<?= $post['id'] ?>').classList.toggle('hidden')">
+                  <i class="ri-chat-1-line"></i>
+                  <?php
+                    $countComments = $conn->query("SELECT COUNT(*) AS total FROM comments WHERE post_id = {$post['id']}")->fetch_assoc();
+                    echo "<span>{$countComments['total']}</span>";
+                  ?>
+                </button>
+
+                <!-- SHARE FORM -->
+                <form method="POST" style="display:inline;">
+                  <input type="hidden" name="share_post_id" value="<?= $post['id'] ?>">
+                  <button type="submit" class="icon-btn">
+                    <i class="ri-share-forward-line"></i>
+                    <?php
+                      $countShares = $conn->query("SELECT COUNT(*) AS total FROM shares WHERE post_id = {$post['id']}")->fetch_assoc();
+                      echo "<span>{$countShares['total']}</span>";
+                    ?>
+                  </button>
+                </form>
+              </div>
+              <button class="icon-btn"><i class="ri-bookmark-line"></i></button>
+            </footer>
+
+            <!-- COMMENT FORM -->
+            <div id="comment-form-<?= $post['id'] ?>" class="hidden" style="margin-top:10px;">
+              <form method="POST">
+                <input type="hidden" name="comment_post_id" value="<?= $post['id'] ?>">
+                <input type="text" name="comment_text" placeholder="Write a comment…" required style="width: 100%; padding: 8px;">
+                <button type="submit" class="btn btn--primary btn--sm" style="margin-top:5px;">Comment</button>
+              </form>
+
+              <!-- EXISTING COMMENTS -->
+              <div style="margin-top:10px;">
+                <?php
+                  $comments = $conn->query("SELECT comments.*, users.first_name, users.last_name FROM comments JOIN users ON comments.user_id = users.id WHERE post_id = {$post['id']} ORDER BY commented_at ASC");
+                  while ($comment = $comments->fetch_assoc()):
+                ?>
+                  <div style="margin-bottom: 8px;">
+                    <strong><?= htmlspecialchars($comment['first_name'] . ' ' . $comment['last_name']) ?>:</strong>
+                    <?= htmlspecialchars($comment['comment_text']) ?>
+                    <small style="color:gray;"> – <?= date("M d, g:i A", strtotime($comment['commented_at'])) ?></small>
+                  </div>
+                <?php endwhile; ?>
+              </div>
             </div>
-            <button class="icon-btn"><i class="ri-more-fill"></i></button>
-          </header>
-
-          <p>Artist Adam Lister remixes old art masterpieces
-            into 8-bit watercolours…
-            <span class="tag">#Masterpiece</span>
-          </p>
-
-          <img class="post-image" src="./assets/post/8bit.jpg" alt="8-bit art">
-
-          <footer class="post-footer">
-            <div class="post-actions">
-
-              <button class="icon-btn like">
-                <i class="ri-heart-line"></i>
-                <span>201</span>
-              </button>
-
-              <button class="icon-btn">
-                <i class="ri-chat-1-line"></i>
-                <span>342</span>
-              </button>
-
-              <button class="icon-btn">
-                <i class="ri-share-forward-line"></i>
-                <span>128</span>
-              </button>
-            </div>
-
-            <button class="icon-btn">
-              <i class="ri-bookmark-line"></i>
-            </button>
-
-          </footer>
-        </article>
+          </article>
+        <?php endwhile; ?>
       </section>
 
       <!-- RIGHT SIDEBAR -->
