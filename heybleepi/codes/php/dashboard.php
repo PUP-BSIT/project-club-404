@@ -189,6 +189,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['share_post_id'])) {
             <i class="ri-bookmark-line"></i>
             Saved
           </a>
+
+          <a class="nav-item" href="logout.php">
+            <i class="ri-logout-box-line"></i>
+            Logout
+          </a>
+
         </nav>
       </aside>
 
