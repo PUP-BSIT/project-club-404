@@ -271,6 +271,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_comment_id'], $_
         ?>
 
         <?php while ($post = $fetchPosts->fetch_assoc()): ?>
+          <?php
+            $likeResult = $conn->query("SELECT COUNT(*) AS total FROM likes WHERE post_id = {$post['id']}");
+            $countLikes = $likeResult ? $likeResult->fetch_assoc() : ['total' => 0];
+
+            $userLikedResult = $conn->query("SELECT 1 FROM likes WHERE post_id = {$post['id']} AND user_id = {$_SESSION['id']}");
+            $userLiked = $userLikedResult && $userLikedResult->num_rows > 0;
+          ?>
           <article class="glass post">
             <header class="post-header">
               <img class="avatar avatar--sm" src="./assets/profile/default.png" alt="">
@@ -286,14 +293,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_comment_id'], $_
             <footer class="post-footer">
               <div class="post-actions">
                 <!-- LIKE FORM -->
-                <form method="POST" style="display:inline;">
+                <form method="POST" class="like-form" style="display:inline;">
                   <input type="hidden" name="like_post_id" value="<?= $post['id'] ?>">
-                  <button type="submit" class="icon-btn">
-                    <i class="ri-heart-line"></i>
-                    <?php
-                      $countLikes = $conn->query("SELECT COUNT(*) AS total FROM likes WHERE post_id = {$post['id']}")->fetch_assoc();
-                      echo "<span>{$countLikes['total']}</span>";
-                    ?>
+                  <button type="button" class="icon-btn like-button <?= $userLiked ? 'liked' : '' ?>" data-post-id="<?= $post['id'] ?>">
+                    <i class="<?= $userLiked ? 'ri-heart-fill' : 'ri-heart-line' ?>"></i>
+                    <span><?= intval($countLikes['total']) ?></span>
                   </button>
                 </form>
 

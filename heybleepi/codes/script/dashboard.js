@@ -213,3 +213,28 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+
+// Like
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll(".like-button").forEach(button => {
+    button.addEventListener("click", function () {
+      const postId = this.getAttribute("data-post-id");
+      const icon = this.querySelector("i");
+      const countSpan = this.querySelector("span");
+
+      fetch("like_toggle.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `post_id=${postId}`
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            icon.className = data.liked ? "ri-heart-fill" : "ri-heart-line";
+            this.classList.toggle("liked", data.liked);
+            countSpan.textContent = data.total;
+          }
+        });
+    });
+  });
+});
