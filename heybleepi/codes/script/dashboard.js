@@ -4,13 +4,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // ENABLE "POST" BUTTON ONLY WHEN TEXTAREA HAS CONTENT
   const postTextarea = document.querySelector(".create-post-input");
-  const postButton = document.querySelector(".create-post-actions .btn");
+  const postButton = document.querySelector("form button.btn--primary");
 
   if (postTextarea && postButton) {
     const togglePostButton = () => {
       postButton.disabled = postTextarea.value.trim() === "";
     };
-    togglePostButton();
+    togglePostButton(); // Initial check
     postTextarea.addEventListener("input", togglePostButton);
   }
 
@@ -153,58 +153,6 @@ function attachDynamicListeners() {
       icon.classList.toggle("ri-bookmark-fill", !isFilled);
       icon.classList.toggle("ri-bookmark-line", isFilled);
       icon.style.color = isFilled ? "" : "gold";
-    });
-  });
-
-  // Comment toggle and reply
-  document.querySelectorAll(".ri-chat-1-line").forEach((icon) => {
-    icon.parentElement?.addEventListener("click", function () {
-      const post = this.closest(".post");
-      if (!post) return;
-
-      let commentForm = post.querySelector(".comment-form");
-      if (commentForm) {
-        commentForm.remove();
-        return;
-      }
-
-      // Build comment form
-      commentForm = document.createElement("div");
-      commentForm.classList.add("comment-form");
-      commentForm.style.marginTop = "1rem";
-
-      commentForm.innerHTML = `
-        <textarea placeholder="Write a comment..." class="comment-input" rows="2" style="
-          width: 100%;
-          background: rgba(255,255,255,0.05);
-          color: white;
-          border: 1px solid rgba(255,255,255,0.2);
-          border-radius: 8px;
-          padding: 0.5rem;
-          resize: none;
-        "></textarea>
-        <button class="btn btn--primary submit-comment" style="margin-top: 0.5rem;">Reply</button>
-        <div class="comment-list" style="margin-top: 1rem;"></div>
-      `;
-
-      this.closest("footer").after(commentForm);
-
-      const submitBtn = commentForm.querySelector(".submit-comment");
-      const textarea = commentForm.querySelector(".comment-input");
-      const commentList = commentForm.querySelector(".comment-list");
-
-      submitBtn.addEventListener("click", () => {
-        const commentText = textarea.value.trim();
-        if (!commentText) return;
-
-        const comment = document.createElement("p");
-        comment.textContent = `🗨️ ${commentText}`;
-        comment.style.color = "rgba(255,255,255,0.9)";
-        comment.style.marginBottom = "0.5rem";
-
-        commentList.appendChild(comment);
-        textarea.value = "";
-      });
     });
   });
 }
