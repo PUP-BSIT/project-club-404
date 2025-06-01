@@ -607,6 +607,10 @@ textarea.create-post-input::placeholder {
   color: var(--primary);
 }
 
+.share-button.shared i {
+  color: gold;
+}
+
 /* Active state: red like, yellow bookmark */
 .post-footer .icon-btn i.ri-heart-fill {
   color: red;

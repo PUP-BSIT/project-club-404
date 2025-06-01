@@ -238,3 +238,33 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 });
+
+// Share
+document.querySelectorAll(".share-button").forEach(button => {
+  button.addEventListener("click", function () {
+    const postId = this.getAttribute("data-post-id");
+    const icon = this.querySelector("i");
+    const countSpan = this.querySelector("span");
+
+    fetch("share_toggle.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: `post_id=${postId}`
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          icon.className = data.shared ? "ri-share-forward-fill" : "ri-share-forward-line";
+          icon.style.color = data.shared ? "gold" : "";
+          this.classList.toggle("shared", data.shared);
+          countSpan.textContent = data.total;
+        }
+      });
+  });
+});
+
+document.querySelectorAll('.share-button').forEach(button => {
+  button.addEventListener('click', () => {
+    button.innerHTML = '<i class="ri-share-forward-fill" style="color: #ff6bc4;"></i> Shared';
+  });
+});

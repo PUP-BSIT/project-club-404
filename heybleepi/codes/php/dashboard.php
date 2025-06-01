@@ -62,59 +62,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['comment_post_id'], $_
   header("Location: dashboard.php");
   exit();
 }
-
-// SHARE A POST
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['share_post_id'])) {
-  $user_id = $_SESSION['id'];
-  $post_id = intval($_POST['share_post_id']);
-
-  $check = $conn->prepare("SELECT id FROM shares WHERE user_id = ? AND post_id = ?");
-  $check->bind_param("ii", $user_id, $post_id);
-  $check->execute();
-  $check->store_result();
-
-  if ($check->num_rows === 0) {
-    $stmt = $conn->prepare("INSERT INTO shares (user_id, post_id) VALUES (?, ?)");
-    $stmt->bind_param("ii", $user_id, $post_id);
-    $stmt->execute();
-    $stmt->close();
-  }
-
-  $check->close();
-  header("Location: dashboard.php");
-  exit();
-}
-
-// DELETE COMMENT
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_comment_id'])) {
-  $commentId = intval($_POST['delete_comment_id']);
-  $userId = $_SESSION['id'];
-
-  $stmt = $conn->prepare("DELETE FROM comments WHERE id = ? AND user_id = ?");
-  $stmt->bind_param("ii", $commentId, $userId);
-  $stmt->execute();
-  $stmt->close();
-
-  header("Location: dashboard.php");
-  exit();
-}
-
-// EDIT COMMENT
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_comment_id'], $_POST['new_comment_text'])) {
-  $commentId = intval($_POST['edit_comment_id']);
-  $newText = trim($_POST['new_comment_text']);
-  $userId = $_SESSION['id'];
-
-  if (!empty($newText)) {
-    $stmt = $conn->prepare("UPDATE comments SET comment_text = ? WHERE id = ? AND user_id = ?");
-    $stmt->bind_param("sii", $newText, $commentId, $userId);
-    $stmt->execute();
-    $stmt->close();
-  }
-
-  header("Location: dashboard.php");
-  exit();
-}
 ?>
 
 <!DOCTYPE html>
@@ -259,25 +206,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_comment_id'], $_
           </div>
         </form>
 
-        <!-- POSTS (example post card) -->
+        <!-- DISPLAY POSTS (original + shared) -->
         <?php
-        // FETCH POSTS FROM DATABASE
-        $fetchPosts = $conn->query("
-          SELECT posts.*, users.first_name, users.last_name, users.user_name
-          FROM posts
-          JOIN users ON posts.user_id = users.id
-          ORDER BY posts.created_at DESC
-        ");
+        $query = "
+          SELECT p.*, u.first_name, u.last_name, u.user_name,
+                sp.content AS shared_content,
+                su.first_name AS shared_first_name, su.last_name AS shared_last_name
+          FROM posts p
+          JOIN users u ON p.user_id = u.id
+          LEFT JOIN posts sp ON p.shared_post_id = sp.id
+          LEFT JOIN users su ON sp.user_id = su.id
+          ORDER BY p.created_at DESC
+        ";
+        $posts = $conn->query($query);
         ?>
 
-        <?php while ($post = $fetchPosts->fetch_assoc()): ?>
-          <?php
-            $likeResult = $conn->query("SELECT COUNT(*) AS total FROM likes WHERE post_id = {$post['id']}");
-            $countLikes = $likeResult ? $likeResult->fetch_assoc() : ['total' => 0];
-
-            $userLikedResult = $conn->query("SELECT 1 FROM likes WHERE post_id = {$post['id']} AND user_id = {$_SESSION['id']}");
-            $userLiked = $userLikedResult && $userLikedResult->num_rows > 0;
-          ?>
+        <?php while ($post = $posts->fetch_assoc()): ?>
           <article class="glass post">
             <header class="post-header">
               <img class="avatar avatar--sm" src="./assets/profile/default.png" alt="">
@@ -290,35 +234,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_comment_id'], $_
 
             <p><?= htmlspecialchars($post['content']) ?></p>
 
+            <!-- SHARE COUNT AND USER SHARE STATUS -->
+            <?php
+              $shareResult = $conn->query("SELECT COUNT(*) AS total FROM shares WHERE post_id = {$post['id']}");
+              $countShares = $shareResult ? $shareResult->fetch_assoc() : ['total' => 0];
+
+              $userSharedResult = $conn->query("SELECT 1 FROM shares WHERE post_id = {$post['id']} AND user_id = {$_SESSION['id']}");
+              $userShared = $userSharedResult && $userSharedResult->num_rows > 0;
+            ?>
+
+            <!-- If shared, show shared content block -->
+            <?php if (!empty($post['shared_post_id'])): ?>
+              <div class="shared-post glass" style="margin-top: 10px; padding: 10px; border-left: 3px solid var(--primary); background-color: rgba(255,255,255,0.05);">
+                <small>Shared from <strong><?= htmlspecialchars($post['shared_first_name'] . ' ' . $post['shared_last_name']) ?></strong></small>
+                <p><?= htmlspecialchars($post['shared_content']) ?></p>
+              </div>
+            <?php endif; ?>
+
             <footer class="post-footer">
               <div class="post-actions">
-                <!-- LIKE FORM -->
-                <form method="POST" class="like-form" style="display:inline;">
+                <!-- LIKE -->
+                <?php
+                $likes = $conn->query("SELECT COUNT(*) AS total FROM likes WHERE post_id = {$post['id']}")->fetch_assoc();
+                $liked = $conn->query("SELECT 1 FROM likes WHERE user_id = {$_SESSION['id']} AND post_id = {$post['id']}")->num_rows > 0;
+                ?>
+                <form method="POST" style="display:inline;">
                   <input type="hidden" name="like_post_id" value="<?= $post['id'] ?>">
-                  <button type="button" class="icon-btn like-button <?= $userLiked ? 'liked' : '' ?>" data-post-id="<?= $post['id'] ?>">
-                    <i class="<?= $userLiked ? 'ri-heart-fill' : 'ri-heart-line' ?>"></i>
-                    <span><?= intval($countLikes['total']) ?></span>
+                  <button type="submit" class="icon-btn <?= $liked ? 'liked' : '' ?>">
+                    <i class="<?= $liked ? 'ri-heart-fill' : 'ri-heart-line' ?>"></i>
+                    <span><?= $likes['total'] ?></span>
                   </button>
                 </form>
 
-                <!-- COMMENT TOGGLE + COUNT -->
+                <!-- COMMENT COUNT -->
+                <?php
+                $comments = $conn->query("SELECT COUNT(*) AS total FROM comments WHERE post_id = {$post['id']}")->fetch_assoc();
+                ?>
                 <button class="icon-btn" onclick="document.getElementById('comment-form-<?= $post['id'] ?>').classList.toggle('hidden')">
                   <i class="ri-chat-1-line"></i>
-                  <?php
-                    $countComments = $conn->query("SELECT COUNT(*) AS total FROM comments WHERE post_id = {$post['id']}")->fetch_assoc();
-                    echo "<span>{$countComments['total']}</span>";
-                  ?>
+                  <span><?= $comments['total'] ?></span>
                 </button>
 
                 <!-- SHARE FORM -->
-                <form method="POST" style="display:inline;">
+                <form method="POST" action="share_post.php" style="display:inline;">
                   <input type="hidden" name="share_post_id" value="<?= $post['id'] ?>">
                   <button type="submit" class="icon-btn">
                     <i class="ri-share-forward-line"></i>
-                    <?php
-                      $countShares = $conn->query("SELECT COUNT(*) AS total FROM shares WHERE post_id = {$post['id']}")->fetch_assoc();
-                      echo "<span>{$countShares['total']}</span>";
-                    ?>
+                    <span><?= $countShares['total'] ?></span>
                   </button>
                 </form>
               </div>
@@ -333,21 +295,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_comment_id'], $_
                 <button type="submit" class="btn btn--primary btn--sm" style="margin-top:5px;">Comment</button>
               </form>
 
-              <!-- EXISTING COMMENTS -->
+              <!-- LOAD COMMENTS -->
               <div style="margin-top:10px;">
                 <?php
-                  $comments = $conn->query("SELECT comments.*, users.first_name, users.last_name FROM comments JOIN users ON comments.user_id = users.id WHERE post_id = {$post['id']} ORDER BY commented_at ASC");
-                  while ($comment = $comments->fetch_assoc()):
+                $cmt = $conn->query("SELECT c.*, u.first_name, u.last_name FROM comments c JOIN users u ON c.user_id = u.id WHERE post_id = {$post['id']} ORDER BY commented_at ASC");
+                while ($row = $cmt->fetch_assoc()):
                 ?>
-                  <div class="comment" data-comment-id="<?= $comment['id'] ?>" style="margin-bottom: 8px;">
-                    <strong><?= htmlspecialchars($comment['first_name'] . ' ' . $comment['last_name']) ?>:</strong>
-                    <span class="comment-text"><?= htmlspecialchars($comment['comment_text']) ?></span>
-                    <small style="color:gray;"> – <?= date("M d, g:i A", strtotime($comment['commented_at'])) ?></small>
-
-                    <?php if ($comment['user_id'] == $_SESSION['id']): ?>
-                      <button class="btn--sm btn-edit-comment" data-id="<?= $comment['id'] ?>">Edit</button>
-                      <button class="btn--sm btn-delete-comment" data-id="<?= $comment['id'] ?>">Delete</button>
-                    <?php endif; ?>
+                  <div style="margin-bottom:8px;">
+                    <strong><?= htmlspecialchars($row['first_name'] . ' ' . $row['last_name']) ?>:</strong>
+                    <?= htmlspecialchars($row['comment_text']) ?>
                   </div>
                 <?php endwhile; ?>
               </div>
