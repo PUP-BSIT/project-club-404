@@ -156,3 +156,60 @@ function attachDynamicListeners() {
     });
   });
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Delete
+  document.querySelectorAll(".btn-delete-comment").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const commentId = btn.dataset.id;
+      fetch("comment_actions.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `comment_id=${commentId}&action=delete`
+      })
+        .then(res => res.text())
+        .then(resp => {
+          if (resp === "deleted") {
+            btn.closest(".comment").remove();
+          }
+        });
+    });
+  });
+
+  // Edit
+  document.querySelectorAll(".btn-edit-comment").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const commentDiv = btn.closest(".comment");
+      const commentId = btn.dataset.id;
+      const textEl = commentDiv.querySelector(".comment-text");
+
+      const currentText = textEl.textContent;
+      const input = document.createElement("input");
+      input.value = currentText;
+      input.style.width = "100%";
+
+      const saveBtn = document.createElement("button");
+      saveBtn.textContent = "Save";
+      saveBtn.className = "btn--sm";
+
+      textEl.replaceWith(input);
+      btn.replaceWith(saveBtn);
+
+      saveBtn.addEventListener("click", () => {
+        fetch("comment_actions.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: `comment_id=${commentId}&action=edit&new_text=${encodeURIComponent(input.value)}`
+        })
+          .then(res => res.text())
+          .then(resp => {
+            const span = document.createElement("span");
+            span.className = "comment-text";
+            span.textContent = resp;
+            input.replaceWith(span);
+            saveBtn.replaceWith(btn); // restore Edit button
+          });
+      });
+    });
+  });
+});
