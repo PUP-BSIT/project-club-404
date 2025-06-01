@@ -298,12 +298,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['comment_post_id'], $_
               <!-- LOAD COMMENTS -->
               <div style="margin-top:10px;">
                 <?php
-                $cmt = $conn->query("SELECT c.*, u.first_name, u.last_name FROM comments c JOIN users u ON c.user_id = u.id WHERE post_id = {$post['id']} ORDER BY commented_at ASC");
-                while ($row = $cmt->fetch_assoc()):
+                  $comments = $conn->query("SELECT comments.*, users.first_name, users.last_name FROM comments JOIN users ON comments.user_id = users.id WHERE post_id = {$post['id']} ORDER BY commented_at ASC");
+                  while ($comment = $comments->fetch_assoc()):
                 ?>
-                  <div style="margin-bottom:8px;">
-                    <strong><?= htmlspecialchars($row['first_name'] . ' ' . $row['last_name']) ?>:</strong>
-                    <?= htmlspecialchars($row['comment_text']) ?>
+                  <div class="comment" data-comment-id="<?= $comment['id'] ?>" style="margin-bottom: 8px;">
+                    <strong><?= htmlspecialchars($comment['first_name'] . ' ' . $comment['last_name']) ?>:</strong>
+                    <span class="comment-text"><?= htmlspecialchars($comment['comment_text']) ?></span>
+                    <small style="color:gray;"> – <?= date("M d, g:i A", strtotime($comment['commented_at'])) ?></small>
+
+                    <?php if ($comment['user_id'] == $_SESSION['id']): ?>
+                      <button class="btn--sm btn-edit-comment-dashboard" data-id="<?= $comment['id'] ?>">Edit</button>
+                      <button class="btn--sm btn-delete-comment-dashboard" data-id="<?= $comment['id'] ?>">Delete</button>
+                    <?php endif; ?>
                   </div>
                 <?php endwhile; ?>
               </div>
@@ -373,7 +379,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['comment_post_id'], $_
       <a class="mobile-link" href="#"><i class="ri-notification-3-line"></i><span>Alerts</span></a>
       <a class="mobile-link" href="#"><i class="ri-user-line"></i><span>Profile</span></a>
     </nav>
-
     <script src="./script/dashboard.js"></script>
   </body>
 </html>

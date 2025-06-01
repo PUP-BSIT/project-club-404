@@ -76,13 +76,6 @@ body.page {
   background: rgba(255, 255, 255, .12);
 }
 
-/* Disabled button state */
-.btn--primary:disabled {
-  background-color: rgba(255, 255, 255, 0.2);
-  cursor: not-allowed;
-  color: rgba(255, 255, 255, 0.5);
-}
-
 /* Pulse animation on hover */
 .btn--primary:hover {
   animation: pulse 0.4s ease;
@@ -647,6 +640,11 @@ textarea.create-post-input::placeholder {
   padding: 0.5rem 1rem;
   border-radius: 8px;
   margin: 0.3rem 0;
+}
+
+.icon-btn {
+  pointer-events: auto !important;
+  cursor: pointer !important;
 }
 
 /* like animation placeholder */

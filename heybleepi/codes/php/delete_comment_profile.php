@@ -15,6 +15,6 @@ $stmt->bind_param("ii", $comment_id, $user_id);
 $stmt->execute();
 $stmt->close();
 
-header("Location: dashboard.php");
+header("Location: profile.php");
 exit();
 ?>

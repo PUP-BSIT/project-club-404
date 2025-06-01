@@ -3,14 +3,14 @@ document.addEventListener("DOMContentLoaded", function () {
   attachDynamicListeners();
 
   // ENABLE "POST" BUTTON ONLY WHEN TEXTAREA HAS CONTENT
-  const postTextarea = document.querySelector(".create-post-input");
-  const postButton = document.querySelector("form button.btn--primary");
+  const postTextarea = document.querySelector("form[action='profile.php'] .create-post-input");
+  const postButton = document.querySelector("form[action='profile.php'] .btn--primary");
 
   if (postTextarea && postButton) {
     const togglePostButton = () => {
       postButton.disabled = postTextarea.value.trim() === "";
     };
-    togglePostButton(); // Initial check
+    togglePostButton();
     postTextarea.addEventListener("input", togglePostButton);
   }
 
@@ -175,42 +175,62 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
   });
+});
 
-  // Edit
-  document.querySelectorAll(".btn-edit-comment").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const commentDiv = btn.closest(".comment");
-      const commentId = btn.dataset.id;
-      const textEl = commentDiv.querySelector(".comment-text");
+// Edit comment for profile
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.btn-edit-comment').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const commentDiv = btn.closest('.comment');
+      const commentId = btn.getAttribute('data-id');
+      const commentTextSpan = commentDiv.querySelector('span');
+      const oldText = commentTextSpan.textContent;
 
-      const currentText = textEl.textContent;
-      const input = document.createElement("input");
-      input.value = currentText;
-      input.style.width = "100%";
+      // Prevent multiple edit forms
+      if (commentDiv.querySelector('form')) return;
 
-      const saveBtn = document.createElement("button");
-      saveBtn.textContent = "Save";
-      saveBtn.className = "btn--sm";
+      // Create edit form
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = 'edit_comment_profile.php';
+      form.style.display = 'inline';
+      form.innerHTML = `
+        <input type="hidden" name="comment_id" value="${commentId}">
+        <input type="text" name="comment_text" value="${oldText}" required style="width:60%;">
+        <button type="submit" class="btn btn--primary btn--sm">Save</button>
+        <button type="button" class="btn btn--secondary btn--sm btn-cancel-edit">Cancel</button>
+      `;
 
-      textEl.replaceWith(input);
-      btn.replaceWith(saveBtn);
+      // Hide old text and buttons
+      commentTextSpan.style.display = 'none';
+      btn.style.display = 'none';
+      const deleteBtn = commentDiv.querySelector('.btn-delete-comment');
+      if (deleteBtn) deleteBtn.style.display = 'none';
 
-      saveBtn.addEventListener("click", () => {
-        fetch("comment_actions.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: `comment_id=${commentId}&action=edit&new_text=${encodeURIComponent(input.value)}`
-        })
-          .then(res => res.text())
-          .then(resp => {
-            const span = document.createElement("span");
-            span.className = "comment-text";
-            span.textContent = resp;
-            input.replaceWith(span);
-            saveBtn.replaceWith(btn); // restore Edit button
-          });
-      });
+      commentDiv.appendChild(form);
+
+      // Cancel button logic
+      form.querySelector('.btn-cancel-edit').onclick = function () {
+        form.remove();
+        commentTextSpan.style.display = '';
+        btn.style.display = '';
+        if (deleteBtn) deleteBtn.style.display = '';
+      };
     });
+  });
+});
+
+// Delete comment for profile
+document.querySelectorAll('.btn-delete-comment').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    if (!confirm('Are you sure you want to delete this comment?')) return;
+    const commentId = btn.getAttribute('data-id');
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'delete_comment_profile.php';
+    form.innerHTML = `<input type="hidden" name="comment_id" value="${commentId}">`;
+    document.body.appendChild(form);
+    form.submit();
   });
 });
 
@@ -266,5 +286,62 @@ document.querySelectorAll(".share-button").forEach(button => {
 document.querySelectorAll('.share-button').forEach(button => {
   button.addEventListener('click', () => {
     button.innerHTML = '<i class="ri-share-forward-fill" style="color: #ff6bc4;"></i> Shared';
+  });
+});
+
+// Edit comment for dashboard
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.btn-edit-comment-dashboard').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const commentDiv = btn.closest('.comment');
+      const commentId = btn.getAttribute('data-id');
+      const commentTextSpan = commentDiv.querySelector('.comment-text');
+      const oldText = commentTextSpan.textContent;
+
+      // Prevent multiple edit forms
+      if (commentDiv.querySelector('form')) return;
+
+      // Create edit form
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = 'edit_comment_dashboard.php';
+      form.style.display = 'inline';
+      form.innerHTML = `
+        <input type="hidden" name="comment_id" value="${commentId}">
+        <input type="text" name="comment_text" value="${oldText}" required style="width:60%;">
+        <button type="submit" class="btn btn--primary btn--sm">Save</button>
+        <button type="button" class="btn btn--secondary btn--sm btn-cancel-edit">Cancel</button>
+      `;
+
+      // Hide old text and buttons
+      commentTextSpan.style.display = 'none';
+      btn.style.display = 'none';
+      const deleteBtn = commentDiv.querySelector('.btn-delete-comment-dashboard');
+      if (deleteBtn) deleteBtn.style.display = 'none';
+
+      commentDiv.appendChild(form);
+
+      // Cancel button logic
+      form.querySelector('.btn-cancel-edit').onclick = function () {
+        form.remove();
+        commentTextSpan.style.display = '';
+        btn.style.display = '';
+        if (deleteBtn) deleteBtn.style.display = '';
+      };
+    });
+  });
+});
+
+// Delete comment for dashboard
+document.querySelectorAll('.btn-delete-comment-dashboard').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    if (!confirm('Are you sure you want to delete this comment?')) return;
+    const commentId = btn.getAttribute('data-id');
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'delete_comment_dashboard.php';
+    form.innerHTML = `<input type="hidden" name="comment_id" value="${commentId}">`;
+    document.body.appendChild(form);
+    form.submit();
   });
 });
