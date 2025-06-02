@@ -564,6 +564,44 @@ textarea.create-post-input::placeholder {
   text-decoration: underline;
 }
 
+/* Post options dropdown */
+
+.post-options {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown {
+  position: absolute;
+  right: 0;
+  top: 30px;
+  background: #222;
+  border-radius: 6px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+  padding: 0;
+  list-style: none;
+  min-width: 120px;
+}
+
+.dropdown li button {
+  background: none;
+  border: none;
+  color: white;
+  width: 100%;
+  padding: 8px 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dropdown li button:hover {
+  background: #333;
+}
+
+.dropdown.hidden {
+  display: none;
+}
+
 /* Reaction Icons (like, comment, share, bookmark) */
 
 .post-footer .icon-btn i {

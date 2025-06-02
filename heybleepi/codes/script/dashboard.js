@@ -345,3 +345,56 @@ document.querySelectorAll('.btn-delete-comment-dashboard').forEach(function (btn
     form.submit();
   });
 });
+
+// Edit / Delete Post
+document.addEventListener('DOMContentLoaded', () => {
+  // Toggle 3-dot menu
+  document.querySelectorAll('.toggle-options').forEach(button => {
+    button.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const dropdown = button.nextElementSibling;
+      dropdown.classList.toggle('hidden');
+    });
+  });
+
+  // Close dropdowns on outside click
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.dropdown').forEach(dropdown => dropdown.classList.add('hidden'));
+  });
+
+  // Inline Edit for Posts
+  document.querySelectorAll('.btn-edit-post').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const postId = btn.dataset.id;
+      const postContentDiv = document.querySelector(`.post-content[data-post-id="${postId}"]`);
+      const postTextP = postContentDiv.querySelector('.post-text');
+      const originalText = postTextP.textContent;
+
+      // Detect current page (dashboard or profile)
+      const isDashboard = window.location.pathname.includes("dashboard.php");
+      const actionURL = isDashboard ? "edit_post_dashboard.php" : "edit_post_profile.php";
+
+
+      // Prevent duplicate form
+      if (postContentDiv.querySelector('form')) return;
+
+      // Create form
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = actionURL;
+      form.innerHTML = `
+        <input type="hidden" name="post_id" value="${postId}">
+        <input type="text" name="new_content" value="${originalText}" required style="width:80%;">
+        <button type="submit" class="btn--sm btn--primary">Save</button>
+        <button type="button" class="btn--sm btn--secondary cancel-edit">Cancel</button>
+      `;
+
+      postTextP.replaceWith(form);
+
+      // Cancel logic
+      form.querySelector('.cancel-edit').addEventListener('click', () => {
+        form.replaceWith(postTextP);
+      });
+    });
+  });
+});

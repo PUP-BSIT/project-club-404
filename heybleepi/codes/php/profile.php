@@ -38,6 +38,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['comment_post_id'], $_
     exit();
 }
 
+// POST CREATION
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['post_content'])) {
+  $user_id = $_SESSION['id'];
+  $post_content = trim($_POST['post_content']);
+
+  if (!empty($post_content)) {
+    $stmt = $conn->prepare("INSERT INTO posts (user_id, content) VALUES (?, ?)");
+    $stmt->bind_param("is", $user_id, $post_content);
+    $stmt->execute();
+    $stmt->close();
+  }
+
+  header("Location: profile.php");
+  exit();
+}
+
 $user = $result->fetch_assoc();
 ?>
 
@@ -223,7 +239,18 @@ $user = $result->fetch_assoc();
                 <h4><?= htmlspecialchars($post['first_name'] . ' ' . $post['last_name']) ?></h4>
                 <time><?= date("M d, g:i A", strtotime($post['created_at'])) ?></time>
               </div>
-              <button class="icon-btn"><i class="ri-more-fill"></i></button>
+              <div class="post-options">
+                <button class="icon-btn toggle-options"><i class="ri-more-fill"></i></button>
+                <ul class="dropdown hidden">
+                  <li><button class="btn--sm btn-edit-post" data-id="<?= $post['post_id'] ?>">Edit Post</button></li>
+                  <li>
+                    <form method="POST" action="delete_post_profile.php" style="display:inline;">
+                      <input type="hidden" name="post_id" value="<?= $post['post_id'] ?>">
+                      <button type="submit" onclick="return confirm('Delete this post?')">Delete Post</button>
+                    </form>
+                  </li>
+                </ul>
+              </div>
             </header>
 
             <!-- SHARED POST BLOCK INSIDE -->
@@ -235,7 +262,9 @@ $user = $result->fetch_assoc();
             <?php endif; ?>
 
             <!-- MAIN POST CONTENT -->
-            <p><?= htmlspecialchars($post['content']) ?></p>
+            <div class="post-content" data-post-id="<?= $post['post_id'] ?>">
+              <p class="post-text"><?= htmlspecialchars($post['content']) ?></p>
+            </div>
 
             <footer class="post-footer">
               <div class="post-actions">
