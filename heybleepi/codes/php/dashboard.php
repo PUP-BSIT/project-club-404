@@ -229,10 +229,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['comment_post_id'], $_
                 <h4><?= htmlspecialchars($post['first_name'] . ' ' . $post['last_name']) ?></h4>
                 <time><?= date("g:i A", strtotime($post['created_at'])) ?></time>
               </div>
-              <button class="icon-btn"><i class="ri-more-fill"></i></button>
+              <div class="post-options">
+                <button class="icon-btn toggle-options"><i class="ri-more-fill"></i></button>
+                <ul class="dropdown hidden">
+                  <li><button class="btn--sm btn-edit-post" data-id="<?= $post['id'] ?>">Edit Post</button></li>
+                  <li>
+                    <form method="POST" action="delete_post_dashboard.php" style="display:inline;">
+                      <input type="hidden" name="post_id" value="<?= $post['id'] ?>">
+                      <button type="submit" onclick="return confirm('Delete this post?')">Delete Post</button>
+                    </form>
+                  </li>
+                </ul>
+              </div>
             </header>
 
-            <p><?= htmlspecialchars($post['content']) ?></p>
+            <div class="post-content" data-post-id="<?= $post['id'] ?>">
+              <p class="post-text"><?= htmlspecialchars($post['content']) ?></p>
+            </div>
 
             <!-- SHARE COUNT AND USER SHARE STATUS -->
             <?php
