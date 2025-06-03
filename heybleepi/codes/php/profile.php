@@ -42,10 +42,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['comment_post_id'], $_
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['post_content'])) {
   $user_id = $_SESSION['id'];
   $post_content = trim($_POST['post_content']);
+  $image_path = null;
 
-  if (!empty($post_content)) {
-    $stmt = $conn->prepare("INSERT INTO posts (user_id, content) VALUES (?, ?)");
-    $stmt->bind_param("is", $user_id, $post_content);
+  // Handle uploaded image
+  if (isset($_FILES['post_image']) && $_FILES['post_image']['error'] === UPLOAD_ERR_OK) {
+    $tmp_name = $_FILES['post_image']['tmp_name'];
+    $filename = basename($_FILES['post_image']['name']);
+    $upload_dir = "uploads/";
+    if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
+    $target = $upload_dir . time() . '_' . $filename;
+
+    if (move_uploaded_file($tmp_name, $target)) {
+      $image_path = $target;
+    }
+  }
+
+  if (!empty($post_content) || $image_path) {
+    $stmt = $conn->prepare("INSERT INTO posts (user_id, content, image_path) VALUES (?, ?, ?)");
+    $stmt->bind_param("iss", $user_id, $post_content, $image_path);
     $stmt->execute();
     $stmt->close();
   }
@@ -161,7 +175,7 @@ $user = $result->fetch_assoc();
         <!-- Create Post -->
         <section class="right-column">
           <div class="glass create-post">
-            <form method="POST" action="profile.php">
+            <form method="POST" action="profile.php"  enctype="multipart/form-data">
               <div class="create-post-header">
                 <img class="avatar avatar--sm" src="./assets/profile/rawr.png" alt="">
                 <div class="poster-info">
@@ -172,9 +186,19 @@ $user = $result->fetch_assoc();
 
               <textarea class="create-post-input" name="post_content" placeholder="What's happening in your galaxy?" required></textarea>
 
+              <!-- Image Preview -->
+              <div id="imagePreviewContainer" style="display: none; position: relative; margin-top: 10px;">
+                <img id="imagePreview" src="" style="max-width: 150px; max-height: 150px; border-radius: 8px;">
+                <button type="button" id="removeImageBtn"
+                  style="position: absolute; top: -8px; right: -8px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer;">×</button>
+              </div>
+
               <div class="create-post-actions">
                 <div class="action-group">
-                  <button class="icon-btn" type="button"><i class="ri-image-line"></i></button>
+                  <label class="icon-btn">
+                    <i class="ri-image-line"></i>
+                    <input type="file" name="post_image" id="postImageInput" accept="image/*" style="display: none;">
+                  </label>
                   <button class="icon-btn" type="button"><i class="ri-vidicon-line"></i></button>
                   <button class="icon-btn" type="button"><i class="ri-emotion-line"></i></button>
                   <button class="icon-btn" type="button"><i class="ri-map-pin-line"></i></button>
@@ -231,6 +255,10 @@ $user = $result->fetch_assoc();
             $shareRes = $conn->query("SELECT COUNT(*) AS total FROM posts WHERE shared_post_id = {$post['post_id']}");
             $countShares = $shareRes ? $shareRes->fetch_assoc() : ['total' => 0];
           ?>
+
+          <?php if (!empty($post['image_path'])): ?>
+            <img src="<?= htmlspecialchars($post['image_path']) ?>" alt="Post Image" style="max-width: 150px; margin-top: 10px; border-radius: 10px;">
+          <?php endif; ?>
 
           <article class="glass post">
             <header class="post-header">
