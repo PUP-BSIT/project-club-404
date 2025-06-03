@@ -346,7 +346,7 @@ document.querySelectorAll('.btn-delete-comment-dashboard').forEach(function (btn
   });
 });
 
-// Edit / Delete Post
+// EDIT AND DELETE POST (DASHBOARD & PROFILE)
 document.addEventListener('DOMContentLoaded', () => {
   // Toggle 3-dot menu
   document.querySelectorAll('.toggle-options').forEach(button => {
@@ -397,4 +397,45 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   });
+});
+
+// DASHBOARD IMAGE PREVIEW
+document.getElementById("postImageInput").addEventListener("change", function () {
+  const file = this.files[0];
+  const preview = document.getElementById("imagePreview");
+
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      preview.src = e.target.result;
+      preview.style.display = "block";
+    };
+    reader.readAsDataURL(file);
+  } else {
+    preview.style.display = "none";
+    preview.src = "";
+  }
+});
+
+const imageInput = document.getElementById('postImageInput');
+const imagePreview = document.getElementById('imagePreview');
+const previewContainer = document.getElementById('imagePreviewContainer');
+const removeBtn = document.getElementById('removeImageBtn');
+
+imageInput?.addEventListener('change', function () {
+  const file = this.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      imagePreview.src = e.target.result;
+      previewContainer.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+removeBtn?.addEventListener('click', function () {
+  imagePreview.src = '';
+  previewContainer.style.display = 'none';
+  imageInput.value = '';
 });

@@ -11,10 +11,23 @@ if (!isset($_SESSION['username'])) {
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['post_content'])) {
   $user_id = $_SESSION['id'];
   $post_content = trim($_POST['post_content']);
+  $image_path = null;
 
-  if (!empty($post_content)) {
-    $stmt = $conn->prepare("INSERT INTO posts (user_id, content) VALUES (?, ?)");
-    $stmt->bind_param("is", $user_id, $post_content);
+  // Handle image upload
+  if (isset($_FILES['post_image']) && $_FILES['post_image']['error'] === UPLOAD_ERR_OK) {
+    $imageName = basename($_FILES['post_image']['name']);
+    $targetDir = 'uploads/';
+    if (!is_dir($targetDir)) mkdir($targetDir); // create if not exists
+    $targetPath = $targetDir . uniqid() . "_" . $imageName;
+
+    if (move_uploaded_file($_FILES['post_image']['tmp_name'], $targetPath)) {
+      $image_path = $targetPath;
+    }
+  }
+
+  if (!empty($post_content) || $image_path) {
+    $stmt = $conn->prepare("INSERT INTO posts (user_id, content, image_path) VALUES (?, ?, ?)");
+    $stmt->bind_param("iss", $user_id, $post_content, $image_path);
     $stmt->execute();
     $stmt->close();
   }
@@ -179,7 +192,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['comment_post_id'], $_
       <section class="feed" id="mainFeed">
 
         <!-- Create Post -->
-        <form method="POST" action="dashboard.php">
+        <form method="POST" action="dashboard.php" enctype="multipart/form-data">
           <div class="glass create-post">
             <div class="create-post-header">
               <img class="avatar avatar--sm" src="<?= $_SESSION['avatar'] ?? './assets/profile/default.png' ?>" alt="">
@@ -189,19 +202,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['comment_post_id'], $_
               </div>
             </div>
 
-            <textarea class="create-post-input" name="post_content"
-              placeholder="What's happening in your galaxy?"
-              required
-            ></textarea>
+            <textarea class="create-post-input" name="post_content" placeholder="What's happening in your galaxy?"></textarea>
+
+            <!-- Image Preview -->
+            <div id="imagePreviewContainer" style="display: none; position: relative; margin-top: 10px;">
+              <img id="imagePreview" src="" style="max-width: 150px; max-height: 150px; border-radius: 8px;">
+              <button type="button" id="removeImageBtn" title="Remove Image"
+                style="position: absolute; top: -8px; right: -8px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer;">×</button>
+            </div>
 
             <div class="create-post-actions">
               <div class="action-group">
-                <button class="icon-btn" type="button"><i class="ri-image-line"></i></button>
-                <button class="icon-btn" type="button"><i class="ri-vidicon-line"></i></button>
-                <button class="icon-btn" type="button"><i class="ri-emotion-line"></i></button>
-                <button class="icon-btn" type="button"><i class="ri-map-pin-line"></i></button>
+                <div class="image-upload">
+                  <label class="icon-btn">
+                    <i class="ri-image-line"></i>
+                    <input type="file" name="post_image" accept="image/*" id="postImageInput" style="display:none;">
+                    <button class="icon-btn" type="button"><i class="ri-vidicon-line"></i></button>
+                    <button class="icon-btn" type="button"><i class="ri-emotion-line"></i></button>
+                    <button class="icon-btn" type="button"><i class="ri-map-pin-line"></i></button>
+                  </label>
+                </div>
               </div>
-              <button class="btn btn--primary" onClick="submit">Post</button>
+              <button class="btn btn--primary" type="submit">Post</button>
             </div>
           </div>
         </form>
@@ -246,6 +268,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['comment_post_id'], $_
             <div class="post-content" data-post-id="<?= $post['id'] ?>">
               <p class="post-text"><?= htmlspecialchars($post['content']) ?></p>
             </div>
+
+            <?php if (!empty($post['image_path'])): ?>
+              <img src="<?= htmlspecialchars($post['image_path']) ?>" alt="Post Image" style="width: 100%; margin-top: 10px; border-radius: 10px;">
+            <?php endif; ?>
 
             <!-- SHARE COUNT AND USER SHARE STATUS -->
             <?php
