@@ -270,7 +270,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['comment_post_id'], $_
             </div>
 
             <?php if (!empty($post['image_path'])): ?>
-              <img src="<?= htmlspecialchars($post['image_path']) ?>" alt="Post Image" style="width: 100%; margin-top: 10px; border-radius: 10px;">
+              <img src="<?= htmlspecialchars($post['image_path']) ?>" alt="Post Image" style="max-width: 150px; margin-top: 10px; border-radius: 10px;">
             <?php endif; ?>
 
             <!-- SHARE COUNT AND USER SHARE STATUS -->
