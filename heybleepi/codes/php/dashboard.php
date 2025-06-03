@@ -233,6 +233,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['comment_post_id'], $_
         $query = "
           SELECT p.*, u.first_name, u.last_name, u.user_name,
                 sp.content AS shared_content,
+                sp.image_path AS shared_image_path,
                 su.first_name AS shared_first_name, su.last_name AS shared_last_name
           FROM posts p
           JOIN users u ON p.user_id = u.id
@@ -287,6 +288,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['comment_post_id'], $_
               <div class="shared-post glass" style="margin-top: 10px; padding: 10px; border-left: 3px solid var(--primary); background-color: rgba(255,255,255,0.05);">
                 <small>Shared from <strong><?= htmlspecialchars($post['shared_first_name'] . ' ' . $post['shared_last_name']) ?></strong></small>
                 <p><?= htmlspecialchars($post['shared_content']) ?></p>
+
+                <?php if (!empty($post['shared_image_path'])): ?>
+                  <img src="<?= htmlspecialchars($post['shared_image_path']) ?>" alt="Shared Post Image" style="max-width: 150px; max-height: 150px; margin-top: 10px; border-radius: 10px;">
+                <?php endif; ?>
               </div>
             <?php endif; ?>
 
