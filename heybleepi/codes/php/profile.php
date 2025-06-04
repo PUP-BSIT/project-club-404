@@ -255,7 +255,9 @@ $user = $result->fetch_assoc();
               u.last_name,
               u.user_name,
               sp.content AS shared_content,
+              sp.video_path AS shared_video_path,
               sp.image_path AS shared_image_path,
+              sp.video_path AS shared_video_path,
               su.first_name AS shared_first_name,
               su.last_name AS shared_last_name
             FROM posts p
@@ -316,10 +318,21 @@ $user = $result->fetch_assoc();
                   <small>Shared from <strong><?= htmlspecialchars($post['shared_first_name'] . ' ' . $post['shared_last_name']) ?></strong></small>
                   <p><?= htmlspecialchars($post['shared_content']) ?></p>
 
+                  <!-- Image shared post -->
                   <?php if (!empty($post['shared_image_path'])): ?>
                     <img src="<?= htmlspecialchars($post['shared_image_path']) ?>" alt="Shared Post Image" style="max-width: 150px; max-height: 150px; margin-top: 10px; border-radius: 10px;">
                   <?php endif; ?>
+
+                  <!-- Video shared post -->
+                  <?php if (!empty($post['shared_video_path'])): ?>
+                    <video controls style="max-width: 100%; margin-top: 10px; border-radius: 10px;">
+                      <source src="<?= htmlspecialchars($post['shared_video_path']) ?>" type="video/mp4">
+                      Your browser does not support the video tag.
+                    </video>
+                  <?php endif; ?>
+
                 </div>
+
               <?php endif; ?>
 
               <!-- MAIN POST CONTENT -->
