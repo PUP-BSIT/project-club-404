@@ -43,6 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['post_content'])) {
   $user_id = $_SESSION['id'];
   $post_content = trim($_POST['post_content']);
   $image_path = null;
+  $video_path = null;
 
   // Handle uploaded image
   if (isset($_FILES['post_image']) && $_FILES['post_image']['error'] === UPLOAD_ERR_OK) {
@@ -57,9 +58,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['post_content'])) {
     }
   }
 
-  if (!empty($post_content) || $image_path) {
-    $stmt = $conn->prepare("INSERT INTO posts (user_id, content, image_path) VALUES (?, ?, ?)");
-    $stmt->bind_param("iss", $user_id, $post_content, $image_path);
+  // Handle uploaded video
+  if (isset($_FILES['post_video']) && $_FILES['post_video']['error'] === UPLOAD_ERR_OK) {
+    $tmp_name = $_FILES['post_video']['tmp_name'];
+    $filename = basename($_FILES['post_video']['name']);
+    $upload_dir = "uploads/";
+    if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
+    $target = $upload_dir . time() . '_' . $filename;
+
+    if (move_uploaded_file($tmp_name, $target)) {
+      $video_path = $target;
+    }
+  }
+
+  if (!empty($post_content) || $image_path || $video_path) {
+    $stmt = $conn->prepare("INSERT INTO posts (user_id, content, image_path, video_path) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("isss", $user_id, $post_content, $image_path, $video_path);
     $stmt->execute();
     $stmt->close();
   }
@@ -193,14 +207,31 @@ $user = $result->fetch_assoc();
                   style="position: absolute; top: -8px; right: -8px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer;">×</button>
               </div>
 
+              <!-- Video Preview -->
+              <div id="videoPreviewContainer" style="display: none; position: relative; margin-top: 10px;">
+                <video id="videoPreview" controls style="max-width: 200px; border-radius: 10px;"></video>
+                <button type="button" id="removeVideoBtn"
+                  style="position: absolute; top: -8px; right: -8px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer;">×</button>
+              </div>
+
               <div class="create-post-actions">
                 <div class="action-group">
+                  <!-- Image -->
                   <label class="icon-btn">
                     <i class="ri-image-line"></i>
-                    <input type="file" name="post_image" id="postImageInput" accept="image/*" style="display: none;">
+                    <input type="file" name="post_image" accept="image/*" id="postImageInput" style="display: none;">
                   </label>
-                  <button class="icon-btn" type="button"><i class="ri-vidicon-line"></i></button>
+
+                  <!-- Video -->
+                  <label class="icon-btn">
+                    <i class="ri-vidicon-line"></i>
+                    <input type="file" name="post_video" accept="video/*" id="postVideoInput" style="display: none;">
+                  </label>
+
+                  <!-- Emoji -->
                   <button class="icon-btn" type="button"><i class="ri-emotion-line"></i></button>
+
+                  <!-- Location -->
                   <button class="icon-btn" type="button"><i class="ri-map-pin-line"></i></button>
                 </div>
                 <button class="btn btn--primary" type="submit">Post</button>
@@ -219,6 +250,7 @@ $user = $result->fetch_assoc();
               p.created_at,
               p.shared_post_id,
               p.image_path,
+              p.video_path,
               u.first_name,
               u.last_name,
               u.user_name,
@@ -299,6 +331,14 @@ $user = $result->fetch_assoc();
               <?php if (!empty($post['image_path'])): ?>
                 <img src="<?= htmlspecialchars($post['image_path']) ?>" alt="Post Image" style="max-width: 150px; margin-top: 10px; border-radius: 10px;">
               <?php endif; ?>
+
+              <?php if (!empty($post['video_path'])): ?>
+                <video controls style="width: 100%; max-width: 300px; border-radius: 10px; margin-top: 10px;">
+                  <source src="<?= htmlspecialchars($post['video_path']) ?>" type="video/mp4">
+                  Your browser does not support the video tag.
+                </video>
+              <?php endif; ?>
+
 
               <footer class="post-footer">
                 <div class="post-actions">
