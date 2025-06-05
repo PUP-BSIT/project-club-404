@@ -7,6 +7,33 @@ if (!isset($_SESSION['username'])) {
   exit();
 }
 
+// Fetch notifications
+$notificationQuery = "
+  SELECT n.*,
+         u.first_name AS actor_first_name,
+         u.last_name AS actor_last_name,
+         p.content AS post_content
+  FROM notifications n
+  JOIN users u ON n.actor_id = u.id
+  LEFT JOIN posts p ON n.post_id = p.id
+  WHERE n.user_id = ?
+  ORDER BY n.created_at DESC
+  LIMIT 10
+";
+
+$notificationStmt = $conn->prepare($notificationQuery);
+$notificationStmt->bind_param("i", $_SESSION['id']);
+$notificationStmt->execute();
+$notificationsResult = $notificationStmt->get_result();
+$notifications = $notificationsResult->fetch_all(MYSQLI_ASSOC);
+$notificationStmt->close();
+
+// Count unread notifications
+$unreadCountRes = $conn->query("SELECT COUNT(*) AS unread FROM notifications WHERE user_id = {$_SESSION['id']} AND is_read = 0");
+$unread = $unreadCountRes->fetch_assoc()['unread'] ?? 0;
+
+$user_id = $_SESSION['id'];
+
 // POST CREATION
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['post_content'])) {
   $user_id = $_SESSION['id'];
@@ -52,10 +79,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['post_content'])) {
 
 // LIKE A POST
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['like_post_id'])) {
-  $user_id = $_SESSION['id'];
   $post_id = intval($_POST['like_post_id']);
 
-  // Check if already liked
   $check = $conn->prepare("SELECT id FROM likes WHERE user_id = ? AND post_id = ?");
   $check->bind_param("ii", $user_id, $post_id);
   $check->execute();
@@ -66,6 +91,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['like_post_id'])) {
     $like->bind_param("ii", $user_id, $post_id);
     $like->execute();
     $like->close();
+
+    // Add notification to post owner
+    $ownerStmt = $conn->prepare("SELECT user_id FROM posts WHERE id = ?");
+    $ownerStmt->bind_param("i", $post_id);
+    $ownerStmt->execute();
+    $ownerStmt->bind_result($owner_id);
+    $ownerStmt->fetch();
+    $ownerStmt->close();
+
+    if ($owner_id != $user_id) {
+      $notifStmt = $conn->prepare("INSERT INTO notifications (user_id, actor_id, post_id, type) VALUES (?, ?, ?, 'like')");
+      $notifStmt->bind_param("iii", $owner_id, $user_id, $post_id);
+      $notifStmt->execute();
+      $notifStmt->close();
+    }
   }
 
   $check->close();
@@ -75,7 +115,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['like_post_id'])) {
 
 // COMMENT ON A POST
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['comment_post_id'], $_POST['comment_text'])) {
-  $user_id = $_SESSION['id'];
   $post_id = intval($_POST['comment_post_id']);
   $comment = trim($_POST['comment_text']);
 
@@ -84,11 +123,47 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['comment_post_id'], $_
     $stmt->bind_param("iis", $user_id, $post_id, $comment);
     $stmt->execute();
     $stmt->close();
+
+    // Add notification to post owner
+    $ownerStmt = $conn->prepare("SELECT user_id FROM posts WHERE id = ?");
+    $ownerStmt->bind_param("i", $post_id);
+    $ownerStmt->execute();
+    $ownerStmt->bind_result($owner_id);
+    $ownerStmt->fetch();
+    $ownerStmt->close();
+
+    if ($owner_id != $user_id) {
+      $notifStmt = $conn->prepare("INSERT INTO notifications (user_id, actor_id, post_id, type) VALUES (?, ?, ?, 'comment')");
+      $notifStmt->bind_param("iii", $owner_id, $user_id, $post_id);
+      $notifStmt->execute();
+      $notifStmt->close();
+    }
   }
 
   header("Location: dashboard.php");
   exit();
 }
+
+// Fetch latest 10 notifications
+$notifications = [];
+$unread_count = 0;
+
+$nstmt = $conn->prepare("SELECT n.*, u.first_name, u.last_name FROM notifications n JOIN users u ON n.actor_id = u.id WHERE n.user_id = ? ORDER BY n.created_at DESC LIMIT 10");
+$nstmt->bind_param("i", $user_id);
+$nstmt->execute();
+$result = $nstmt->get_result();
+while ($row = $result->fetch_assoc()) {
+  $notifications[] = $row;
+}
+$nstmt->close();
+
+$unreadResult = $conn->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = ? AND is_read = 0");
+$unreadResult->bind_param("i", $user_id);
+$unreadResult->execute();
+$unreadResult->bind_result($unread_count);
+$unreadResult->fetch();
+$unreadResult->close();
+
 ?>
 
 <!DOCTYPE html>
@@ -128,17 +203,29 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['comment_post_id'], $_
         <div class="notification-wrapper" id="notification_wrapper">
           <button class="icon-btn" id="notificationBtn" aria-label="Notifications">
             <i class="ri-notification-3-line ri-lg"></i>
-            <span class="badge" id="notification_count">3</span>
+            <?php if ($unread_count > 0): ?>
+              <span class="badge" id="notification_count"><?= $unread_count ?></span>
+            <?php endif; ?>
           </button>
 
           <div class="notification-dropdown" id="notification_dropdown">
             <h4>Notifications</h4>
             <ul>
-              <li><strong>John</strong> liked your post.</li>
-              <li><strong>Alice</strong> followed you.</li>
-              <li><strong>Jane</strong> liked your post.</li>
+              <?php if (empty($notifications)): ?>
+                <li>No new notifications.</li>
+              <?php else: ?>
+                <?php foreach ($notifications as $notification): ?>
+                  <li>
+                    <strong><?= htmlspecialchars($notification['first_name'] . ' ' . $notification['last_name']) ?></strong>
+                    <?= htmlspecialchars($notification['type']) ?> your post.
+                    <br><small><?= date("M d, g:i A", strtotime($notification['created_at'])) ?></small>
+                  </li>
+                <?php endforeach; ?>
+              <?php endif; ?>
             </ul>
-            <button class="mark-read" id="markAllReadBtn">Mark all as read</button>
+            <form method="POST" action="mark_notifications_read.php">
+              <button class="mark-read" type="submit" name="mark_read" id="markAllReadBtn">Mark all as read</button>
+            </form>
           </div>
         </div>
 
