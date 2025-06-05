@@ -10,6 +10,34 @@ if (!isset($_SESSION['username'])) {
 
 $username = $_SESSION['username'];
 
+// Fetch latest 10 notifications for the logged-in user
+$notifications = [];
+$unread_count = 0;
+
+$nstmt = $conn->prepare("
+  SELECT n.*, u.first_name AS actor_first_name, u.last_name AS actor_last_name
+  FROM notifications n
+  JOIN users u ON n.actor_id = u.id
+  WHERE n.user_id = ?
+  ORDER BY n.created_at DESC
+  LIMIT 10
+");
+$nstmt->bind_param("i", $_SESSION['id']);
+$nstmt->execute();
+$result = $nstmt->get_result();
+while ($row = $result->fetch_assoc()) {
+  $notifications[] = $row;
+}
+$nstmt->close();
+
+// Count unread notifications
+$unreadResult = $conn->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = ? AND is_read = 0");
+$unreadResult->bind_param("i", $_SESSION['id']);
+$unreadResult->execute();
+$unreadResult->bind_result($unread_count);
+$unreadResult->fetch();
+$unreadResult->close();
+
 // Fetch user data by username
 $sql = "SELECT * FROM users WHERE user_name = ?";
 $stmt = $conn->prepare($sql);
@@ -112,17 +140,30 @@ $user = $result->fetch_assoc();
         <div class="notification-wrapper" id="notification_wrapper">
           <button class="icon-btn" id="notificationBtn" aria-label="Notifications">
             <i class="ri-notification-3-line ri-lg"></i>
-            <span class="badge" id="notification_count">3</span>
+            <?php if ($unread_count > 0): ?>
+              <span class="badge" id="notification_count"><?= $unread_count ?></span>
+            <?php endif; ?>
           </button>
 
           <div class="notification-dropdown" id="notification_dropdown">
             <h4>Notifications</h4>
             <ul>
-              <li><strong>John</strong> liked your post.</li>
-              <li><strong>Alice</strong> followed you.</li>
-              <li><strong>Jane</strong> liked your post.</li>
+              <?php if (empty($notifications)): ?>
+                <li>No new notifications.</li>
+              <?php else: ?>
+                <?php foreach ($notifications as $notification): ?>
+                  <li>
+                    <strong><?= htmlspecialchars($notification['actor_first_name'] . ' ' . $notification['actor_last_name']) ?></strong>
+                    <?= htmlspecialchars($notification['type']) ?> your post.
+                    <br><small><?= date("M d, g:i A", strtotime($notification['created_at'])) ?></small>
+                  </li>
+                <?php endforeach; ?>
+              <?php endif; ?>
             </ul>
-            <button class="mark-read" id="markAllReadBtn">Mark all as read</button>
+
+            <form method="POST" action="mark_notifications_read.php">
+              <button class="mark-read" type="submit" name="mark_read" id="markAllReadBtn">Mark all as read</button>
+            </form>
           </div>
         </div>
       </nav>
