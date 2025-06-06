@@ -20,73 +20,70 @@
 }
 
 body {
-  font-family: "Quicksand", sans-serif;
-  background: url(../assets/dark_mode.jpg);
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  margin: 0;
-  padding: 2rem;
+  background: url(../assets/dark_mode.jpg) center/cover fixed no-repeat;
   color: white;
 }
 
-/* Container (glass style) */
 .container {
-  max-width: 800px;
-  height: 1307px;
-  margin: auto;
+  width: 80%;
+  max-width: 1000px;
+  margin: 40px auto;
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 2rem;
+  border-radius: 10px;
+  padding: 20px 40px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
-/* Cover Photo Preview */
+#profile_form {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* Cover Preview */
 .cover-preview-div {
   width: 100%;
-  height: 150px;
-  background-image: url("../assets/profile/cat.jpg");
+  height: 200px;
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
-  border-radius: 12px;
+  border-radius: 10px;
   margin-bottom: 1rem;
 }
 
-/* Change Cover Button */
+/* Cover Upload Button */
 .change-profile-pic {
-  display: block;
-  margin: 0 auto 1.5rem auto;
   background-color: #904a8e;
   color: black;
   padding: 0.5rem 1rem;
-  border: none;
   border-radius: 12px;
-  cursor: pointer;
   font-weight: bold;
+  cursor: pointer;
+  margin: 10px auto 24px auto;
+  display: block;
   transition: background 0.3s;
 }
 
 .change-profile-pic:hover {
-  background-color: #904a8e;
   animation: bounce 0.5s;
 }
 
-/* Profile Picture & Label */
+/* Profile Picture Upload */
 .profile-picture {
   text-align: center;
-  margin-bottom: 1.5rem;
   position: relative;
+  width: 120px;
+  height: 120px;
+  margin: -60px 0 1.5rem 20px;
 }
 
 .profile-picture img {
-  width: 130px;
-  height: 130px;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   border-radius: 50%;
-  border: 3px solid white;
-  position: relative;
+  border: 4px solid white;
 }
 
 .profile-picture h2 {
@@ -96,44 +93,41 @@ body {
   color: #facc15;
 }
 
-/* Small circle edit button */
 .change-profile-image {
   position: absolute;
-  right: calc(50% - 60px);
-  background-color: #8A4FFF;
+  bottom: 0;
+  right: 0;
+  background-color: #1877f2;
   color: white;
-  border: none;
-  font-size: 1.2rem;
+  font-size: 20px;
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  line-height: 32px;
+  width: 30px;
+  height: 30px;
   text-align: center;
+  line-height: 28px;
   cursor: pointer;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-  bottom: 47px;
 }
 
 .change-profile-image:hover {
   animation: bounce 0.5s;
 }
 
-/* Form Layout */
-#edit_profile_form {
+/* Grid Layout */
+.grid-2 {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.2rem;
-  margin-top: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
 }
 
-.input-group label {
-  display: block;
-  margin-bottom: 0.4rem;
-  font-weight: 600;
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.input-group input {
-  width: 100%;
+.input-group input,
+.input-group textarea {
   padding: 0.6rem;
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -143,206 +137,85 @@ body {
 
 /* Bio Section */
 .bio-section {
-  margin-top: 2rem;
-  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.bio-section > label {
-  display: block;
-  margin-bottom: 0.5rem;
+.bio-section label {
   font-weight: 600;
 }
 
-.bio-section > textarea {
-  width: 100%;
+.bio-section textarea {
   height: 120px;
   padding: 1rem;
-  border-radius: 10px;
-  font-size: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background-color: rgba(255, 255, 255, 0.05);
-  color: white;
   resize: none;
-  margin-bottom: 1rem;
-}
-
-/* Base button style for all major actions */
-button,
-.change-profile-pic,
-.change-bio,
-.save-changes {
-  padding: 0.5rem 1rem;
-  border-radius: 12px;
-  font-size: 0.95rem;
-  font-weight: bold;
-  cursor: pointer;
-  border: none;
-  transition: background-color 0.3s ease;
-}
-
-/* Buttons */
-.bio-section > button {
-  padding: 0.6rem 1.2rem;
-  font-size: 0.9rem;
-  border-radius: 9999px;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  margin-right: 0.75rem;
-  margin-top: 0.5rem;
 }
 
 .change-bio {
   background-color: #904a8e;
   color: black;
-  position: relative;
-  left: 308px;
-  bottom: 37px;
+  border-radius: 9999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.6rem 1.2rem;
+  width: fit-content;
 }
 
 .change-bio:hover {
-  animation: bounce 0.5s; 
+  animation: bounce 0.5s;
+}
+
+/* Relationship Group */
+.relationship-group {
+  margin-top: 20px;
+}
+
+.relationship-group label {
+  font-weight: bold;
+}
+
+.radio-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.radio-options label {
+  padding: 8px 16px;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.radio-options input[type="radio"] {
+  margin-right: 6px;
+}
+
+/* Buttons */
+button {
+  padding: 10px 20px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
 }
 
 .save-changes {
-  background-color: #47cc6d;
-  color: black;
-  position: absolute;
-  left: 330px;
-  bottom: 1px;
+  background-color: #1877f2;
+  color: white;
 }
 
 .save-changes:hover {
   animation: bounce 0.5s;
 }
 
-.profile-details-title {
-  margin-top: 1rem;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #facc15;
-  text-align: center;
-  margin-bottom: 6%;
-}
-
-.input-group-2 > input{
-  width: 40%;  
-  padding: 0.6rem;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background-color: rgba(255, 255, 255, 0.05);
-  color: white;
-  margin-bottom: 5%;
-}
-
-.input-group-2 > label { 
-  display: block;
-  margin-bottom: 0.4rem;
-  font-weight: 600;
-}
-
-.input-group-2 > #home {
-  position: relative;
-  left: 436px;
-  bottom: 203px;
-}
-
-#home_label {
-  position: relative;
-  left: 436px;
-  bottom: 204px;
-  width: 100px;
-}
-
-#religion {
-  position: relative;
-  left: 436px;
-  bottom: 412px;
-}
-
-#religion_label {
-  position: relative;
-  left: 436px;
-  bottom: 412px;
-  width: 100px;
-}
-
-.input-group-2 > #rel {
-  position: relative;
-  left: 436px;
-  bottom: 204px;
-
-}
-
-#relationship_label {
-  position: relative;
-  bottom: 98px;
-  width: 300px;
-}
-
-#single {
-  position: relative;
-  bottom: 85px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background-color: rgba(255, 255, 255, 0.05);
-  width: 21%;
-  padding: 0.6rem;
-  border-radius: 10px;
-}
-
-#in_a_relationship {
-  position: relative;
-  bottom: 79px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background-color: rgba(255, 255, 255, 0.05);
-  width: 21%;
-  padding: 0.6rem;
-  border-radius: 10px;
-  font-size: 15px;
-}
-
-#married {
-  position: relative;
-  left: 166px;
-  bottom: 179px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background-color: rgba(255, 255, 255, 0.05);
-  width: 21%;
-  padding: 0.6rem;
-  border-radius: 10px;
-  font-size: 15px;
-}
-
-#complicated {
-  position: relative;
-  left: 166px;
-  bottom: 173px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background-color: rgba(255, 255, 255, 0.05);
-  width: 21%;
-  padding: 0.6rem;
-  border-radius: 10px;
-  font-size: 15px;
-}
-
-#single:hover {
-  animation: bounce 0.5s;
-}
-
-#in_a_relationship:hover {
-  animation: bounce 0.5s;
-}
-
-#married:hover {
-  animation: bounce 0.5s;
-}
-
-#complicated:hover {
-  animation: bounce 0.5s;
-}
-
 .return-to-profile {
-  position: absolute;
-  left: 28px;
-  bottom: 1089px
+  background: #e4e6eb;
+  color: #050505;
 }
