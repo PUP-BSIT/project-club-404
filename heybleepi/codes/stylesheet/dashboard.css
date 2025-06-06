@@ -186,6 +186,12 @@ body.page {
   position: relative;
 }
 
+.notification-wrapper .badge {
+  top: -5px;
+  right: -5px;
+  position: absolute;
+}
+
 .notification-dropdown {
   position: absolute;
   top: 120%;
@@ -203,6 +209,12 @@ body.page {
   transform: translateY(-10px);
   pointer-events: none;
   transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.notification_count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
 }
 
 .notification-dropdown.visible {
@@ -293,10 +305,18 @@ body.page {
   top: -4px;
   right: -4px;
   background: var(--secondary);
-  color: #fff;
-  font-size: .55rem;
-  padding: 0 .3rem;
+  background-color: crimson;
+  color: white;
+  font-size: 0.7rem;
+  padding: 2px 6px;
   border-radius: 12px;
+  line-height: 1;
+  display: inline-block;
+}
+
+.badge-inline {
+  position: static !important;
+  margin-top: 2px;
 }
 
 /*  ====  LAYOUT  ==== */
@@ -381,12 +401,20 @@ body.page {
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 10px;
   padding: 0.65rem 1rem;
+  position: relative;
   border-radius: 14px;
   color: #fff;
   text-decoration: none;
   transition: background, color 0.2s;
+}
+
+.nav-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 20px;
+  /* space to badge */
 }
 
 .nav-item:hover {

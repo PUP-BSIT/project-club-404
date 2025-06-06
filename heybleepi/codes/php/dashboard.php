@@ -34,6 +34,19 @@ $unread = $unreadCountRes->fetch_assoc()['unread'] ?? 0;
 
 $user_id = $_SESSION['id'];
 
+// Count messages the user hasn't read yet
+$lastSeenQuery = $conn->prepare("SELECT last_seen_message_id FROM users WHERE id = ?");
+$lastSeenQuery->bind_param("i", $user_id);
+$lastSeenQuery->execute();
+$lastSeenQuery->bind_result($lastSeenMessageId);
+$lastSeenQuery->fetch();
+$lastSeenQuery->close();
+
+$lastSeenMessageId = $lastSeenMessageId ?? 0;
+
+$countNewMessages = $conn->query("SELECT COUNT(*) AS unread_messages FROM messages WHERE id > $lastSeenMessageId");
+$unreadMessages = $countNewMessages->fetch_assoc()['unread_messages'] ?? 0;
+
 // POST CREATION
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['post_content'])) {
   $user_id = $_SESSION['id'];
@@ -264,8 +277,14 @@ $unreadResult->close();
 
           <a class="nav-item" href="messages.php">
             <i class="ri-message-3-line"></i>
-            Messages
+            <span class="nav-label">
+              Messages
+              <?php if ($unreadMessages > 0): ?>
+                <span class="badge badge-inline"><?= $unreadMessages ?></span>
+              <?php endif; ?>
+            </span>
           </a>
+
 
           <a class="nav-item" href="profile.php">
             <i class="ri-user-line"></i>
