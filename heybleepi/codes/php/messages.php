@@ -62,7 +62,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 } 
 
 // Fetch all messages with user avatars
-$sql = "SELECT m.*, u.avatar FROM messages m LEFT JOIN users u ON m.user_name = u.user_name ORDER BY m.created_at DESC";
+$sql = "SELECT m.*, ud.profile_picture 
+        FROM messages m 
+        LEFT JOIN users u ON m.user_name = u.user_name 
+        LEFT JOIN user_details ud ON u.id = ud.id_fk 
+        ORDER BY m.created_at DESC";
 $result = $conn->query($sql);
 
 if (!$result) {
@@ -81,7 +85,7 @@ $conn->close();
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@4.6.4/dist/index.min.js"></script>
-  <link rel="stylesheet" href="../stylesheet/messages.css" />
+  <link rel="stylesheet" href="./stylesheet/messages.css" />
 </head>
 <body class="page">
   <header class="top-nav glass">
@@ -126,7 +130,7 @@ $conn->close();
         <div class="message-preview">
           <div class="comment-box">
             <div class="comment-header">
-              <img src="../assets/profile/<?= htmlspecialchars($row['avatar'] ?? 'default.png') ?>" alt="Avatar" class="avatar avatar--sm" />
+            <img src="./assets/profile/<?= htmlspecialchars($row['profile_picture'] ?? 'default.png') ?>" alt="Avatar" class="avatar avatar--sm" />
               <div class="preview-text">
                 <h4><?= htmlspecialchars($row['user_name']) ?></h4>
                 <p><?= htmlspecialchars($row['message']) ?></p>
@@ -153,6 +157,6 @@ $conn->close();
     <?php endif; ?>
   </div>
 
-  <script src="../script/messages.js"></script>
+  <script src="./script/messages.js"></script>
 </body>
 </html>
