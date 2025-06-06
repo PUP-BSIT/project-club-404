@@ -1,48 +1,33 @@
-//Changes the profile image
-const fileInput = document.getElementById('file_input');
-const profileImage = document.getElementById('profile_image');
-
-fileInput.addEventListener('change', function () {
+// Profile Picture Preview
+document.getElementById('file_input').addEventListener('change', function () {
   const file = this.files[0];
-
   if (file) {
-    const reader = new FileReader();
-
-    reader.onload = function (e) {
-      profileImage.src = e.target.result; 
-    };
-
-    reader.readAsDataURL(file); 
+    const preview = document.getElementById('profile_image');
+    preview.src = URL.createObjectURL(file);
   }
 });
 
-function alertUserOnSave() {
-  const saveButton = document.querySelector(".save-changes");
-  alert("Changes saved successfully!");
-}
-
+// Enable textarea for Bio
 function enableTextArea() {
-  enableText = document.getElementById("bio");
-  enableText.disabled = false;
+  const textarea = document.getElementById("bio");
+  textarea.removeAttribute("readonly");
+  textarea.focus();
+
+  const button = document.querySelector(".change-bio");
+  button.textContent = "Editing Bio...";
+  button.disabled = true;
 }
 
+// Change Cover and Preview
 function changeCover() {
-  const changeCover = document.getElementById("cover_input");
-  changeCover.click();
+  const coverInput = document.getElementById('cover_input');
+  coverInput.click();
 
-  //Changes the cover image
-  cover_input.onchange = function () {
+  coverInput.onchange = function () {
     const file = this.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const cover_preview_div = document.getElementById("cover_preview_div");
-        cover_preview_div.style.backgroundImage = `url(${e.target.result})`;
-      };
-      reader.readAsDataURL(file);
+      const preview = document.getElementById('cover_preview_div');
+      preview.style.backgroundImage = `url(${URL.createObjectURL(file)})`;
     }
   };
 }
-
-
-

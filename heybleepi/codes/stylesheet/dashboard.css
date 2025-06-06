@@ -69,6 +69,7 @@ body.page {
   height: 2.25rem;
   border-radius: 8px;
   background: rgba(255, 255, 255, .04);
+  position: relative;
   transition: background .2s
 }
 
@@ -319,6 +320,21 @@ body.page {
   margin-top: 2px;
 }
 
+.badge--message {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--secondary);
+  background-color: crimson;
+  color: white;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 12px;
+  line-height: 1;
+  font-weight: bold;
+  z-index: 10;
+}
+
 /*  ====  LAYOUT  ==== */
 .layout {
   display: flex;
@@ -374,6 +390,11 @@ body.page {
   font-size: 0.75rem;
   opacity: 0.7;
   margin-top: 0.15rem;
+}
+
+.left-column .card i {
+  margin-right: 8px;
+  vertical-align: middle;
 }
 
 .stats {

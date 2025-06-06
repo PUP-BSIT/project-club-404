@@ -8,6 +8,16 @@ if (!isset($_SESSION['username'])) {
   exit();
 }
 
+$user_id = $_SESSION['id'];
+
+// Get last seen message ID
+$lastSeenRow = $conn->query("SELECT last_seen_message_id FROM users WHERE id = $user_id");
+$lastSeenMessageId = $lastSeenRow ? ($lastSeenRow->fetch_assoc()['last_seen_message_id'] ?? 0) : 0;
+
+// Get count of newer messages
+$unreadResult = $conn->query("SELECT COUNT(*) AS unread FROM messages WHERE id > $lastSeenMessageId");
+$unreadMessages = $unreadResult ? $unreadResult->fetch_assoc()['unread'] : 0;
+
 $username = $_SESSION['username'];
 
 // Fetch latest 10 notifications for the logged-in user
@@ -39,7 +49,11 @@ $unreadResult->fetch();
 $unreadResult->close();
 
 // Fetch user data by username
-$sql = "SELECT * FROM users WHERE user_name = ?";
+$sql = "SELECT users.*, user_details.bio, user_details.work, user_details.school, user_details.home, user_details.religion, user_details.relationship_status, user_details.profile_picture, user_details.profile_cover
+        FROM users
+        LEFT JOIN user_details ON users.id = user_details.id_fk
+        WHERE users.user_name = ?";
+
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $username);
 $stmt->execute();
@@ -135,7 +149,13 @@ $user = $result->fetch_assoc();
       <h1 class="brand">HEYBLEEPI</h1>
       <nav class="nav-actions">
         <a class="icon-btn" href="dashboard.php" title="Home"><i class="ri-home-4-line"></i></a>
-        <a class="icon-btn" href="messages.php" title="Messages"><i class="ri-message-3-line"></i></a>
+
+        <a class="icon-btn" href="messages.php" title="Messages">
+          <i class="ri-message-3-line"></i>
+          <?php if ($unreadMessages > 0): ?>
+            <span class="badge  badge--message"><?= $unreadMessages ?></span>
+          <?php endif; ?>
+        </a>
 
         <div class="notification-wrapper" id="notification_wrapper">
           <button class="icon-btn" id="notificationBtn" aria-label="Notifications">
@@ -173,20 +193,16 @@ $user = $result->fetch_assoc();
     <main class="profile-container">
       <!-- Banner + Profile info -->
       <div class="profile-top glass">
-        <img class="banner-img" src="./assets/profile/banner.jpg" alt="Banner" />
+        <img class="banner-img" src="./assets/profile/<?= htmlspecialchars($user['profile_cover'] ?? 'banner.jpg') ?>" alt="Banner" />
         <div class="profile-info-bar">
-          <img class="avatar avatar--sm" src="./assets/profile/<?= htmlspecialchars($user['avatar'] ?? 'rawr.png') ?>" alt="">
+          <img class="avatar avatar--sm" src="./assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>" alt="">
           <div class="user-basic-info">
-            <h2><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></h2>
-            <p>@<?php echo htmlspecialchars($user['user_name']); ?> · 81</p>
+            <h2><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></h2>
+            <p>@<?= htmlspecialchars($user['user_name']) ?> · 81</p>
           </div>
-
           <div class="profile-buttons">
             <button class="btn btn--primary">Add to Story</button>
-              <button class="btn btn--secondary"
-                onclick="window.location.href='profile_edit.php'">
-                Edit Profile
-            </button>
+            <button class="btn btn--secondary" onclick="window.location.href='profile_edit.php'">Edit Profile</button>
           </div>
         </div>
       </div>
@@ -205,10 +221,30 @@ $user = $result->fetch_assoc();
         <aside class="left-column">
           <section class="glass card">
             <h4 class="card-title">Intro</h4>
-            <p> Welcome to HeyBleeepi!</p>
-            <p><i class="ri-briefcase-line"></i> Works at Krusty Krab</p>
-            <p><i class="ri-graduation-cap-line"></i> Studies at PUP Taguig</p>
-            <p><i class="ri-map-pin-line"></i> Lives in Manila</p>
+
+            <?php if (!empty($user['bio'])): ?>
+              <p><?= htmlspecialchars($user['bio']) ?></p>
+            <?php endif; ?>
+
+            <?php if (!empty($user['work'])): ?>
+              <p><i class="ri-briefcase-line"></i> Works at <?= htmlspecialchars($user['work']) ?></p>
+            <?php endif; ?>
+
+            <?php if (!empty($user['school'])): ?>
+              <p><i class="ri-graduation-cap-line"></i> Studies at <?= htmlspecialchars($user['school']) ?></p>
+            <?php endif; ?>
+
+            <?php if (!empty($user['home'])): ?>
+              <p><i class="ri-map-pin-line"></i> Lives in <?= htmlspecialchars($user['home']) ?></p>
+            <?php endif; ?>
+
+            <?php if (!empty($user['religion'])): ?>
+              <p><i class="ri-heart-pulse-line"></i> Religion: <?= htmlspecialchars($user['religion']) ?></p>
+            <?php endif; ?>
+
+            <?php if (!empty($user['relationship_status'])): ?>
+              <p><i class="ri-heart-line"></i> <?= ucwords(str_replace('_', ' ', htmlspecialchars($user['relationship_status']))) ?></p>
+            <?php endif; ?>
           </section>
 
           <section class="glass card">
@@ -232,7 +268,7 @@ $user = $result->fetch_assoc();
           <div class="glass create-post">
             <form method="POST" action="profile.php"  enctype="multipart/form-data">
               <div class="create-post-header">
-                <img class="avatar avatar--sm" src="./assets/profile/rawr.png" alt="">
+                <img class="avatar avatar--sm" src="./assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>" alt="">
                 <div class="poster-info">
                   <a href="profile.php" class="poster-name"><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></a>
                   <p>@<?php echo htmlspecialchars($user['user_name']); ?></p>
@@ -334,7 +370,7 @@ $user = $result->fetch_assoc();
 
             <article class="glass post">
               <header class="post-header">
-                <img class="avatar avatar--sm" src="./assets/profile/default.png" alt="User Avatar">
+                <img class="avatar avatar--sm" src="./assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>" alt="User Avatar">
                 <div>
                   <h4><?= htmlspecialchars($post['first_name'] . ' ' . $post['last_name']) ?></h4>
                   <time><?= date("M d, g:i A", strtotime($post['created_at'])) ?></time>
