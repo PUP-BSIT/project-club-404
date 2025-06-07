@@ -1,51 +1,72 @@
 <div align="center">
-   <img width=1063px height=320px src="./heybleepi/readme_cover.png" />
+  <img width="100%" src="./heybleepi/readme_cover.png" alt="HeyBleeepi Cover"/>
 
-# HEYBLEEPI
-
-<hr>
-
+  <h1>HEYBLEEPI</h1>
+  <p><em>Connect. Share. Engage.</em></p>
+  <hr/>
 </div>
 
-### Welcome to _HeyBleeepi!_ 👋
+### 👋 Welcome to **HeyBleeepi**
 
-**HeyBleeepi** is your go-to platform for connecting with others online through 
-dynamic posts. With a simple and intuitive interface, HeyBleeepi makes it easy
-and enjoyable to share thoughts, engage with others, and build connections.
+**HeyBleeepi** is a social media-style platform that lets users interact through dynamic posts, real-time comments, and social engagement tools. With a modern and intuitive interface, it makes connecting online simple and fun.
 
-Join the conversation today! Register and explore HeyBleeepi now.
+- Create dynamic posts 📝
+- React, comment, and share content 💬
+- Stay connected with a global feed 🌍
 
-<hr>
+> 💬 **Join the conversation today! Register and explore HeyBleeepi now.**
 
-<h3> Features of <em>HeyBleeepi</em> ⚙️</h3>
+---
 
-- [x] Create and Manage Your Own Post _(Edit & Delete)_
-- [x] Has a global timeline/wall.
-- [x] React, Comment, & Share of posts.
+## 🚀 Features
 
-<hr>
+- **Post Management** – Create, edit, and delete your own posts
+- **Interactive Feed** – Global timeline view for all users
+- **Social Actions** – Like ❤️, Comment 💬, and Share 🔁 on posts
+- **Mobile-Responsive** – Optimized for all devices
+- **User Authentication** – Secure login and registration system
 
-### Web Host ⚙️
-- [x] Hostinger
-- [x] Domain: [club-404.com](https://dimgrey-parrot-643194.hostingersite.com/)
+---
 
-<hr>
+## 🌐 Web Hosting
 
-### TechStack ⌨️
-### Backend:
-> PHP & JS
+- **Hosted on:** Hostinger
+- **Live URL:** [HeyBleepi.com](https://dimgrey-parrot-643194.hostingersite.com/)
 
-### Frontend:
->  HTML, CSS and JS
+---
 
-### Database: 
-> MySQL
+## 👤 Sample Account
 
-<hr>
+To explore without registering:
 
-### The Team:
+- **Email:** `joe123@example`
+- **Password:** `joe123`
 
-- 👨‍💻 **Tech Lead/Developer:** John Matthew Arroyo
-- 👨‍💻 **Tester/Developer:** Justine Delima
-- 👩‍💻 **Project Manager/Developer:** Patricia Joy Relente
-- 👩‍💻 **UI/UX Designer/Developer:** Ma. Bea Mae Ynion
+---
+
+## 🧰 Tech Stack
+
+### Backend
+![PHP](https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+
+### Frontend
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+
+### Database
+![MySQL](https://img.shields.io/badge/MySQL-00758F?style=for-the-badge&logo=mysql&logoColor=white)
+
+---
+
+## 👥 Meet the Team
+
+| Name | Role |
+|------|------|
+| 👨‍💻 John Matthew Arroyo | Tech Lead / Developer |
+| 👨‍💻 Justine Delima | Tester / Developer |
+| 👩‍💻 Patricia Joy Relente | Project Manager / Developer |
+| 👩‍💻 Ma. Bea Mae Ynion | UI/UX Designer / Developer |
+
+---
