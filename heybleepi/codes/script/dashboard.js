@@ -457,3 +457,24 @@ document.getElementById("removeVideoBtn")?.addEventListener("click", function ()
   container.style.display = "none";
   input.value = "";
 });
+
+document.querySelectorAll('.photo-grid img, .photo-grid video').forEach(item => {
+  item.addEventListener('click', function () {
+    const type = this.getAttribute('data-type');
+    const src = this.getAttribute('data-src');
+    const lightboxContent = document.getElementById('lightboxContent');
+
+    if (type === 'image') {
+      lightboxContent.innerHTML = `<img src="${src}" alt="Preview" />`;
+    } else if (type === 'video') {
+      lightboxContent.innerHTML = `<video src="${src}" controls autoplay></video>`;
+    }
+
+    document.getElementById('lightbox').style.display = 'flex';
+  });
+});
+
+function closeLightbox() {
+  document.getElementById('lightbox').style.display = 'none';
+  document.getElementById('lightboxContent').innerHTML = '';
+}

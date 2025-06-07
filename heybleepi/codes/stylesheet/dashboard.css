@@ -102,6 +102,11 @@ body.page {
   object-fit: cover;
 }
 
+.avatar--sm2 {
+  width: 120px;
+  height: 120px;
+}
+
 .avatar--sm {
   width: 40px;
   height: 40px;
@@ -1089,8 +1094,17 @@ textarea:focus {
 /* ==== LEFT COLUMN ==== */
 .photo-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   gap: 0.5rem;
+}
+
+.photo-grid img,
+.photo-grid video {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
 }
 
 .photo-grid img {
@@ -1107,6 +1121,36 @@ textarea:focus {
 
 .photos-card .card-title {
   margin-bottom: 0.6rem;
+}
+
+/*Light Box*/
+.lightbox {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.lightbox-content img,
+.lightbox-content video {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 10px;
+}
+
+.lightbox .close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-size: 40px;
+  color: #fff;
+  cursor: pointer;
 }
 
 .left-column .card,

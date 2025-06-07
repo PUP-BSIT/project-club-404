@@ -125,6 +125,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['post_content'])) {
 }
 
 $user = $result->fetch_assoc();
+
+$userId = $_SESSION['id'];
+
+$mediaStmt = $conn->prepare("
+  SELECT image_path, video_path
+  FROM posts
+  WHERE user_id = ?
+    AND (image_path IS NOT NULL OR video_path IS NOT NULL)
+  ORDER BY created_at DESC
+");
+$mediaStmt->bind_param("i", $userId);
+$mediaStmt->execute();
+$mediaResult = $mediaStmt->get_result();
+$mediaPosts = $mediaResult->fetch_all(MYSQLI_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -195,7 +209,7 @@ $user = $result->fetch_assoc();
       <div class="profile-top glass">
         <img class="banner-img" src="./assets/profile/<?= htmlspecialchars($user['profile_cover'] ?? 'banner.jpg') ?>" alt="Banner" />
         <div class="profile-info-bar">
-          <img class="avatar avatar--sm" src="./assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>" alt="">
+          <img class="avatar avatar--sm2" src="./assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>" alt="">
           <div class="user-basic-info">
             <h2><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></h2>
             <p>@<?= htmlspecialchars($user['user_name']) ?> · 81</p>
@@ -249,17 +263,24 @@ $user = $result->fetch_assoc();
 
           <section class="glass card">
             <h4 class="card-title">Photos</h4>
-            <div class="photo-grid">
-              <img src="./assets/profile/cat.jpg" alt="">
-              <img src="./assets/profile/penguin.jpg" alt="">
-              <img src="./assets/profile/frog.jpg" alt="">
-              <img src="./assets/profile/cat.jpg" alt="">
-              <img src="./assets/profile/penguin.jpg" alt="">
-              <img src="./assets/profile/frog.jpg" alt="">
-              <img src="./assets/profile/cat.jpg" alt="">
-              <img src="./assets/profile/penguin.jpg" alt="">
-              <img src="./assets/profile/frog.jpg" alt="">
-            </div>
+              <div class="photo-grid">
+                <?php foreach ($mediaPosts as $media): ?>
+                  <?php if (!empty($media['image_path'])): ?>
+                    <img src="<?= htmlspecialchars($media['image_path']) ?>"
+                        data-type="image"
+                        data-src="<?= htmlspecialchars($media['image_path']) ?>"
+                        alt="User Image" />
+                  <?php endif; ?>
+
+                  <?php if (!empty($media['video_path'])): ?>
+                    <video muted
+                          data-type="video"
+                          data-src="<?= htmlspecialchars($media['video_path']) ?>">
+                      <source src="<?= htmlspecialchars($media['video_path']) ?>" type="video/mp4" />
+                    </video>
+                  <?php endif; ?>
+                <?php endforeach; ?>
+              </div>
           </section>
         </aside>
 
@@ -493,6 +514,10 @@ $user = $result->fetch_assoc();
         </section>
       </div>
     </main>
+    <div id="lightbox" class="lightbox" style="display:none;">
+      <span class="close" onclick="closeLightbox()">×</span>
+      <div class="lightbox-content" id="lightboxContent"></div>
+    </div>
 
     <script src="./script/dashboard.js"></script>
   </body>
