@@ -22,6 +22,37 @@ $stmt->execute();
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 
+$defaultProfilePic = 'rawr.png';
+$oldProfilePath = __DIR__ . "/assets/profile/" . $user['profile_picture'];
+if (empty($user['profile_picture']) || $user['profile_picture'] !== $defaultProfilePic && !file_exists($oldProfilePath)) {
+  $stmt = $conn->prepare(
+    "UPDATE user_details
+      SET profile_picture = ?
+      WHERE id_fk = ?"
+  );
+
+
+  $stmt-> bind_param("si", $defaultProfilePic, $user['id']);
+  $stmt-> execute();
+  $user['profile_picture'] = $defaultProfilePic;
+  
+}
+
+$defaultCoverPic = 'dark_mode.jpg';
+$oldCoverPath = __DIR__ . "/assets/profile/" . $user['profile_cover'];
+if (empty($user['profile_cover']) || $user['profile_picture'] !== $defaultCoverPic && !file_exists($oldCoverPath)) {
+    $stmt = $conn->prepare(
+      "UPDATE user_details
+       SET profile_cover = ?
+       WHERE id_fk = ?"
+    );
+    
+    $stmt-> bind_param("si", $defaultCoverPic, $user['id']);
+    $stmt-> execute();
+    $user['profile_cover'] = $defaultCoverPic;
+  
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $newUsername = $_POST['username'];
   $firstName = $_POST['first_name'];
@@ -144,7 +175,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <!-- Cover Upload -->
         <div class="cover-preview-div"
-          style="background-image: url('../assets/profile/<?= htmlspecialchars($user['profile_cover'] ?? 'default_cover.jpg') ?>');"
+          style="background-image: url('../assets/profile/<?php echo htmlspecialchars($user['profile_cover'] ?? 'dark_mode.jpg') ?>');"
           id="cover_preview_div">
         </div>
         <button class="change-profile-pic" type="button" onclick="changeCover()">Change Cover Photo</button>
@@ -153,7 +184,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <!-- Edit Profile Title -->
         <div class="profile-picture">
           <img id="profile_image"
-            src="../assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'cat.png') ?>"
+            src="../assets/profile/<?php echo htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>"
             alt="Profile Picture" />
           <label for="file_input" class="change-profile-image">+</label>
           <input type="file" name="file_input" id="file_input" accept="image/*" hidden />
