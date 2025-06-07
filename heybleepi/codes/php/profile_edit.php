@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $school = $_POST['school'];
   $home = $_POST['home'];
   $religion = $_POST['religion'];
-  $relationshipStatus = $_POST['relationship'];
+  $relationshipStatus = $_POST['relationship'] ?? '';
   $oldUsername = $_SESSION['username'];
 
   // Update users table
@@ -95,10 +95,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
   }
 
+  // Update session variables to reflect new profile
   $_SESSION['username'] = $newUsername;
+  $_SESSION['first_name'] = $firstName;
+  $_SESSION['last_name'] = $lastName;
 
-  // Redirect to profile.php to view changes live
-  header("Location: profile.php");
+  if (!empty($avatarName)) {
+    $_SESSION['avatar'] = $avatarName;
+  }
+
+  header("Location: profile_edit.php");
   exit;
 }
 ?>
