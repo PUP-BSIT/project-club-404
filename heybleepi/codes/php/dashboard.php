@@ -243,10 +243,7 @@ $unreadResult->close();
         </div>
 
         <!-- Profile -->
-        <img
-          class="avatar avatar--sm"
-          src="./assets/profile/shark.jpg"
-          alt="Profile" />
+        <img class="avatar avatar--sm" src="./assets/profile/<?= htmlspecialchars($_SESSION['avatar'] ?? 'default.png') ?>" alt="">
       </div>
     </header>
 
@@ -258,9 +255,17 @@ $unreadResult->close();
 
         <!-- Profile Card -->
         <section class="glass card card--profile">
-          <img class="avatar avatar--lg" src="./assets/profile/shark.jpg" alt="" />
-          <h3 class="card-title"><?php echo htmlspecialchars($_SESSION['first_name'] . " " . $_SESSION['last_name']);?></h3>
-          <p class="card-subtitle"><?php echo htmlspecialchars($_SESSION['username'])?></p>
+          <?php
+          $postAvatarPath = './assets/profile/' . ($_SESSION['avatar'] ?? 'default.png');
+          if (!file_exists($postAvatarPath)) {
+            $postAvatarPath = './assets/profile/default.png';
+          }
+          ?>
+          <img class="avatar avatar--sm" src="<?= $postAvatarPath ?>" alt="">
+
+          <h3 class="card-title"><?= htmlspecialchars($_SESSION['first_name'] . " " . $_SESSION['last_name']) ?></h3>
+          <p class="card-subtitle">@<?= htmlspecialchars($_SESSION['username']) ?></p>
+
           <ul class="stats">
             <li><strong>248</strong><span>Posts</span></li>
             <li><strong>15.2 K</strong><span>Followers</span></li>
@@ -315,7 +320,15 @@ $unreadResult->close();
         <form method="POST" action="dashboard.php" enctype="multipart/form-data">
           <div class="glass create-post">
             <div class="create-post-header">
-              <img class="avatar avatar--sm" src="<?= $_SESSION['avatar'] ?? './assets/profile/default.png' ?>" alt="">
+
+              <?php
+              $postAvatarPath = './assets/profile/' . ($_SESSION['avatar'] ?? 'default.png');
+              if (!file_exists($postAvatarPath)) {
+                $postAvatarPath = './assets/profile/default.png';
+              }
+              ?>
+              <img class="avatar avatar--sm" src="<?= $postAvatarPath ?>" alt="">
+
               <div class="poster-info">
                 <a href="profile.php" class="poster-name"><?= $_SESSION['first_name'] . ' ' . $_SESSION['last_name'] ?></a>
                 <p>@<?= $_SESSION['username'] ?></p>
@@ -366,13 +379,18 @@ $unreadResult->close();
         <!-- DISPLAY POSTS (original + shared) -->
         <?php
         $query = "
-          SELECT p.*, u.first_name, u.last_name, u.user_name,
-                sp.content AS shared_content,
-                sp.image_path AS shared_image_path,
-                sp.video_path AS shared_video_path,
-                su.first_name AS shared_first_name, su.last_name AS shared_last_name
+          SELECT
+            p.*,
+            u.first_name, u.last_name, u.user_name,
+            ud.profile_picture,
+            sp.content AS shared_content,
+            sp.image_path AS shared_image_path,
+            sp.video_path AS shared_video_path,
+            su.first_name AS shared_first_name,
+            su.last_name AS shared_last_name
           FROM posts p
           JOIN users u ON p.user_id = u.id
+          LEFT JOIN user_details ud ON ud.id_fk = u.id
           LEFT JOIN posts sp ON p.shared_post_id = sp.id
           LEFT JOIN users su ON sp.user_id = su.id
           ORDER BY p.created_at DESC
@@ -383,7 +401,7 @@ $unreadResult->close();
         <?php while ($post = $posts->fetch_assoc()): ?>
           <article class="glass post">
             <header class="post-header">
-              <img class="avatar avatar--sm" src="./assets/profile/default.png" alt="">
+              <img class="avatar avatar--sm" src="./assets/profile/<?= htmlspecialchars($post['profile_picture'] ?? 'default.png') ?>" alt="">
               <div>
                 <h4><?= htmlspecialchars($post['first_name'] . ' ' . $post['last_name']) ?></h4>
                 <time><?= date("g:i A", strtotime($post['created_at'])) ?></time>

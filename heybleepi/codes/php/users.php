@@ -48,7 +48,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
     $email    = trim($_POST['email']);
     $password = $_POST['password'];
 
-    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
+    $stmt = $conn->prepare("
+      SELECT users.*, user_details.profile_picture
+      FROM users
+      LEFT JOIN user_details ON users.id = user_details.id_fk
+      WHERE users.email = ?
+    ");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -57,14 +62,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
         $user = $result->fetch_assoc();
         if (password_verify($password, $user["password"])) {
             $_SESSION['id'] = $user['id'];
-            $_SESSION['username']    = $user['user_name'];
-            $_SESSION['user_email']  = $user['email'];
+            $_SESSION['username'] = $user['user_name'];
+            $_SESSION['user_email'] = $user['email'];
             $_SESSION['first_name'] = $user['first_name'];
             $_SESSION['middle_name'] = $user['middle_name'];
             $_SESSION['last_name'] = $user['last_name'];
-            $_SESSION['password'] = $user['password'];
             $_SESSION['full_name'] = $user['first_name'] . ' ' . $user['last_name'];
-            $_SESSION['avatar'] = $user['avatar'] ?? 'default.png';
+            $_SESSION['avatar'] = $user['profile_picture'] ?? 'default.png';
+
             header("Location: dashboard.php");
             exit();
         } else {
