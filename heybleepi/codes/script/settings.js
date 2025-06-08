@@ -51,32 +51,51 @@ function hideDeleteAccountPrompt() {
   deleteAccPrompt.classList.remove('show-delete-acc-prompt');
 }
 
+function showPassword() {
+  const oldPassword = document.querySelector("#old_password");
+  const newPassword = document.querySelector("#new_password");
+  const confirmPassword = document.querySelector("#confirm_new_password");
+  const showPassBtn = document.querySelector("#show_password");
+
+  if(oldPassword.type == "password") {
+    oldPassword.type = "text";
+    newPassword.type = "text";
+    confirmPassword.type = "text";
+    return;
+  } 
+
+  oldPassword.type = "password";
+  newPassword.type = "password";
+  confirmPassword.type = "password";
+}
+
 // Function to find and delete the account in the database.
 function deleteAccount(id) {
   fetch(deleteEndpointLocation, {
     method: "POST",
-    headers: {
-      "Content-type": "application/x-www-form-urlencoded",
-    },
-    body: `id=${id}`,
   })
   .then((response) => response.text())
   .then((responseText) => {
+    console.log(responseText);
     alert(responseText);
-    window.location.reload(); // reloads the window.
+    // window.location.reload(); // reloads the window.
   })
+  .catch((error) => {
+    console.error("Fetch error:", error);
+    alert("Something went wrong while deleting the account.");
+  });
 }
 
 function updateAccountInformation() {
   const firstNameInput = document.querySelector("#first_name");
   const middleNameInput = document.querySelector("#middle_name");
   const lastNameInput = document.querySelector("#last_name");
-  const usernameInput = document.querySelector("#username");
+  const usernameInput = document.querySelector("#username_input");
   const emailInput = document.querySelector("#email");
   const birthdateInput = document.querySelector("#birthdate");
 
   fetch(updateEndpointLocation, {
-    method: "PATCH",
+    method: "POST",
     headers: {
       "Content-type": "application/x-www-form-urlencoded",  
     },

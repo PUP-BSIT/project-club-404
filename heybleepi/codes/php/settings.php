@@ -29,9 +29,8 @@ if ($result->num_rows > 0) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <link href="http://localhost/project-club-404/heybleepi/codes/stylesheet/settings.css" rel="stylesheet">
-    <!-- change the css filepath later. -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+    <link href="./stylesheet/settings.css" rel="stylesheet">
     <title>Settings</title>
   </head>
 
@@ -64,7 +63,7 @@ if ($result->num_rows > 0) {
       <div class="delete-acc-prompt">
         <h2>Are you sure you want to permanently delete your account?</h2>
         <div class="delete-acc-buttons">
-          <form action="./delete_account.php" method="delete"> <!--to test delete account php-->
+          <form> <!--to test delete account php-->
             <button 
               type="button"
               class="buttons delete-btn"
@@ -95,35 +94,36 @@ if ($result->num_rows > 0) {
           type="button"
           id="acct_info_btn"
           onClick="switchToAccountInformation()">
-            Account Information
+            <span class="material-symbols-outlined">manage_accounts</span>
         </button>
+
         <button
           type="button"
           id="privacy_settings_btn"
           onClick="switchToPrivacySettings()">
-            Privacy & Security
+           <span class="material-symbols-outlined">security</span>
         </button>
+
+        <a href="dashboard.php" class="back-to-dashboard">
+          <span class="material-symbols-outlined">
+            home
+          </span>
+        </a>
+
         <button 
           type="button" 
           id="logout_btn"
-          onClick="showLogoutPrompt()">Logout</button>
+          onClick="showLogoutPrompt()">
+            <span class="material-symbols-outlined">logout</span></button>
       </div>
     </div>
     <!-- End of Navigation-->
 
     <!-- Start of Section -->
     <div id="section">
-      <!-- Account Information -->
       <div id="account_information_container" 
         class="show-account-info">
         <h2>Account Information</h2>
-
-        <?php if (isset($_GET['status']) && $_GET['status'] === 'success'): ?>
-          <div class="update-success">
-            Profile updated successfully!
-          </div>
-        <?php endif; ?>
-
         <p>Here you can view and edit your account information.</p>
         <form>
           <div>
@@ -133,6 +133,7 @@ if ($result->num_rows > 0) {
               placeholder="First Name"
               id="first_name"
               name="first_name"
+              class="acct-info-input"
               value="<?php echo htmlspecialchars($user['first_name']); ?>"
               required>
           </div>
@@ -144,6 +145,7 @@ if ($result->num_rows > 0) {
               placeholder="Middle Name"
               id="middle_name"
               name="middle_name"
+              class="acct-info-input"
               value="<?php echo htmlspecialchars($user['middle_name']); ?>">
           </div>
 
@@ -154,6 +156,7 @@ if ($result->num_rows > 0) {
               placeholder="Last Name"
               id="last_name"
               name="last_name"
+              class="acct-info-input"
               value="<?php echo htmlspecialchars($user['last_name']); ?>"
               required>
           </div>
@@ -163,8 +166,9 @@ if ($result->num_rows > 0) {
             <input
               type="text"
               placeholder="Username"
-              id="username"
-              name="username"
+              id="username_input"
+              name="username_input"
+              class="acct-info-input"
               value="<?php echo htmlspecialchars($user['user_name']); ?>"
               required>
           </div>
@@ -175,6 +179,7 @@ if ($result->num_rows > 0) {
               type="email"
               placeholder="Email"
               id="email"
+              class="acct-info-input"
               value="<?php echo htmlspecialchars($user['email']); ?>"
               required>
           </div>
@@ -186,6 +191,7 @@ if ($result->num_rows > 0) {
               placeholder="Birthdate"
               id="birthdate"
               name="birthdate"
+              class="acct-info-input"
               value="<?php echo htmlspecialchars($user['birthdate']); ?>"
               required>
           </div>
@@ -203,17 +209,13 @@ if ($result->num_rows > 0) {
           <div class="account-buttons">
 
             <button class="account-btn">
-              <img 
-                src="./assets/connected_accounts/devhive.jpg" 
-                alt="devhive">
-                  Connect to Devhive
+              <img src="./assets/connected_accounts/devhive.jpg" alt="devhive">
+              Connect to Devhive
             </button>
 
             <button class="account-btn">
-              <img 
-                src="./assets/connected_accounts/hershell.png" 
-                alt="hershell">
-                  Connect to Hershell
+              <img src="./assets/connected_accounts/hershell.png" alt="hershell">
+              Connect to Hershell
             </button>
           </div>
         </div>
@@ -224,29 +226,43 @@ if ($result->num_rows > 0) {
         <h2>Privacy & Security</h2>
         <p>Here you can manage your password.</p>
         <form>
-          <div>
+          <div class="old-pass-container">
             <label>Old Password</label>
             <input 
-              type="text" 
+              type="password" 
               placeholder="Old Password"
+              class="old-pass"
               id="old_password">
           </div>
 
-          <div>
+          <div class="new-pass-container">
             <label>New Password</label>
             <input 
-              type="text" 
+              type="password" 
               placeholder="New Password"
+              class="new-pass"
               id="new_password">
           </div>
 
-          <div>
+          <div class="confirm-pass-container">
             <label>Confirm New Password</label>
             <input 
-              type="text" 
+              type="password" 
               placeholder="Confirm New Password"
+              class="confirm-pass"
               id="confirm_new_password">
           </div>
+
+          <div class="checkbox-container"> 
+           <input
+              type="checkbox" 
+              id="show_password"
+              class="checkbox"
+              onClick="showPassword()"
+              value="Show Password">
+            <label for="checkbox">Show Password</label>
+            </div>
+
           <button 
             type="button"
             id="change_password_btn"
@@ -263,8 +279,7 @@ if ($result->num_rows > 0) {
       </div>
     </div>
     <!-- End of Section -->
-    
-    <!-- change the script path later -->
-    <script src="http://localhost/project-club-404/heybleepi/codes/script/settings.js"></script>
+
+    <script src="./script/settings.js"></script>
   </body>
 </html>
