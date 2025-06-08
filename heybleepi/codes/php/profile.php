@@ -124,6 +124,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['post_content'])) {
   exit();
 }
 
+function getMediaClass($path) {
+    $size = @getimagesize($path);
+    if (!$size) return 'landscape'; // fallback
+
+    $width = $size[0];
+    $height = $size[1];
+
+    $ratio = $width / $height;
+
+    if ($ratio > 1.2) return 'landscape';
+    elseif ($ratio < 0.8) return 'portrait';
+    else return 'square';
+}
+
 $user = $result->fetch_assoc();
 
 $userId = $_SESSION['id'];
@@ -139,6 +153,29 @@ $mediaStmt->bind_param("i", $userId);
 $mediaStmt->execute();
 $mediaResult = $mediaStmt->get_result();
 $mediaPosts = $mediaResult->fetch_all(MYSQLI_ASSOC);
+
+$albumStmt = $conn->prepare("
+  SELECT a.*, COUNT(ap.id) AS media_count
+  FROM albums a
+  LEFT JOIN album_photos ap ON a.id = ap.album_id
+  WHERE a.user_id = ?
+  GROUP BY a.id
+  ORDER BY a.created_at DESC
+");
+$albumStmt->bind_param("i", $_SESSION['id']);
+$albumStmt->execute();
+$albumResult = $albumStmt->get_result();
+$albums = $albumResult->fetch_all(MYSQLI_ASSOC);
+
+function getAlbumCover($albumId, $conn) {
+  $stmt = $conn->prepare("SELECT file_path FROM album_photos WHERE album_id = ? ORDER BY id ASC LIMIT 1");
+  $stmt->bind_param("i", $albumId);
+  $stmt->execute();
+  $stmt->bind_result($path);
+  $stmt->fetch();
+  $stmt->close();
+  return $path ? $path : './assets/profile/default.png';
+}
 ?>
 
 <!DOCTYPE html>
@@ -261,27 +298,57 @@ $mediaPosts = $mediaResult->fetch_all(MYSQLI_ASSOC);
             <?php endif; ?>
           </section>
 
+          <!-- Gallery Section -->
           <section class="glass card">
-            <h4 class="card-title">Photos</h4>
-              <div class="photo-grid">
-                <?php foreach ($mediaPosts as $media): ?>
-                  <?php if (!empty($media['image_path'])): ?>
-                    <img src="<?= htmlspecialchars($media['image_path']) ?>"
-                        data-type="image"
-                        data-src="<?= htmlspecialchars($media['image_path']) ?>"
-                        alt="User Image" />
-                  <?php endif; ?>
-
-                  <?php if (!empty($media['video_path'])): ?>
-                    <video muted
-                          data-type="video"
-                          data-src="<?= htmlspecialchars($media['video_path']) ?>">
-                      <source src="<?= htmlspecialchars($media['video_path']) ?>" type="video/mp4" />
-                    </video>
-                  <?php endif; ?>
-                <?php endforeach; ?>
-              </div>
+            <h4 class="card-title">Gallery</h4>
+            <div class="photo-grid">
+              <?php foreach ($mediaPosts as $media): ?>
+                <?php if (!empty($media['image_path'])): ?>
+                  <img
+                    src="<?= htmlspecialchars($media['image_path']) ?>"
+                    class="gallery-item"
+                    data-type="image"
+                    data-src="<?= htmlspecialchars($media['image_path']) ?>"
+                    alt="User Image"
+                  />
+                <?php elseif (!empty($media['video_path'])): ?>
+                  <video
+                    class="gallery-item"
+                    muted
+                    data-type="video"
+                    data-src="<?= htmlspecialchars($media['video_path']) ?>"
+                  >
+                    <source src="<?= htmlspecialchars($media['video_path']) ?>" type="video/mp4" />
+                  </video>
+                <?php endif; ?>
+              <?php endforeach; ?>
+            </div>
           </section>
+
+          <!-- Albums Section -->
+          <section class="glass card">
+            <div style="text-align: right; margin-bottom: 10px;">
+              <a href="create_album.php" class="btn btn--primary">+ Create Album</a>
+            </div>
+
+            <h4 class="card-title">Albums</h4>
+            <div class="photo-grid">
+              <?php if (empty($albums)): ?>
+                <p style="padding: 1rem;">No albums created yet.</p>
+              <?php else: ?>
+                <?php foreach ($albums as $album): ?>
+                  <div class="album-item" onclick="window.location.href='view_album.php?album_id=<?= $album['id'] ?>'">
+                    <img src="<?= htmlspecialchars(getAlbumCover($album['id'], $conn)) ?>" alt="Album Cover" />
+                    <div class="album-info">
+                      <strong><?= htmlspecialchars($album['title']) ?></strong>
+                      <p><?= $album['media_count'] ?> item(s)</p>
+                    </div>
+                  </div>
+                <?php endforeach; ?>
+              <?php endif; ?>
+            </div>
+          </section>
+
         </aside>
 
         <!-- Create Post -->
@@ -438,18 +505,23 @@ $mediaPosts = $mediaResult->fetch_all(MYSQLI_ASSOC);
                 <p class="post-text"><?= htmlspecialchars($post['content']) ?></p>
               </div>
 
-              <!-- Display uploaded image -->
+              <!-- Display uploaded image/video -->
+              <?php
+              $imageClass = !empty($post['image_path']) ? getMediaClass($post['image_path']) : '';
+              ?>
+
               <?php if (!empty($post['image_path'])): ?>
-                <img src="<?= htmlspecialchars($post['image_path']) ?>" alt="Post Image" style="max-width: 150px; margin-top: 10px; border-radius: 10px;">
+                <img src="<?= htmlspecialchars($post['image_path']) ?>"
+                    onclick="openLightbox('image', '<?= htmlspecialchars($post['image_path']) ?>')"
+                    style="max-width: 100%; max-height: 500px; cursor: zoom-in; border-radius: 10px;" />
               <?php endif; ?>
 
               <?php if (!empty($post['video_path'])): ?>
-                <video controls style="width: 100%; max-width: 300px; border-radius: 10px; margin-top: 10px;">
-                  <source src="<?= htmlspecialchars($post['video_path']) ?>" type="video/mp4">
-                  Your browser does not support the video tag.
-                </video>
+                <video src="<?= htmlspecialchars($post['video_path']) ?>"
+                      onclick="openLightbox('video', '<?= htmlspecialchars($post['video_path']) ?>')"
+                      style="max-width: 100%; max-height: 500px; cursor: zoom-in; border-radius: 10px;"
+                      muted></video>
               <?php endif; ?>
-
 
               <footer class="post-footer">
                 <div class="post-actions">
@@ -514,6 +586,8 @@ $mediaPosts = $mediaResult->fetch_all(MYSQLI_ASSOC);
         </section>
       </div>
     </main>
+
+    <!-- Lightbox Modal -->
     <div id="lightbox" class="lightbox" style="display:none;">
       <span class="close" onclick="closeLightbox()">×</span>
       <div class="lightbox-content" id="lightboxContent"></div>
