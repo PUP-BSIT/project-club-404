@@ -13,15 +13,21 @@ if (!isset($_SESSION['username'])) {
 
 $user = $_SESSION['username'];
 
-// Get the user ID from the database
+// Get user_id for current user
 $stmt = $conn->prepare("SELECT id FROM users WHERE user_name = ?");
 $stmt->bind_param("s", $user);
 $stmt->execute();
-$stmt->bind_result($user_id);
-$stmt->fetch();
+$result = $stmt->get_result();
+$user_row = $result->fetch_assoc();
 $stmt->close();
 
-// Handle adding, updating, deleting messages
+if (!$user_row) {
+    die("User not found.");
+}
+
+$user_id = $user_row['id'];
+
+// Handle adding or updating a message
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (isset($_POST["comment"]) && trim($_POST["comment"]) !== "") {
         $msg = trim($_POST['comment']);
@@ -45,6 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit();
     }
 
+    // Delete message
     if (isset($_POST['delete_id'])) {
         $delete_id = intval($_POST['delete_id']);
         $stmt = $conn->prepare("DELETE FROM messages WHERE id = ? AND user_id = ?");
@@ -56,6 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit();
     }
 
+    // Load message for editing
     if (isset($_POST['edit_id'])) {
         $edit_id = intval($_POST['edit_id']);
         $stmt = $conn->prepare("SELECT * FROM messages WHERE id = ? AND user_id = ?");
@@ -67,12 +75,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 }
 
-// Fetch all messages with avatars
-$sql = "SELECT messages.*, user_details.profile_picture 
-        FROM messages 
-        LEFT JOIN users ON messages.user_id = users.id 
-        LEFT JOIN user_details ON users.id = user_details.id_fk 
-        ORDER BY messages.created_at DESC";
+// Fetch all messages with user avatars
+$sql = "SELECT m.*, ud.profile_picture 
+        FROM messages m 
+        LEFT JOIN users u ON m.user_id = u.id 
+        LEFT JOIN user_details ud ON u.id = ud.id_fk 
+        ORDER BY m.created_at DESC";
 
 $result = $conn->query($sql);
 
