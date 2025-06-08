@@ -13,7 +13,15 @@ if (!isset($_SESSION['username'])) {
 
 $user = $_SESSION['username'];
 
-// Handle adding or updating a message
+// Get the user ID from the database
+$stmt = $conn->prepare("SELECT id FROM users WHERE user_name = ?");
+$stmt->bind_param("s", $user);
+$stmt->execute();
+$stmt->bind_result($user_id);
+$stmt->fetch();
+$stmt->close();
+
+// Handle adding, updating, deleting messages
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (isset($_POST["comment"]) && trim($_POST["comment"]) !== "") {
         $msg = trim($_POST['comment']);
@@ -21,14 +29,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if (isset($_POST['update_id'])) {
             // Update existing message
             $update_id = intval($_POST['update_id']);
-            $stmt = $conn->prepare("UPDATE messages SET message = ? WHERE id = ? AND user_name = ?");
-            $stmt->bind_param("sis", $msg, $update_id, $user);
+            $stmt = $conn->prepare("UPDATE messages SET message = ? WHERE id = ? AND user_id = ?");
+            $stmt->bind_param("sii", $msg, $update_id, $user_id);
             $stmt->execute();
             $stmt->close();
         } else {
             // Insert new message
-            $stmt = $conn->prepare("INSERT INTO messages (user_name, message, created_at) VALUES (?, ?, NOW())");
-            $stmt->bind_param("ss", $user, $msg);
+            $stmt = $conn->prepare("INSERT INTO messages (user_id, user_name, message, created_at) VALUES (?, ?, ?, NOW())");
+            $stmt->bind_param("iss", $user_id, $user, $msg);
             $stmt->execute();
             $stmt->close();
         }
@@ -37,11 +45,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit();
     }
 
-    // Delete message
     if (isset($_POST['delete_id'])) {
         $delete_id = intval($_POST['delete_id']);
-        $stmt = $conn->prepare("DELETE FROM messages WHERE id = ? AND user_name = ?");
-        $stmt->bind_param("is", $delete_id, $user);
+        $stmt = $conn->prepare("DELETE FROM messages WHERE id = ? AND user_id = ?");
+        $stmt->bind_param("ii", $delete_id, $user_id);
         $stmt->execute();
         $stmt->close();
 
@@ -49,24 +56,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit();
     }
 
-    // Load message for editing
     if (isset($_POST['edit_id'])) {
         $edit_id = intval($_POST['edit_id']);
-        $stmt = $conn->prepare("SELECT * FROM messages WHERE id = ? AND user_name = ?");
-        $stmt->bind_param("is", $edit_id, $user);
+        $stmt = $conn->prepare("SELECT * FROM messages WHERE id = ? AND user_id = ?");
+        $stmt->bind_param("ii", $edit_id, $user_id);
         $stmt->execute();
         $result = $stmt->get_result();
         $edit_message = $result->fetch_assoc();
         $stmt->close();
     }
-} 
+}
 
-// Fetch all messages with user avatars
-$sql = "SELECT m.*, ud.profile_picture 
-        FROM messages m 
-        LEFT JOIN users u ON m.user_name = u.user_name 
-        LEFT JOIN user_details ud ON u.id = ud.id_fk 
-        ORDER BY m.created_at DESC";
+// Fetch all messages with avatars
+$sql = "SELECT messages.*, user_details.profile_picture 
+        FROM messages 
+        LEFT JOIN users ON messages.user_id = users.id 
+        LEFT JOIN user_details ON users.id = user_details.id_fk 
+        ORDER BY messages.created_at DESC";
+
 $result = $conn->query($sql);
 
 if (!$result) {
