@@ -7,6 +7,7 @@ if (!isset($_SESSION['username'])) {
   exit();
 }
 
+$currentId = $_SESSION['id'];
 $currentUsername = $_SESSION['username'];
 $currentPassword = $_SESSION['password'];
 
@@ -16,13 +17,13 @@ $newPassword = password_hash($_POST['new_password'], PASSWORD_DEFAULT);
 if(password_verify($currentPasswordInput, $currentPassword)) {
   $sql = "UPDATE users 
           SET password = '${newPassword}' 
-          WHERE user_name = '${currentUsername}'";
+          WHERE id = ${currentId}";
   $result = mysqli_query($conn, $sql);
 }
 
 if(!$result) {
-  // echo "Error:" . $sql . "<br>" . mysqli_error($conn); 
-  echo "Error occurred.";
+   echo "Error:" . $sql . "<br>" . mysqli_error($conn); 
+//   echo "Error occurred.";
 }
 
 echo "Password change success";

@@ -66,7 +66,7 @@ body {
   gap: 1em;
   align-items: center;
   background: rgba(255, 255, 255, 0.05);
-  background-color: rgba(255, 255, 255, .4);
+  background-color: rgba(255, 255, 255, .15);
   border-radius: 10px;
   padding: 0.5rem 1rem;
   margin: 5px 0;
@@ -84,7 +84,8 @@ body {
 }
 
 #buttons_container button:hover,
-#buttons_container button:focus {
+#buttons_container button:focus, 
+#buttons_container .back-to-dashboard:hover{
   background: rgba(255, 255, 255, 0.15);
   font-weight: bold;
 }
@@ -155,12 +156,12 @@ body {
   gap: 1rem;
 }
 
-#account_information_container input,
+#account_information_container
 #save_btn {
   padding: 5px;
   border-radius: 5px;
   border: 1px solid #ccc;
-  width: 20em;
+  width: 20em;  
 }
 
 #account_information_container h2,
@@ -189,7 +190,7 @@ body {
   margin-left: 90px;
 }
 
-#username {
+#username_input {
   margin-left: 95px;
 }
 
@@ -206,6 +207,8 @@ body {
   color: white;
   cursor: pointer;
   margin-left: 90px;
+  border-radius: 9999px;
+  height: 5vh;
 }
 
 #account_information_container #save_btn:hover {
@@ -224,6 +227,21 @@ body {
 #account_information_container label {
   margin-bottom: 0.25rem;
   font-weight: 500;
+}
+
+.acct-info-input {
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 25em;
+  height: 2em;
+  background-color: rgba(255, 255, 255, .10);
+  color: wheat;
+  font-size: medium;
+}
+
+.acct-info-input::placeholder  {
+  color: rgba(255, 255, 255, .40);
 }
 
 /* Save Button */
@@ -311,7 +329,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-bottom: 8em;
+  padding-bottom: 0em;
 }
 
 .hide-privacy-settings {
@@ -323,13 +341,15 @@ body {
   flex-direction: column;
   align-items: center;
   margin-top: 20px;
+  padding: 0 20px;
+  width: auto;
   gap: 1em;
 }
 
-#privacy_settings_container input,
+#privacy_settings_container
 #change_password_btn,
 #delete_account_btn {
-  padding: 5px;
+  padding: px;
   border-radius: 5px;
   border: 1px solid #ccc;
   width: 20em;
@@ -360,6 +380,23 @@ body {
 
 #confirm_new_password {
   margin-left: 35px;
+}
+
+.old-pass, .new-pass, .confirm-pass {
+  height: 8vh;
+  width: 30vw;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  padding-left: 10px;
+  background-color: rgba(255, 255, 255, .15);
+  color: white;
+  font-size: large;
+}
+
+.old-pass::placeholder, 
+.new-pass::placeholder, 
+.confirm-pass::placeholder {
+  color: rgba(255, 255, 255, .40);
 }
 
 #delete_account_btn {
@@ -469,6 +506,34 @@ body {
   cursor: pointer;
 }
 
+.checkbox-container {
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+  margin-top: 30px;
+}
+
+.checkbox {
+  width: 10px;
+  height: 20px;
+  transform: scale(2.0);
+}
+
+.checkbox-container label {
+  display: flex;
+  align-items: center;
+}
+
+.back-to-dashboard {
+  color: white;
+  text-decoration: none;
+  padding: 10px 20px;
+}
+
+.back-to-dashboard:hover {
+    
+}
+
 /* Responsiveness */
 
 /* Mobile S */
@@ -488,7 +553,8 @@ body {
   }
 
   #buttons_container {
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: center;
     width: 94vw;
     padding: 5px;
   }
@@ -505,8 +571,7 @@ body {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
-    align-items: flex-start;
-    margin-top: 100px;
+    margin-top: 200px;
   }
 
   #account_information_container h2,
@@ -524,14 +589,19 @@ body {
     padding: 5px;
   }
 
-  #account_information_container input {
-    width: 40vw;
+  .acct-info-input {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 8em;
+    height: 2em;
   }
 
   #account_information_container #save_btn {
     margin-top: 20px;
     margin-left: 4em;
     width: 50vw;
+    height: 8vh;
   }
 
   #first_name {
@@ -546,7 +616,7 @@ body {
     margin-left: 50px;
   }
 
-  #username {
+  #username_input {
     margin-left: 55px;
   }
 
@@ -559,46 +629,77 @@ body {
   }
 
   #privacy_settings_container {
-    align-items: flex-start;
-    padding-bottom: 9em;
+    align-items: center;
+    margin-top: 9em;
+  }
+
+  #old_password {
+    margin-left: 0px;
+  }
+
+  .old-pass {
+    width: 70vw;
+  }
+
+  .old-pass-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+  }
+
+  #new_password {
+    margin-left: 0;
+  }
+
+  .new-pass {
+    width: 70vw;
+  }
+
+  .new-pass-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+  }
+
+  #confirm_new_password {
+    margin-left: 0;
+  }
+
+  .confirm-pass-container {
+    width: 75vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+  }
+
+  .confirm-pass {
+    width: 70vw;
   }
 
   #privacy_settings_container form {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     gap: 1em;
-    padding: 10px;
+    padding: 40px 10px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 8px;
     backdrop-filter: blur(10px);
   }
 
-  #privacy_settings_container form input {
-    width: 16vw;
-  }
-
   #privacy_settings_container #change_password_btn {
-    margin-left: 60px;
+    margin-left: 5px;
     width: 45vw;
   }
 
   #delete_account_btn {
-    margin-left: 70px;
+    margin-left: 10px;
+    margin-top: 50px;
     width: 45vw;
-  }
-
-  #old_password {
-    margin-left: 80px;
-  }
-
-  #new_password {
-    margin-left: 75px;
-  }
-
-  #confirm_new_password {
-    margin-left: 15px;
   }
 
   .show-logout-question {
@@ -630,7 +731,8 @@ body {
   }
 
   #buttons_container {
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: center;
     width: 94vw;
     padding: 5px;
   }
@@ -648,6 +750,10 @@ body {
     flex-direction: column;
     flex-wrap: wrap;
     align-items: center;
+  }
+
+  #account_information_container {
+    margin-top: 180px;
   }
 
   #account_information_container h2,
@@ -672,6 +778,7 @@ body {
   #account_information_container #save_btn {
     margin-top: 20px;
     width: 40vw;
+    height: 8vh;
   }
 
   #first_name {
@@ -686,7 +793,7 @@ body {
     margin-left: 33px;
   }
 
-  #username {
+  #username_input {
     margin-left: 38px;
   }
 
@@ -699,33 +806,34 @@ body {
   }
 
   #privacy_settings_container {
-    align-items: flex-start;
-    padding-bottom: 6em;
+    margin-top: 100px;
+    align-items: center;
   }
 
   #privacy_settings_container form {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     gap: 1em;
-    padding: 10px;
+    padding: 50px 30px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 8px;
     backdrop-filter: blur(10px);
   }
 
-  #privacy_settings_container form input {
-    width: 25vw;
+  #privacy_settings_container form {
+    width: 80vw;
   }
 
   #privacy_settings_container #change_password_btn {
-    margin-left: 70px;
+    margin-left: 10px;
     width: 45vw;
   }
 
   #delete_account_btn {
-    margin-left: 85px;
+    margin-left: 10px;
+    margin-top: 30px;
     width: 45vw;
   }
 
@@ -738,6 +846,63 @@ body {
     width: 50vw;
     top: 25%;
     left: 11%;
+  }
+
+  .old-pass-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+  }
+
+  .new-pass-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+  }
+
+  .confirm-pass-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+  }
+
+  .old-pass {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+    width: auto;
+  }
+  
+  .new-pass {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+    width: auto;
+  }
+
+  .confirm-pass {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+    width: auto;
+  }
+
+  #old_password {
+    margin-left: 0;
+  }
+
+  #new_password {
+    margin-left: 0;
+  }
+
+  #confirm_new_password {
+    margin-left: 0;
   }
 }
 
@@ -758,7 +923,8 @@ body {
   }
 
   #buttons_container {
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: center;
     width: 94vw;
     padding: 5px;
   }
@@ -799,7 +965,9 @@ body {
 
   #account_information_container #save_btn {
     margin-top: 20px;
+    margin-left: 100px;
     width: 40vw;
+    height: 8vh;
   }
 
   #first_name {
@@ -814,7 +982,7 @@ body {
     margin-left: 33px;
   }
 
-  #username {
+  #username_input {
     margin-left: 38px;
   }
 
@@ -827,33 +995,35 @@ body {
   }
 
   #privacy_settings_container {
-    align-items: flex-start;
-    padding-bottom: 6em;
+    margin-top: 80px;
+    align-items: center;
+    height: auto;
   }
 
   #privacy_settings_container form {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     gap: 1em;
-    padding: 10px;
+    padding: 50px 10px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 8px;
     backdrop-filter: blur(10px);
   }
 
-  #privacy_settings_container form input {
-    width: 25vw;
+  #privacy_settings_container form {
+    width: 90vw;
   }
 
   #privacy_settings_container #change_password_btn {
-    margin-left: 70px;
+    margin-left: 10px;
     width: 45vw;
   }
 
   #delete_account_btn {
-    margin-left: 85px;
+    margin-top: 2em;
+    margin-left: 15px;
     width: 45vw;
   }
 
@@ -866,6 +1036,63 @@ body {
     width: 50vw;
     top: 25%;
     left: 14%;
+  }
+
+  .old-pass-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+  }
+
+  .new-pass-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+  }
+
+  .confirm-pass-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+  }
+
+  .old-pass {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+    width: auto;
+  }
+  
+  .new-pass {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+    width: auto;
+  }
+
+  .confirm-pass {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+    width: auto;
+  }
+
+  #old_password {
+    margin-left: 0;
+  }
+
+  #new_password {
+    margin-left: 0;
+  }
+
+  #confirm_new_password {
+    margin-left: 0;
   }
 }
 
@@ -896,14 +1123,14 @@ body {
 
   #section {
     margin: 10px 40px;
-    height: 130vh;
+    height: 160vh;
     padding: 1rem;
   }
 
   #buttons_container {
     flex-wrap: wrap;
-    justify-content: flex-start;
-    width: 100%;
+    justify-content: center;
+    width: 40%;
   }
 
   #account_information_container #save_btn {
@@ -949,7 +1176,7 @@ body {
 
   #section {
     margin: 10px 51px;
-    height: 130vh;
+    height: 160vh;
     padding-bottom: 4rem;
   }
 
@@ -958,14 +1185,14 @@ body {
   }
 
   #privacy_settings_container {
-    padding-bottom: 8em;
+    padding-bottom: 0em;
   }
 
   #privacy_settings_container form {
     display: flex;
     flex-direction: column;
     gap: 1em;
-    padding: 10px;
+    padding: 50px 30px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 8px;
@@ -997,7 +1224,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 1em;
-    padding: 10px;
+    padding: 30px 50px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 8px;
