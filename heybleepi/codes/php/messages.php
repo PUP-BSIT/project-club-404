@@ -120,9 +120,7 @@ $conn->close();
     </form>
 
     <div class="message-actions">
-      <button type="button" id="emojiBtn" onclick="alert('Emoji picker not implemented yet')"><i class="ri-emotion-line"></i></button>
-      <button type="button" onclick="document.getElementById('imageInput').click()"><i class="ri-image-line"></i></button>
-      <button type="button" onclick="document.getElementById('fileInput').click()"><i class="ri-attachment-line"></i></button>
+      <button type="button" id="emojiBtn"><i class="ri-emotion-line"></i></button>
     </div>
 
     <?php if (count($messages) > 0): ?>
@@ -130,7 +128,7 @@ $conn->close();
         <div class="message-preview">
           <div class="comment-box">
             <div class="comment-header">
-            <img src="./assets/profile/<?= htmlspecialchars($row['profile_picture'] ?? 'default.png') ?>" alt="Avatar" class="avatar avatar--sm" />
+            <img src="./assets/profile/<?= htmlspecialchars($row['profile_picture'] ?? 'rawr.png') ?>" alt="Avatar" class="avatar avatar--sm" />
               <div class="preview-text">
                 <h4><?= htmlspecialchars($row['user_name']) ?></h4>
                 <p><?= htmlspecialchars($row['message']) ?></p>
