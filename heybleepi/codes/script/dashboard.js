@@ -478,3 +478,26 @@ function closeLightbox() {
   document.getElementById('lightbox').style.display = 'none';
   document.getElementById('lightboxContent').innerHTML = '';
 }
+
+function openLightbox(src) {
+  const lightbox = document.getElementById("lightbox");
+  const content = document.getElementById("lightboxContent");
+  content.innerHTML = `<img src="${src}" style="max-width:90vw; max-height:90vh; border-radius:10px;">`;
+  lightbox.style.display = "flex"; // or "block"
+}
+
+function closeLightbox() {
+  const lightbox = document.getElementById("lightbox");
+  lightbox.style.display = "none";
+  document.getElementById("lightboxContent").innerHTML = "";
+}
+
+function openLightboxVideo(src) {
+  const lightbox = document.getElementById("lightbox");
+  const content = document.getElementById("lightboxContent");
+  content.innerHTML = `<video controls autoplay style="max-width:90vw; max-height:90vh; border-radius:10px;">
+                         <source src="${src}" type="video/mp4">
+                         Your browser does not support the video tag.
+                       </video>`;
+  lightbox.style.display = "flex";
+}

@@ -90,6 +90,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['post_content'])) {
   exit();
 }
 
+function getMediaClass($path) {
+    $size = @getimagesize($path);
+    if (!$size) return 'landscape'; // fallback
+
+    $width = $size[0];
+    $height = $size[1];
+
+    $ratio = $width / $height;
+
+    if ($ratio > 1.2) return 'landscape';
+    elseif ($ratio < 0.8) return 'portrait';
+    else return 'square';
+}
+
 // LIKE A POST
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['like_post_id'])) {
   $post_id = intval($_POST['like_post_id']);
@@ -428,15 +442,24 @@ $unreadResult->close();
               <p class="post-text"><?= htmlspecialchars($post['content']) ?></p>
             </div>
 
+            <?php
+            $imageClass = !empty($post['image_path']) ? getMediaClass($post['image_path']) : '';
+            ?>
+
             <?php if (!empty($post['image_path'])): ?>
-              <img src="<?= htmlspecialchars($post['image_path']) ?>" alt="Post Image" style="max-width: 150px; margin-top: 10px; border-radius: 10px;">
+              <div class="post-media-container">
+                <img src="<?= htmlspecialchars($post['image_path']) ?>"
+                  alt="Post Image"
+                  class="<?= $imageClass ?>"
+                  onclick="openLightbox(this.src)">
+              </div>
             <?php endif; ?>
 
             <?php if (!empty($post['video_path'])): ?>
-              <video controls style="max-width: 250px; border-radius: 10px; margin-top: 10px;">
-                <source src="<?= htmlspecialchars($post['video_path']) ?>" type="video/mp4">
-                Your browser does not support the video tag.
-              </video>
+              <div class="post-media-container">
+                <video controls class="landscape"
+                    onclick="openLightboxVideo('<?= htmlspecialchars($post['video_path']) ?>')">
+              </div>
             <?php endif; ?>
 
             <!-- SHARE COUNT AND USER SHARE STATUS -->
@@ -599,6 +622,13 @@ $unreadResult->close();
       <a class="mobile-link" href="#"><i class="ri-notification-3-line"></i><span>Alerts</span></a>
       <a class="mobile-link" href="#"><i class="ri-user-line"></i><span>Profile</span></a>
     </nav>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="lightbox" style="display: none;">
+      <span class="lightbox-close" onclick="closeLightbox()">×</span>
+      <div class="lightbox-content" id="lightboxContent"></div>
+    </div>
+
     <script src="./script/dashboard.js"></script>
   </body>
 </html>
