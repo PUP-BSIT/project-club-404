@@ -6,19 +6,17 @@ if (!isset($_SESSION['username'])) {
   header("Location: index.php");
   exit();
 }
-// Get raw values.
-parse_str(file_get_contents('php://input'), $_PATCH);
 
 // Get the current username using the session.
-$currentUsername = $_SESSION['username'];
+$currentId= $_SESSION['id'];
 
 // Get form values
-$updatedFirstName = $_PATCH['first_name'] ?? "";
-$updatedMiddleName = $_PATCH['middle_name'] ?? "";
-$updatedLastName = $_PATCH['last_name'] ?? "";
-$updatedUsername = $_PATCH['user_name'] ?? "";
-$updatedEmail = $_PATCH['email'] ?? "";
-$updatedBirthdate = $_PATCH['birthdate'] ?? "";
+$updatedFirstName = $_POST['first_name'] ?? "";
+$updatedMiddleName = $_POST['middle_name'] ?? "";
+$updatedLastName = $_POST['last_name'] ?? "";
+$updatedUsername = $_POST['user_name'] ?? "";
+$updatedEmail = $_POST['email'] ?? "";
+$updatedBirthdate = $_POST['birthdate'] ?? "";
 
 // Update query
 $sql = "UPDATE users 
@@ -28,18 +26,19 @@ $sql = "UPDATE users
         last_name='${updatedLastName}',
         email='${updatedEmail}', 
         birthdate='${updatedBirthdate}' 
-        WHERE user_name='${currentUsername}'";
+        WHERE id='${currentId}'";
       
 if(!mysqli_query($conn, $sql)) {
-  // echo "Error:" . $sql . "<br>" . mysqli_error($conn); 
+  echo "Error:" . $sql . "<br>" . mysqli_error($conn); 
   echo "Failed to update account information";
 }
 
-echo "Account Information Updated!";
 $_SESSION['username'] = $updatedUsername;
 $_SESSION['email'] = $updatedEmail;
 $_SESSION['first_name'] = $updatedFirstName;
 $_SESSION['middle_name'] = $updatedMiddleName;
 $_SESSION['last_name'] = $updatedLastName;
+
+echo "Account Information Updated!";
 mysqli_close($conn);
 ?>
