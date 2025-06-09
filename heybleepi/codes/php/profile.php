@@ -80,44 +80,51 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['comment_post_id'], $_
     exit();
 }
 
-// POST CREATION
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['post_content'])) {
   $user_id = $_SESSION['id'];
   $post_content = trim($_POST['post_content']);
-  $image_path = null;
-  $video_path = null;
 
-  // Handle uploaded image
-  if (isset($_FILES['post_image']) && $_FILES['post_image']['error'] === UPLOAD_ERR_OK) {
-    $tmp_name = $_FILES['post_image']['tmp_name'];
-    $filename = basename($_FILES['post_image']['name']);
-    $upload_dir = "uploads/";
-    if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
-    $target = $upload_dir . time() . '_' . $filename;
+  // Step 1: insert the post
+  $stmt = $conn->prepare("INSERT INTO posts (user_id, content) VALUES (?, ?)");
+  $stmt->bind_param("is", $user_id, $post_content);
+  $stmt->execute();
+  $post_id = $stmt->insert_id;
+  $stmt->close();
 
-    if (move_uploaded_file($tmp_name, $target)) {
-      $image_path = $target;
+  // Step 2: upload media
+  $upload_dir = "uploads/";
+  if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
+
+  // Images
+  if (!empty($_FILES['post_images']['name'][0])) {
+    foreach ($_FILES['post_images']['tmp_name'] as $key => $tmp_name) {
+      if ($_FILES['post_images']['error'][$key] === UPLOAD_ERR_OK) {
+        $file_name = time() . '_' . basename($_FILES['post_images']['name'][$key]);
+        $target = $upload_dir . $file_name;
+        if (move_uploaded_file($tmp_name, $target)) {
+          $mediaStmt = $conn->prepare("INSERT INTO post_media (post_id, file_path, media_type) VALUES (?, ?, 'image')");
+          $mediaStmt->bind_param("is", $post_id, $target);
+          $mediaStmt->execute();
+          $mediaStmt->close();
+        }
+      }
     }
   }
 
-  // Handle uploaded video
-  if (isset($_FILES['post_video']) && $_FILES['post_video']['error'] === UPLOAD_ERR_OK) {
-    $tmp_name = $_FILES['post_video']['tmp_name'];
-    $filename = basename($_FILES['post_video']['name']);
-    $upload_dir = "uploads/";
-    if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
-    $target = $upload_dir . time() . '_' . $filename;
-
-    if (move_uploaded_file($tmp_name, $target)) {
-      $video_path = $target;
+  // Videos
+  if (!empty($_FILES['post_videos']['name'][0])) {
+    foreach ($_FILES['post_videos']['tmp_name'] as $key => $tmp_name) {
+      if ($_FILES['post_videos']['error'][$key] === UPLOAD_ERR_OK) {
+        $file_name = time() . '_' . basename($_FILES['post_videos']['name'][$key]);
+        $target = $upload_dir . $file_name;
+        if (move_uploaded_file($tmp_name, $target)) {
+          $mediaStmt = $conn->prepare("INSERT INTO post_media (post_id, file_path, media_type) VALUES (?, ?, 'video')");
+          $mediaStmt->bind_param("is", $post_id, $target);
+          $mediaStmt->execute();
+          $mediaStmt->close();
+        }
+      }
     }
-  }
-
-  if (!empty($post_content) || $image_path || $video_path) {
-    $stmt = $conn->prepare("INSERT INTO posts (user_id, content, image_path, video_path) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("isss", $user_id, $post_content, $image_path, $video_path);
-    $stmt->execute();
-    $stmt->close();
   }
 
   header("Location: profile.php");
@@ -365,42 +372,28 @@ function getAlbumCover($albumId, $conn) {
 
               <textarea class="create-post-input" name="post_content" placeholder="What's happening in your galaxy?" required></textarea>
 
-              <!-- Image Preview -->
-              <div id="imagePreviewContainer" style="display: none; position: relative; margin-top: 10px;">
-                <img id="imagePreview" src="" style="max-width: 150px; max-height: 150px; border-radius: 8px;">
-                <button type="button" id="removeImageBtn"
-                  style="position: absolute; top: -8px; right: -8px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer;">×</button>
-              </div>
-
-              <!-- Video Preview -->
-              <div id="videoPreviewContainer" style="display: none; position: relative; margin-top: 10px;">
-                <video id="videoPreview" controls style="max-width: 200px; border-radius: 10px;"></video>
-                <button type="button" id="removeVideoBtn"
-                  style="position: absolute; top: -8px; right: -8px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer;">×</button>
-              </div>
+              <!-- Media Preview Grid (above action row) -->
+              <div id="mediaPreviewGrid" class="media-preview-grid"></div>
 
               <div class="create-post-actions">
-                <div class="action-group">
-                  <!-- Image -->
-                  <label class="icon-btn">
-                    <i class="ri-image-line"></i>
-                    <input type="file" name="post_image" accept="image/*" id="postImageInput" style="display: none;">
-                  </label>
+                <div class="media-actions">
+                  <!-- Add Media Buttons -->
+                  <button type="button" class="btn-add" onclick="document.getElementById('postImageInput').click()">+ Photo</button>
+                  <button type="button" class="btn-add" onclick="document.getElementById('postVideoInput').click()">+ Video</button>
 
-                  <!-- Video -->
-                  <label class="icon-btn">
-                    <i class="ri-vidicon-line"></i>
-                    <input type="file" name="post_video" accept="video/*" id="postVideoInput" style="display: none;">
-                  </label>
+                  <!-- Hidden File Inputs -->
+                  <input type="file" name="post_images[]" accept="image/*" multiple id="postImageInput" hidden>
+                  <input type="file" name="post_videos[]" accept="video/*" multiple id="postVideoInput" hidden>
+                </div>
 
-                  <!-- Emoji -->
+                <div class="minor-actions">
                   <button class="icon-btn" type="button"><i class="ri-emotion-line"></i></button>
-
-                  <!-- Location -->
                   <button class="icon-btn" type="button"><i class="ri-map-pin-line"></i></button>
                 </div>
+
                 <button class="btn btn--primary" type="submit">Post</button>
               </div>
+
             </form>
           </div>
 
@@ -477,55 +470,47 @@ function getAlbumCover($albumId, $conn) {
                 </div>
               </header>
 
-              <!-- SHARED POST BLOCK -->
+              <!-- SHARED POST (if any) -->
               <?php if ($post['shared_post_id']): ?>
                 <div class="shared-post glass" style="padding: 10px; background-color: rgba(255, 255, 255, 0.05); border-left: 3px solid var(--primary); border-radius: 10px; margin-bottom: 10px;">
                   <small>Shared from <strong><?= htmlspecialchars($post['shared_first_name'] . ' ' . $post['shared_last_name']) ?></strong></small>
                   <p><?= htmlspecialchars($post['shared_content']) ?></p>
-
-                  <!-- Image shared post -->
-                  <?php if (!empty($post['shared_image_path'])): ?>
-                    <img src="<?= htmlspecialchars($post['shared_image_path']) ?>" alt="Shared Post Image" style="max-width: 150px; max-height: 150px; margin-top: 10px; border-radius: 10px;">
-                  <?php endif; ?>
-
-                  <!-- Video shared post -->
-                  <?php if (!empty($post['shared_video_path'])): ?>
-                    <video controls style="max-width: 100%; margin-top: 10px; border-radius: 10px;">
-                      <source src="<?= htmlspecialchars($post['shared_video_path']) ?>" type="video/mp4">
-                      Your browser does not support the video tag.
-                    </video>
-                  <?php endif; ?>
-
                 </div>
-
               <?php endif; ?>
 
-              <!-- MAIN POST CONTENT -->
+              <!-- POST CONTENT -->
               <div class="post-content" data-post-id="<?= $post['post_id'] ?>">
                 <p class="post-text"><?= htmlspecialchars($post['content']) ?></p>
+
+                <?php
+                  // Load multiple media for this post
+                  $mediaStmt = $conn->prepare("SELECT file_path, media_type FROM post_media WHERE post_id = ?");
+                  $mediaStmt->bind_param("i", $post['post_id']);
+                  $mediaStmt->execute();
+                  $mediaResult = $mediaStmt->get_result();
+                ?>
+
+                <?php if ($mediaResult->num_rows > 0): ?>
+                  <div class="post-media-grid">
+                    <?php while ($media = $mediaResult->fetch_assoc()): ?>
+                      <?php if ($media['media_type'] === 'image'): ?>
+                        <img src="<?= htmlspecialchars($media['file_path']) ?>" class="post-image" alt="Post Image">
+                      <?php elseif ($media['media_type'] === 'video'): ?>
+                        <video controls class="post-video">
+                          <source src="<?= htmlspecialchars($media['file_path']) ?>" type="video/mp4">
+                          Your browser does not support the video tag.
+                        </video>
+                      <?php endif; ?>
+                    <?php endwhile; ?>
+                  </div>
+                <?php endif; ?>
+                <?php $mediaStmt->close(); ?>
               </div>
 
-              <!-- Display uploaded image/video -->
-              <?php
-              $imageClass = !empty($post['image_path']) ? getMediaClass($post['image_path']) : '';
-              ?>
-
-              <?php if (!empty($post['image_path'])): ?>
-                <img src="<?= htmlspecialchars($post['image_path']) ?>"
-                    onclick="openLightbox('image', '<?= htmlspecialchars($post['image_path']) ?>')"
-                    style="max-width: 100%; max-height: 500px; cursor: zoom-in; border-radius: 10px;" />
-              <?php endif; ?>
-
-              <?php if (!empty($post['video_path'])): ?>
-                <video src="<?= htmlspecialchars($post['video_path']) ?>"
-                      onclick="openLightbox('video', '<?= htmlspecialchars($post['video_path']) ?>')"
-                      style="max-width: 100%; max-height: 500px; cursor: zoom-in; border-radius: 10px;"
-                      muted></video>
-              <?php endif; ?>
-
+              <!-- FOOTER -->
               <footer class="post-footer">
                 <div class="post-actions">
-                  <!-- LIKE -->
+                  <!-- Like -->
                   <form method="POST" class="like-form" style="display:inline;">
                     <input type="hidden" name="like_post_id" value="<?= $post['post_id'] ?>">
                     <button type="button" class="icon-btn like-button <?= $userLiked ? 'liked' : '' ?>" data-post-id="<?= $post['post_id'] ?>">
@@ -534,13 +519,13 @@ function getAlbumCover($albumId, $conn) {
                     </button>
                   </form>
 
-                  <!-- COMMENT TOGGLE -->
+                  <!-- Comment toggle -->
                   <button class="icon-btn" onclick="document.getElementById('comment-form-<?= $post['post_id'] ?>').classList.toggle('hidden')">
                     <i class="ri-chat-1-line"></i>
                     <span><?= $countComments['total'] ?></span>
                   </button>
 
-                  <!-- SHARE -->
+                  <!-- Share -->
                   <form method="POST" action="share_post.php" style="display:inline;">
                     <input type="hidden" name="share_post_id" value="<?= $post['post_id'] ?>">
                     <button type="submit" class="icon-btn">
@@ -552,7 +537,7 @@ function getAlbumCover($albumId, $conn) {
                 <button class="icon-btn"><i class="ri-bookmark-line"></i></button>
               </footer>
 
-              <!-- COMMENTS SECTION -->
+               <!-- COMMENTS SECTION -->
               <div id="comment-form-<?= $post['post_id'] ?>" class="hidden" style="margin-top:10px;">
                 <form method="POST" action="profile.php">
                   <input type="hidden" name="comment_post_id" value="<?= $post['post_id'] ?>">
@@ -592,6 +577,18 @@ function getAlbumCover($albumId, $conn) {
       <span class="close" onclick="closeLightbox()">×</span>
       <div class="lightbox-content" id="lightboxContent"></div>
     </div>
+
+    <div id="lightbox" onclick="closeLightbox()" style="
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;">
+      <div id="lightboxContent" style="max-width: 90%; max-height: 90%;"></div>
+    </div>
+
 
     <script src="./script/dashboard.js"></script>
   </body>
