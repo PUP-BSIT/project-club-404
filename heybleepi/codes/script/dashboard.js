@@ -5,13 +5,22 @@ document.addEventListener("DOMContentLoaded", function () {
   // ENABLE "POST" BUTTON ONLY WHEN TEXTAREA HAS CONTENT
   const postTextarea = document.querySelector("form[action='profile.php'] .create-post-input");
   const postButton = document.querySelector("form[action='profile.php'] .btn--primary");
+  const imageInput = document.getElementById("postImageInput");
+  const videoInput = document.getElementById("postVideoInput");
 
   if (postTextarea && postButton) {
     const togglePostButton = () => {
-      postButton.disabled = postTextarea.value.trim() === "";
+      const hasText = postTextarea.value.trim() !== "";
+      const hasImages = imageInput?.files?.length > 0;
+      const hasVideos = videoInput?.files?.length > 0;
+      postButton.disabled = !(hasText || hasImages || hasVideos);
     };
-    togglePostButton();
+
+    togglePostButton(); // initial
+
     postTextarea.addEventListener("input", togglePostButton);
+    imageInput?.addEventListener("change", togglePostButton);
+    videoInput?.addEventListener("change", togglePostButton);
   }
 
   // Home
@@ -399,25 +408,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// IMAGE PREVIEW
-document.getElementById("postImageInput")?.addEventListener("change", function () {
-  const file = this.files[0];
-  const preview = document.getElementById("imagePreview");
-  const container = document.getElementById("imagePreviewContainer");
-
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      preview.src = e.target.result;
-      container.style.display = "block";
-    };
-    reader.readAsDataURL(file);
-  } else {
-    container.style.display = "none";
-    preview.src = "";
-  }
-});
-
 document.getElementById("removeImageBtn")?.addEventListener("click", function () {
   const input = document.getElementById("postImageInput");
   const preview = document.getElementById("imagePreview");
@@ -426,26 +416,6 @@ document.getElementById("removeImageBtn")?.addEventListener("click", function ()
   preview.src = "";
   container.style.display = "none";
   input.value = "";
-});
-
-
-// VIDEO PREVIEW
-document.getElementById("postVideoInput")?.addEventListener("change", function () {
-  const file = this.files[0];
-  const preview = document.getElementById("videoPreview");
-  const container = document.getElementById("videoPreviewContainer");
-
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      preview.src = e.target.result;
-      container.style.display = "block";
-    };
-    reader.readAsDataURL(file);
-  } else {
-    container.style.display = "none";
-    preview.src = "";
-  }
 });
 
 document.getElementById("removeVideoBtn")?.addEventListener("click", function () {
@@ -500,4 +470,64 @@ function openLightboxVideo(src) {
                          Your browser does not support the video tag.
                        </video>`;
   lightbox.style.display = "flex";
+}
+
+const previewGrid = document.getElementById("mediaPreviewGrid");
+const imageInput = document.getElementById("postImageInput");
+const videoInput = document.getElementById("postVideoInput");
+
+function createPreviewElement(src, type) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "media-item";
+
+  const removeBtn = document.createElement("button");
+  removeBtn.innerText = "×";
+  removeBtn.className = "remove-btn";
+  removeBtn.onclick = () => wrapper.remove();
+
+  wrapper.appendChild(removeBtn);
+
+  if (type === "image") {
+    const img = document.createElement("img");
+    img.src = src;
+    wrapper.appendChild(img);
+  } else if (type === "video") {
+    const video = document.createElement("video");
+    video.src = src;
+    video.controls = true;
+    wrapper.appendChild(video);
+  }
+
+  return wrapper;
+}
+
+imageInput.addEventListener("change", function () {
+  Array.from(this.files).forEach(file => {
+    const url = URL.createObjectURL(file);
+    const el = createPreviewElement(url, "image");
+    previewGrid.appendChild(el);
+  });
+});
+
+videoInput.addEventListener("change", function () {
+  Array.from(this.files).forEach(file => {
+    const url = URL.createObjectURL(file);
+    const el = createPreviewElement(url, "video");
+    previewGrid.appendChild(el);
+  });
+});
+
+function openLightbox(type, src) {
+  const content = document.getElementById("lightboxContent");
+  if (type === 'image') {
+    content.innerHTML = `<img src="${src}" style="max-width:100%; border-radius:10px;">`;
+  } else {
+    content.innerHTML = `<video src="${src}" controls autoplay style="max-width:100%; border-radius:10px;"></video>`;
+  }
+  document.getElementById("lightbox").style.display = "flex";
+}
+
+function closeLightbox() {
+  document.getElementById("lightbox").style.display = "none";
+  document.getElementById("lightboxContent").innerHTML = '';
 }
