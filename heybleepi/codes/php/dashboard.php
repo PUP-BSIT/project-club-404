@@ -647,46 +647,5 @@ $unreadResult->close();
     </div>
 
     <script src="./script/dashboard.js"></script>
-    <script>
-      // Media Preview Handlers
-      const imageInput = document.getElementById('postImageInput');
-      const videoInput = document.getElementById('postVideoInput');
-      const grid = document.getElementById('mediaPreviewGrid');
-
-      if (imageInput) {
-        imageInput.addEventListener('change', function(e) {
-          grid.innerHTML = '';
-          for(let file of this.files) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-              const preview = document.createElement('div');
-              preview.className = 'media-preview';
-              preview.innerHTML = `
-                <img src="${e.target.result}" alt="Preview">
-                <button type="button" class="remove-media" onclick="this.parentElement.remove();">×</button>
-              `;
-              grid.appendChild(preview);
-            }
-            reader.readAsDataURL(file);
-          }
-        });
-      }
-      if (videoInput) {
-        videoInput.addEventListener('change', function(e) {
-          grid.innerHTML = '';
-          for(let file of this.files) {
-            const preview = document.createElement('div');
-            preview.className = 'media-preview';
-            preview.innerHTML = `
-              <video controls>
-                <source src="${URL.createObjectURL(file)}" type="video/mp4">
-              </video>
-              <button type="button" class="remove-media" onclick="this.parentElement.remove();">×</button>
-            `;
-            grid.appendChild(preview);
-          }
-        });
-      }
-    </script>
   </body>
 </html>
