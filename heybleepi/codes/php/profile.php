@@ -456,7 +456,7 @@ function getAlbumCover($albumId, $conn) {
                   <h4><?= htmlspecialchars($post['first_name'] . ' ' . $post['last_name']) ?></h4>
                   <time><?= date("M d, g:i A", strtotime($post['created_at'])) ?></time>
                 </div>
-                <div class="post-options">
+                <div class="post-options" style="align-self: flex-start; margin-left: auto; margin-top: 0;">
                   <button class="icon-btn toggle-options"><i class="ri-more-fill"></i></button>
                   <ul class="dropdown hidden">
                     <li><button class="btn--sm btn-edit-post" data-id="<?= $post['post_id'] ?>">Edit Post</button></li>
@@ -470,42 +470,61 @@ function getAlbumCover($albumId, $conn) {
                 </div>
               </header>
 
+              <!-- POST CONTENT -->
+              <div class="post-content" data-post-id="<?= $post['post_id'] ?>">
+                <p class="post-text"><?= htmlspecialchars($post['content']) ?></p>
+                <?php if (empty($post['shared_post_id'])): ?>
+                  <?php
+                    // Load multiple media for this post (only if not a shared post)
+                    $mediaStmt = $conn->prepare("SELECT file_path, media_type FROM post_media WHERE post_id = ?");
+                    $mediaStmt->bind_param("i", $post['post_id']);
+                    $mediaStmt->execute();
+                    $mediaResult = $mediaStmt->get_result();
+                    if ($mediaResult->num_rows > 0) {
+                      echo '<div class="post-media-grid">';
+                      while ($media = $mediaResult->fetch_assoc()) {
+                        if ($media['media_type'] === 'image') {
+                          echo '<img src="' . htmlspecialchars($media['file_path']) . '" class="post-image" alt="Post Image">';
+                        } elseif ($media['media_type'] === 'video') {
+                          echo '<video controls class="post-video"><source src="' . htmlspecialchars($media['file_path']) . '" type="video/mp4"></video>';
+                        }
+                      }
+                      echo '</div>';
+                    }
+                    $mediaStmt->close();
+                  ?>
+                <?php endif; ?>
+              </div>
+
               <!-- SHARED POST (if any) -->
               <?php if ($post['shared_post_id']): ?>
                 <div class="shared-post glass" style="padding: 10px; background-color: rgba(255, 255, 255, 0.05); border-left: 3px solid var(--primary); border-radius: 10px; margin-bottom: 10px;">
                   <small>Shared from <strong><?= htmlspecialchars($post['shared_first_name'] . ' ' . $post['shared_last_name']) ?></strong></small>
-                  <p><?= htmlspecialchars($post['shared_content']) ?></p>
+                  <?php
+                    // Show shared post caption above media grid
+                    if (!empty($post['shared_content'])) {
+                      echo '<p>' . htmlspecialchars($post['shared_content']) . '</p>';
+                    }
+                    // Load multiple media for the shared post
+                    $sharedMediaStmt = $conn->prepare("SELECT file_path, media_type FROM post_media WHERE post_id = ?");
+                    $sharedMediaStmt->bind_param("i", $post['shared_post_id']);
+                    $sharedMediaStmt->execute();
+                    $sharedMediaResult = $sharedMediaStmt->get_result();
+                    if ($sharedMediaResult->num_rows > 0) {
+                      echo '<div class="post-media-grid">';
+                      while ($media = $sharedMediaResult->fetch_assoc()) {
+                        if ($media['media_type'] === 'image') {
+                          echo '<img src="' . htmlspecialchars($media['file_path']) . '" class="post-image" alt="Shared Post Image">';
+                        } elseif ($media['media_type'] === 'video') {
+                          echo '<video controls class="post-video"><source src="' . htmlspecialchars($media['file_path']) . '" type="video/mp4"></video>';
+                        }
+                      }
+                      echo '</div>';
+                    }
+                    $sharedMediaStmt->close();
+                  ?>
                 </div>
               <?php endif; ?>
-
-              <!-- POST CONTENT -->
-              <div class="post-content" data-post-id="<?= $post['post_id'] ?>">
-                <p class="post-text"><?= htmlspecialchars($post['content']) ?></p>
-
-                <?php
-                  // Load multiple media for this post
-                  $mediaStmt = $conn->prepare("SELECT file_path, media_type FROM post_media WHERE post_id = ?");
-                  $mediaStmt->bind_param("i", $post['post_id']);
-                  $mediaStmt->execute();
-                  $mediaResult = $mediaStmt->get_result();
-                ?>
-
-                <?php if ($mediaResult->num_rows > 0): ?>
-                  <div class="post-media-grid">
-                    <?php while ($media = $mediaResult->fetch_assoc()): ?>
-                      <?php if ($media['media_type'] === 'image'): ?>
-                        <img src="<?= htmlspecialchars($media['file_path']) ?>" class="post-image" alt="Post Image">
-                      <?php elseif ($media['media_type'] === 'video'): ?>
-                        <video controls class="post-video">
-                          <source src="<?= htmlspecialchars($media['file_path']) ?>" type="video/mp4">
-                          Your browser does not support the video tag.
-                        </video>
-                      <?php endif; ?>
-                    <?php endwhile; ?>
-                  </div>
-                <?php endif; ?>
-                <?php $mediaStmt->close(); ?>
-              </div>
 
               <!-- FOOTER -->
               <footer class="post-footer">
@@ -565,9 +584,7 @@ function getAlbumCover($albumId, $conn) {
                 </div>
               </div>
             </article>
-
           <?php endwhile; ?>
-
         </section>
       </div>
     </main>
@@ -588,7 +605,6 @@ function getAlbumCover($albumId, $conn) {
       z-index: 9999;">
       <div id="lightboxContent" style="max-width: 90%; max-height: 90%;"></div>
     </div>
-
 
     <script src="./script/dashboard.js"></script>
   </body>

@@ -47,43 +47,50 @@ $lastSeenMessageId = $lastSeenMessageId ?? 0;
 $countNewMessages = $conn->query("SELECT COUNT(*) AS unread_messages FROM messages WHERE id > $lastSeenMessageId");
 $unreadMessages = $countNewMessages->fetch_assoc()['unread_messages'] ?? 0;
 
-// POST CREATION
+// POST CREATION - handles multiple image/video uploads
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['post_content'])) {
   $user_id = $_SESSION['id'];
   $post_content = trim($_POST['post_content']);
-  $image_path = null;
-  $video_path = null;
+  $upload_dir = "uploads/";
+  if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
 
-  // Handle image upload
-  if (isset($_FILES['post_image']) && $_FILES['post_image']['error'] === UPLOAD_ERR_OK) {
-    $imageName = basename($_FILES['post_image']['name']);
-    $targetDir = 'uploads/';
-    if (!is_dir($targetDir)) mkdir($targetDir); // create if not exists
-    $targetPath = $targetDir . uniqid() . "_" . $imageName;
+  // Insert post first to get post_id
+  $stmt = $conn->prepare("INSERT INTO posts (user_id, content) VALUES (?, ?)");
+  $stmt->bind_param("is", $user_id, $post_content);
+  $stmt->execute();
+  $post_id = $stmt->insert_id;
+  $stmt->close();
 
-    if (move_uploaded_file($_FILES['post_image']['tmp_name'], $targetPath)) {
-      $image_path = $targetPath;
+  // Handle multiple image uploads
+  if (!empty($_FILES['post_images']['name'][0])) {
+    foreach ($_FILES['post_images']['tmp_name'] as $key => $tmp_name) {
+      if ($_FILES['post_images']['error'][$key] === UPLOAD_ERR_OK) {
+        $filename = time() . '_img_' . $key . '_' . basename($_FILES['post_images']['name'][$key]);
+        $target = $upload_dir . $filename;
+        if (move_uploaded_file($tmp_name, $target)) {
+          $mediaStmt = $conn->prepare("INSERT INTO post_media (post_id, file_path, media_type) VALUES (?, ?, 'image')");
+          $mediaStmt->bind_param("is", $post_id, $target);
+          $mediaStmt->execute();
+          $mediaStmt->close();
+        }
+      }
     }
   }
 
-  // Handle video upload
-  if (isset($_FILES['post_video']) && $_FILES['post_video']['error'] === UPLOAD_ERR_OK) {
-    $tmp_name = $_FILES['post_video']['tmp_name'];
-    $filename = basename($_FILES['post_video']['name']);
-    $upload_dir = "uploads/";
-    if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
-    $target = $upload_dir . time() . '_' . $filename;
-
-    if (move_uploaded_file($tmp_name, $target)) {
-      $video_path = $target;
+  // Handle multiple video uploads
+  if (!empty($_FILES['post_videos']['name'][0])) {
+    foreach ($_FILES['post_videos']['tmp_name'] as $key => $tmp_name) {
+      if ($_FILES['post_videos']['error'][$key] === UPLOAD_ERR_OK) {
+        $filename = time() . '_vid_' . $key . '_' . basename($_FILES['post_videos']['name'][$key]);
+        $target = $upload_dir . $filename;
+        if (move_uploaded_file($tmp_name, $target)) {
+          $mediaStmt = $conn->prepare("INSERT INTO post_media (post_id, file_path, media_type) VALUES (?, ?, 'video')");
+          $mediaStmt->bind_param("is", $post_id, $target);
+          $mediaStmt->execute();
+          $mediaStmt->close();
+        }
+      }
     }
-  }
-
-  if (!empty($post_content) || $image_path || $video_path) {
-    $stmt = $conn->prepare("INSERT INTO posts (user_id, content, image_path, video_path) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("isss", $user_id, $post_content, $image_path, $video_path);
-    $stmt->execute();
-    $stmt->close();
   }
 
   header("Location: dashboard.php");
@@ -304,13 +311,12 @@ $unreadResult->close();
             </span>
           </a>
 
-
           <a class="nav-item" href="profile.php">
             <i class="ri-user-line"></i>
             Profile
           </a>
 
-          <a class="nav-item" href="settings.php"> <!-- Link to settings & privacy -->
+          <a class="nav-item" href="settings.php">
             <i class="ri-settings-4-line"></i>
             Settings & Privacy
           </a>
@@ -351,38 +357,19 @@ $unreadResult->close();
 
             <textarea class="create-post-input" name="post_content" placeholder="What's happening in your galaxy?"></textarea>
 
-            <!-- Image Preview -->
-            <div id="imagePreviewContainer" style="display: none; position: relative; margin-top: 10px;">
-              <img id="imagePreview" src="" style="max-width: 150px; max-height: 150px; border-radius: 8px;">
-              <button type="button" id="removeImageBtn" title="Remove Image"
-                style="position: absolute; top: -8px; right: -8px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer;">×</button>
-            </div>
-
-            <!-- Video Preview -->
-            <div id="videoPreviewContainer" style="display: none; position: relative; margin-top: 10px;">
-              <video id="videoPreview" controls style="max-width: 200px; border-radius: 10px;"></video>
-              <button type="button" id="removeVideoBtn"
-                style="position: absolute; top: -8px; right: -8px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer;">×</button>
-            </div>
+            <!-- Media Preview Grid -->
+            <div id="mediaPreviewGrid" class="media-preview-grid"></div>
 
             <div class="create-post-actions">
-              <div class="action-group">
-                <!-- Image -->
-                <label class="icon-btn">
-                  <i class="ri-image-line"></i>
-                  <input type="file" name="post_image" accept="image/*" id="postImageInput" style="display: none;">
-                </label>
-
-                <!-- Video -->
-                <label class="icon-btn">
-                  <i class="ri-vidicon-line"></i>
-                  <input type="file" name="post_video" accept="video/*" id="postVideoInput" style="display: none;">
-                </label>
-
-                <!-- Emoji -->
+              <div class="media-actions">
+                <button type="button" class="btn-add" onclick="document.getElementById('postImageInput').click()">+ Photo</button>
+                <button type="button" class="btn-add" onclick="document.getElementById('postVideoInput').click()">+ Video</button>
+                <!-- Hidden File Inputs -->
+                <input type="file" name="post_images[]" accept="image/*" multiple id="postImageInput" hidden>
+                <input type="file" name="post_videos[]" accept="video/*" multiple id="postVideoInput" hidden>
+              </div>
+              <div class="minor-actions">
                 <button class="icon-btn" type="button"><i class="ri-emotion-line"></i></button>
-
-                <!-- Location -->
                 <button class="icon-btn" type="button"><i class="ri-map-pin-line"></i></button>
               </div>
               <button class="btn btn--primary" type="submit">Post</button>
@@ -422,7 +409,7 @@ $unreadResult->close();
               </div>
 
               <?php if ($post['user_id'] == $_SESSION['id']): ?>
-                <div class="post-options">
+                <div class="post-options" style="align-self: flex-start; margin-left: auto; margin-top: 0;">
                   <button class="icon-btn toggle-options"><i class="ri-more-fill"></i></button>
                   <ul class="dropdown hidden">
                     <li><button class="btn--sm btn-edit-post" data-id="<?= $post['id'] ?>">Edit Post</button></li>
@@ -440,27 +427,39 @@ $unreadResult->close();
 
             <div class="post-content" data-post-id="<?= $post['id'] ?>">
               <p class="post-text"><?= htmlspecialchars($post['content']) ?></p>
+              <?php if (empty($post['shared_post_id'])): ?>
+                <?php
+                  $mediaStmt = $conn->prepare("SELECT file_path, media_type FROM post_media WHERE post_id = ?");
+                  $mediaStmt->bind_param("i", $post['id']);
+                  $mediaStmt->execute();
+                  $mediaResult = $mediaStmt->get_result();
+                  if ($mediaResult->num_rows > 0) {
+                    echo '<div class="post-media-grid">';
+                    while ($media = $mediaResult->fetch_assoc()) {
+                      if ($media['media_type'] === 'image') {
+                        echo '<img src="' . htmlspecialchars($media['file_path']) . '" class="post-image" alt="Post Image">';
+                      } elseif ($media['media_type'] === 'video') {
+                        echo '<video controls class="post-video"><source src="' . htmlspecialchars($media['file_path']) . '" type="video/mp4"></video>';
+                      }
+                    }
+                    echo '</div>';
+                  }
+                  $mediaStmt->close();
+                ?>
+              <?php endif; ?>
             </div>
 
             <?php
             $imageClass = !empty($post['image_path']) ? getMediaClass($post['image_path']) : '';
             ?>
 
-            <?php if (!empty($post['image_path'])): ?>
-              <div class="post-media-container">
-                <img src="<?= htmlspecialchars($post['image_path']) ?>"
-                  alt="Post Image"
-                  class="<?= $imageClass ?>"
-                  onclick="openLightbox(this.src)">
-              </div>
-            <?php endif; ?>
-
-            <?php if (!empty($post['video_path'])): ?>
-              <div class="post-media-container">
-                <video controls class="landscape"
-                    onclick="openLightboxVideo('<?= htmlspecialchars($post['video_path']) ?>')">
-              </div>
-            <?php endif; ?>
+            <?php
+              // Load multiple media for this post
+              $mediaStmt = $conn->prepare("SELECT file_path, media_type FROM post_media WHERE post_id = ?");
+              $mediaStmt->bind_param("i", $post['id']);
+              $mediaStmt->execute();
+              $mediaResult = $mediaStmt->get_result();
+            ?>
 
             <!-- SHARE COUNT AND USER SHARE STATUS -->
             <?php
@@ -477,21 +476,28 @@ $unreadResult->close();
                 <small>Shared from <strong><?= htmlspecialchars($post['shared_first_name'] . ' ' . $post['shared_last_name']) ?></strong></small>
                 <p><?= htmlspecialchars($post['shared_content']) ?></p>
 
-                <!-- Image shared post -->
-                <?php if (!empty($post['shared_image_path'])): ?>
-                  <img src="<?= htmlspecialchars($post['shared_image_path']) ?>" alt="Shared Post Image" style="max-width: 150px; max-height: 150px; margin-top: 10px; border-radius: 10px;">
-                <?php endif; ?>
-
-                <!-- Video shared post -->
-                <?php if (!empty($post['shared_video_path'])): ?>
-                  <video controls style="max-width: 100%; margin-top: 10px; border-radius: 10px;">
-                    <source src="<?= htmlspecialchars($post['shared_video_path']) ?>" type="video/mp4">
-                    Your browser does not support the video tag.
-                  </video>
-                <?php endif; ?>
-
+                <?php
+                // Load multiple media for the shared post
+                if (!empty($post['shared_post_id'])) {
+                  $sharedMediaStmt = $conn->prepare("SELECT file_path, media_type FROM post_media WHERE post_id = ?");
+                  $sharedMediaStmt->bind_param("i", $post['shared_post_id']);
+                  $sharedMediaStmt->execute();
+                  $sharedMediaResult = $sharedMediaStmt->get_result();
+                  if ($sharedMediaResult->num_rows > 0) {
+                    echo '<div class="post-media-grid">';
+                    while ($media = $sharedMediaResult->fetch_assoc()) {
+                      if ($media['media_type'] === 'image') {
+                        echo '<img src="' . htmlspecialchars($media['file_path']) . '" class="post-image" alt="Shared Post Image">';
+                      } elseif ($media['media_type'] === 'video') {
+                        echo '<video controls class="post-video"><source src="' . htmlspecialchars($media['file_path']) . '" type="video/mp4"></video>';
+                      }
+                    }
+                    echo '</div>';
+                  }
+                  $sharedMediaStmt->close();
+                }
+                ?>
               </div>
-
             <?php endif; ?>
 
             <footer class="post-footer">
@@ -569,7 +575,6 @@ $unreadResult->close();
           <h3 class="card-title">Suggested Connections</h3>
           <ul class="suggestions" id="suggestion_list">
 
-
             <!-- Initial Visible Users -->
             <li class="suggestion">
               <img class="avatar avatar--sm" src="./assets/profile/chick.jpg" alt="">
@@ -630,5 +635,46 @@ $unreadResult->close();
     </div>
 
     <script src="./script/dashboard.js"></script>
+    <script>
+      // Media Preview Handlers
+      const imageInput = document.getElementById('postImageInput');
+      const videoInput = document.getElementById('postVideoInput');
+      const grid = document.getElementById('mediaPreviewGrid');
+
+      if (imageInput) {
+        imageInput.addEventListener('change', function(e) {
+          grid.innerHTML = '';
+          for(let file of this.files) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+              const preview = document.createElement('div');
+              preview.className = 'media-preview';
+              preview.innerHTML = `
+                <img src="${e.target.result}" alt="Preview">
+                <button type="button" class="remove-media" onclick="this.parentElement.remove();">×</button>
+              `;
+              grid.appendChild(preview);
+            }
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+      if (videoInput) {
+        videoInput.addEventListener('change', function(e) {
+          grid.innerHTML = '';
+          for(let file of this.files) {
+            const preview = document.createElement('div');
+            preview.className = 'media-preview';
+            preview.innerHTML = `
+              <video controls>
+                <source src="${URL.createObjectURL(file)}" type="video/mp4">
+              </video>
+              <button type="button" class="remove-media" onclick="this.parentElement.remove();">×</button>
+            `;
+            grid.appendChild(preview);
+          }
+        });
+      }
+    </script>
   </body>
 </html>
