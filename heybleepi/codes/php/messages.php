@@ -27,6 +27,22 @@ if (!$user_row) {
 
 $user_id = $user_row['id'];
 
+// Get the latest message ID and update user's last_seen_message_id
+$latest_msg_query = $conn->query("SELECT MAX(id) as max_id FROM messages");
+$latest_msg = $latest_msg_query->fetch_assoc();
+$latest_msg_id = $latest_msg['max_id'] ?? 0;
+
+$update_last_seen = $conn->prepare("UPDATE users SET last_seen_message_id = ? WHERE id = ?");
+$update_last_seen->bind_param("ii", $latest_msg_id, $user_id);
+$update_last_seen->execute();
+$update_last_seen->close();
+
+// Mark all messages as read for the current user
+$update = $conn->prepare("UPDATE messages SET is_read = 1 WHERE user_id = ? AND is_read = 0");
+$update->bind_param("i", $user_id);
+$update->execute();
+$update->close();
+
 // Handle adding or updating a message
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (isset($_POST["comment"]) && trim($_POST["comment"]) !== "") {
@@ -166,7 +182,7 @@ $conn->close();
         </div>
       <?php endforeach; ?>
     <?php else: ?>
-      <p>No messages found.</p>
+      <p class="no-messages">No messages found.</p>
     <?php endif; ?>
   </div>
 
