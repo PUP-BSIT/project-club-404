@@ -4,6 +4,10 @@ require_once 'users.php';
 
 $message = '';
 $activeTab = 'login'; // Default tab
+if(isset($_SESSION['isloginok']) && $_SESSION['isloginok'] === true) {
+    header('Location: dashboard.php');
+    exit();
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['login'])) {
