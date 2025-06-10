@@ -372,7 +372,7 @@ function getAlbumCover($albumId, $conn) {
 
               <textarea class="create-post-input" name="post_content" placeholder="What's happening in your galaxy?" required></textarea>
 
-              <!-- Media Preview Grid (above action row) -->
+              <!-- Media Preview Grid -->
               <div id="mediaPreviewGrid" class="media-preview-grid"></div>
 
               <div class="create-post-actions">
@@ -456,7 +456,7 @@ function getAlbumCover($albumId, $conn) {
                   <h4><?= htmlspecialchars($post['first_name'] . ' ' . $post['last_name']) ?></h4>
                   <time><?= date("M d, g:i A", strtotime($post['created_at'])) ?></time>
                 </div>
-                <div class="post-options" style="align-self: flex-start; margin-left: auto; margin-top: 0;">
+                <div class="post-options" style="margin-left: auto;">
                   <button class="icon-btn toggle-options"><i class="ri-more-fill"></i></button>
                   <ul class="dropdown hidden">
                     <li><button class="btn--sm btn-edit-post" data-id="<?= $post['post_id'] ?>">Edit Post</button></li>
@@ -484,9 +484,9 @@ function getAlbumCover($albumId, $conn) {
                       echo '<div class="post-media-grid">';
                       while ($media = $mediaResult->fetch_assoc()) {
                         if ($media['media_type'] === 'image') {
-                          echo '<img src="' . htmlspecialchars($media['file_path']) . '" class="post-image" alt="Post Image">';
+                          echo '<img src="' . htmlspecialchars($media['file_path']) . '" class="post-image" alt="Post Image" onclick="openLightbox(\'' . htmlspecialchars($media['file_path']) . '\')">';
                         } elseif ($media['media_type'] === 'video') {
-                          echo '<video controls class="post-video"><source src="' . htmlspecialchars($media['file_path']) . '" type="video/mp4"></video>';
+                          echo '<video controls class="post-video" onclick="openLightboxVideo(\'' . htmlspecialchars($media['file_path']) . '\')"><source src="' . htmlspecialchars($media['file_path']) . '" type="video/mp4"></video>';
                         }
                       }
                       echo '</div>';
@@ -514,9 +514,9 @@ function getAlbumCover($albumId, $conn) {
                       echo '<div class="post-media-grid">';
                       while ($media = $sharedMediaResult->fetch_assoc()) {
                         if ($media['media_type'] === 'image') {
-                          echo '<img src="' . htmlspecialchars($media['file_path']) . '" class="post-image" alt="Shared Post Image">';
+                          echo '<img src="' . htmlspecialchars($media['file_path']) . '" class="post-image" alt="Shared Post Image" onclick="openLightbox(\'' . htmlspecialchars($media['file_path']) . '\')">';
                         } elseif ($media['media_type'] === 'video') {
-                          echo '<video controls class="post-video"><source src="' . htmlspecialchars($media['file_path']) . '" type="video/mp4"></video>';
+                          echo '<video controls class="post-video" onclick="openLightboxVideo(\'' . htmlspecialchars($media['file_path']) . '\')"><source src="' . htmlspecialchars($media['file_path']) . '" type="video/mp4"></video>';
                         }
                       }
                       echo '</div>';
@@ -591,21 +591,52 @@ function getAlbumCover($albumId, $conn) {
 
     <!-- Lightbox Modal -->
     <div id="lightbox" class="lightbox" style="display:none;">
-      <span class="close" onclick="closeLightbox()">×</span>
+      <span class="lightbox-close" onclick="closeLightbox()">×</span>
       <div class="lightbox-content" id="lightboxContent"></div>
     </div>
 
-    <div id="lightbox" onclick="closeLightbox()" style="
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.8);
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;">
-      <div id="lightboxContent" style="max-width: 90%; max-height: 90%;"></div>
-    </div>
-
     <script src="./script/dashboard.js"></script>
+    <script>
+      // Media Preview Handlers (profile.php)
+      const imageInput = document.getElementById('postImageInput');
+      const videoInput = document.getElementById('postVideoInput');
+      const grid = document.getElementById('mediaPreviewGrid');
+
+      if (imageInput) {
+        imageInput.addEventListener('change', function(e) {
+          for(let file of this.files) {
+            // Prevent duplicate previews for the same file
+            if ([...grid.querySelectorAll('img')].some(img => img.src === URL.createObjectURL(file))) continue;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+              const preview = document.createElement('div');
+              preview.className = 'media-preview';
+              preview.innerHTML = `
+                <img src="${e.target.result}" alt="Preview">
+                <button type="button" class="remove-media" onclick="this.parentElement.remove();">×</button>
+              `;
+              grid.appendChild(preview);
+            }
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+      if (videoInput) {
+        videoInput.addEventListener('change', function(e) {
+          for(let file of this.files) {
+            if ([...grid.querySelectorAll('video source')].some(source => source.src === URL.createObjectURL(file))) continue;
+            const preview = document.createElement('div');
+            preview.className = 'media-preview';
+            preview.innerHTML = `
+              <video controls>
+                <source src="${URL.createObjectURL(file)}" type="video/mp4">
+              </video>
+              <button type="button" class="remove-media" onclick="this.parentElement.remove();">×</button>
+            `;
+            grid.appendChild(preview);
+          }
+        });
+      }
+    </script>
   </body>
 </html>

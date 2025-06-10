@@ -444,90 +444,42 @@ document.querySelectorAll('.photo-grid img, .photo-grid video').forEach(item => 
   });
 });
 
+// Lightbox for post media
+function openLightbox(mediaHtml) {
+  const lightbox = document.getElementById('lightbox');
+  const content = document.getElementById('lightboxContent');
+  content.innerHTML = mediaHtml;
+  lightbox.style.display = 'flex';
+}
+
 function closeLightbox() {
   document.getElementById('lightbox').style.display = 'none';
   document.getElementById('lightboxContent').innerHTML = '';
 }
 
-function openLightbox(src) {
-  const lightbox = document.getElementById("lightbox");
-  const content = document.getElementById("lightboxContent");
-  content.innerHTML = `<img src="${src}" style="max-width:90vw; max-height:90vh; border-radius:10px;">`;
-  lightbox.style.display = "flex"; // or "block"
-}
-
-function closeLightbox() {
-  const lightbox = document.getElementById("lightbox");
-  lightbox.style.display = "none";
-  document.getElementById("lightboxContent").innerHTML = "";
-}
-
-function openLightboxVideo(src) {
-  const lightbox = document.getElementById("lightbox");
-  const content = document.getElementById("lightboxContent");
-  content.innerHTML = `<video controls autoplay style="max-width:90vw; max-height:90vh; border-radius:10px;">
-                         <source src="${src}" type="video/mp4">
-                         Your browser does not support the video tag.
-                       </video>`;
-  lightbox.style.display = "flex";
-}
-
-const previewGrid = document.getElementById("mediaPreviewGrid");
-const imageInput = document.getElementById("postImageInput");
-const videoInput = document.getElementById("postVideoInput");
-
-function createPreviewElement(src, type) {
-  const wrapper = document.createElement("div");
-  wrapper.className = "media-item";
-
-  const removeBtn = document.createElement("button");
-  removeBtn.innerText = "×";
-  removeBtn.className = "remove-btn";
-  removeBtn.onclick = () => wrapper.remove();
-
-  wrapper.appendChild(removeBtn);
-
-  if (type === "image") {
-    const img = document.createElement("img");
-    img.src = src;
-    wrapper.appendChild(img);
-  } else if (type === "video") {
-    const video = document.createElement("video");
-    video.src = src;
-    video.controls = true;
-    wrapper.appendChild(video);
+// Attach click listeners to post images and videos
+document.addEventListener('DOMContentLoaded', function () {
+  function attachMediaListeners() {
+    document.querySelectorAll('.post-media-grid img').forEach(img => {
+      img.style.cursor = 'pointer';
+      img.onclick = function () {
+        openLightbox(`<img src='${img.src}' style='max-width:90vw;max-height:80vh;border-radius:16px;'>`);
+      };
+    });
+    document.querySelectorAll('.post-media-grid video').forEach(video => {
+      video.style.cursor = 'pointer';
+      video.onclick = function () {
+        openLightbox(`<video src='${video.querySelector('source').src}' controls autoplay style='max-width:90vw;max-height:80vh;border-radius:16px;'></video>`);
+      };
+    });
   }
-
-  return wrapper;
-}
-
-imageInput.addEventListener("change", function () {
-  Array.from(this.files).forEach(file => {
-    const url = URL.createObjectURL(file);
-    const el = createPreviewElement(url, "image");
-    previewGrid.appendChild(el);
-  });
+  attachMediaListeners();
 });
 
-videoInput.addEventListener("change", function () {
-  Array.from(this.files).forEach(file => {
-    const url = URL.createObjectURL(file);
-    const el = createPreviewElement(url, "video");
-    previewGrid.appendChild(el);
-  });
+// Allow closing lightbox by clicking outside content or pressing ESC
+document.getElementById('lightbox').addEventListener('click', function (e) {
+  if (e.target === this) closeLightbox();
 });
-
-function openLightbox(type, src) {
-  const content = document.getElementById("lightboxContent");
-  if (type === 'image') {
-    content.innerHTML = `<img src="${src}" style="max-width:100%; border-radius:10px;">`;
-  } else {
-    content.innerHTML = `<video src="${src}" controls autoplay style="max-width:100%; border-radius:10px;"></video>`;
-  }
-  document.getElementById("lightbox").style.display = "flex";
-}
-
-function closeLightbox() {
-  document.getElementById("lightbox").style.display = "none";
-  document.getElementById("lightboxContent").innerHTML = '';
-}
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') closeLightbox();
+});

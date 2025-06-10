@@ -288,7 +288,14 @@ $unreadResult->close();
           <p class="card-subtitle">@<?= htmlspecialchars($_SESSION['username']) ?></p>
 
           <ul class="stats">
-            <li><strong>248</strong><span>Posts</span></li>
+            <li><strong>
+              <?php
+                // Count all posts (original + shared) for the user
+                $userPostCount = $conn->query("SELECT COUNT(*) AS total FROM posts WHERE user_id = " . intval($_SESSION['id']));
+                $postCount = $userPostCount ? $userPostCount->fetch_assoc()['total'] : 0;
+                echo $postCount;
+              ?>
+            </strong><span>Posts</span></li>
             <li><strong>15.2 K</strong><span>Followers</span></li>
             <li><strong>1.8 K</strong><span>Following</span></li>
           </ul>
@@ -409,7 +416,7 @@ $unreadResult->close();
               </div>
 
               <?php if ($post['user_id'] == $_SESSION['id']): ?>
-                <div class="post-options" style="align-self: flex-start; margin-left: auto; margin-top: 0;">
+                <div class="post-options" style="margin-left: auto;">
                   <button class="icon-btn toggle-options"><i class="ri-more-fill"></i></button>
                   <ul class="dropdown hidden">
                     <li><button class="btn--sm btn-edit-post" data-id="<?= $post['id'] ?>">Edit Post</button></li>
@@ -507,9 +514,9 @@ $unreadResult->close();
                 $likes = $conn->query("SELECT COUNT(*) AS total FROM likes WHERE post_id = {$post['id']}")->fetch_assoc();
                 $liked = $conn->query("SELECT 1 FROM likes WHERE user_id = {$_SESSION['id']} AND post_id = {$post['id']}")->num_rows > 0;
                 ?>
-                <form method="POST" style="display:inline;">
+                <form method="POST" style="display:inline;" onsubmit="event.preventDefault(); return false;">
                   <input type="hidden" name="like_post_id" value="<?= $post['id'] ?>">
-                  <button type="submit" class="icon-btn <?= $liked ? 'liked' : '' ?>">
+                  <button type="button" class="icon-btn like-button <?= $liked ? 'liked' : '' ?>" data-post-id="<?= $post['id'] ?>">
                     <i class="<?= $liked ? 'ri-heart-fill' : 'ri-heart-line' ?>"></i>
                     <span><?= $likes['total'] ?></span>
                   </button>
@@ -524,12 +531,17 @@ $unreadResult->close();
                   <span><?= $comments['total'] ?></span>
                 </button>
 
-                <!-- SHARE FORM -->
+                <!-- SHARE COUNT -->
+                <?php
+                  // Count shares for this post
+                  $shareCountRes = $conn->query("SELECT COUNT(*) AS total FROM posts WHERE shared_post_id = " . intval($post['id']));
+                  $shareCount = $shareCountRes ? $shareCountRes->fetch_assoc()['total'] : 0;
+                ?>
                 <form method="POST" action="share_post.php" style="display:inline;">
                   <input type="hidden" name="share_post_id" value="<?= $post['id'] ?>">
                   <button type="submit" class="icon-btn">
                     <i class="ri-share-forward-line"></i>
-                    <span><?= $countShares['total'] ?></span>
+                    <span><?= $shareCount ?></span>
                   </button>
                 </form>
               </div>
