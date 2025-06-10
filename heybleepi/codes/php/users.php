@@ -69,6 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
             $_SESSION['last_name'] = $user['last_name'];
             $_SESSION['full_name'] = $user['first_name'] . ' ' . $user['last_name'];
             $_SESSION['avatar'] = $user['profile_picture'] ?? 'default.png';
+            $_SESSION['isloginok'] = true;
 
             header("Location: dashboard.php");
             exit();
