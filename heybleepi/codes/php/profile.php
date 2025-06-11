@@ -149,12 +149,13 @@ $user = $result->fetch_assoc();
 
 $userId = $_SESSION['id'];
 
+// Fetch all media for the user's posts from post_media table
 $mediaStmt = $conn->prepare("
-  SELECT image_path, video_path
-  FROM posts
-  WHERE user_id = ?
-    AND (image_path IS NOT NULL OR video_path IS NOT NULL)
-  ORDER BY created_at DESC
+  SELECT pm.file_path, pm.media_type
+  FROM post_media pm
+  JOIN posts p ON pm.post_id = p.id
+  WHERE p.user_id = ?
+  ORDER BY pm.id DESC
 ");
 $mediaStmt->bind_param("i", $userId);
 $mediaStmt->execute();
@@ -183,6 +184,12 @@ function getAlbumCover($albumId, $conn) {
   $stmt->close();
   return $path ? $path : './assets/profile/default.png';
 }
+
+// Fetch all user images and videos for tabs
+$userImages = array_filter($mediaPosts, function($m) { return $m['media_type'] === 'image'; });
+$userVideos = array_filter($mediaPosts, function($m) { return $m['media_type'] === 'video'; });
+// For gallery, get only the 9 latest images
+$galleryImages = array_slice($userImages, 0, 9);
 ?>
 
 <!DOCTYPE html>
@@ -265,12 +272,12 @@ function getAlbumCover($albumId, $conn) {
         </div>
       </div>
 
-      <nav class="profile-tabs glass">
-        <a class="tab active" href="#">Posts</a>
-        <a class="tab" href="#">About</a>
-        <a class="tab" href="#">Friends</a>
-        <a class="tab" href="#">Photos</a>
-        <a class="tab" href="#">More</a>
+      <nav class="profile-tabs glass" id="profileTabs">
+        <a class="tab active" href="#" data-tab="posts">Posts</a>
+        <a class="tab" href="#" data-tab="friends">Friends</a>
+        <a class="tab" href="#" data-tab="photos">Photos</a>
+        <a class="tab" href="#" data-tab="videos">Videos</a>
+        <a class="tab" href="#" data-tab="more">More</a>
       </nav>
 
       <!-- Main 2-column grid -->
@@ -309,36 +316,24 @@ function getAlbumCover($albumId, $conn) {
           <section class="glass card">
             <h4 class="card-title">Gallery</h4>
             <div class="photo-grid">
-              <?php foreach ($mediaPosts as $media): ?>
-                <?php if (!empty($media['image_path'])): ?>
-                  <img
-                    src="<?= htmlspecialchars($media['image_path']) ?>"
-                    class="gallery-item"
-                    data-type="image"
-                    data-src="<?= htmlspecialchars($media['image_path']) ?>"
-                    alt="User Image"
-                  />
-                <?php elseif (!empty($media['video_path'])): ?>
-                  <video
-                    class="gallery-item"
-                    muted
-                    data-type="video"
-                    data-src="<?= htmlspecialchars($media['video_path']) ?>"
-                  >
-                    <source src="<?= htmlspecialchars($media['video_path']) ?>" type="video/mp4" />
-                  </video>
-                <?php endif; ?>
+              <?php foreach ($galleryImages as $media): ?>
+                <img
+                  src="<?= htmlspecialchars($media['file_path']) ?>"
+                  class="gallery-item"
+                  data-type="image"
+                  data-src="<?= htmlspecialchars($media['file_path']) ?>"
+                  alt="User Image"
+                />
               <?php endforeach; ?>
             </div>
           </section>
 
           <!-- Albums Section -->
           <section class="glass card">
-            <div style="text-align: right; margin-bottom: 10px;">
-              <a href="create_album.php" class="btn btn--primary">+ Create Album</a>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <h4 class="card-title" style="margin: 0;">Albums</h4>
+              <a href="create_album.php" class="btn btn--primary" style="font-size: 0.95em; padding: 6px 16px;">+ Create Album</a>
             </div>
-
-            <h4 class="card-title">Albums</h4>
             <div class="photo-grid">
               <?php if (empty($albums)): ?>
                 <p style="padding: 1rem;">No albums created yet.</p>
@@ -587,6 +582,41 @@ function getAlbumCover($albumId, $conn) {
           <?php endwhile; ?>
         </section>
       </div>
+
+      <!-- Add tab content containers below main grid -->
+      <div id="tab-photos" class="profile-tab-content" style="display:none;">
+        <section class="glass card">
+          <h4 class="card-title">All Photos</h4>
+          <div class="photo-grid">
+            <?php foreach ($userImages as $media): ?>
+              <img
+                src="<?= htmlspecialchars($media['file_path']) ?>"
+                class="gallery-item"
+                data-type="image"
+                data-src="<?= htmlspecialchars($media['file_path']) ?>"
+                alt="User Image"
+              />
+            <?php endforeach; ?>
+          </div>
+        </section>
+      </div>
+      <div id="tab-videos" class="profile-tab-content" style="display:none;">
+        <section class="glass card">
+          <h4 class="card-title">All Videos</h4>
+          <div class="photo-grid">
+            <?php foreach ($userVideos as $media): ?>
+              <video
+                class="gallery-item"
+                muted
+                data-type="video"
+                data-src="<?= htmlspecialchars($media['file_path']) ?>"
+              >
+                <source src="<?= htmlspecialchars($media['file_path']) ?>" type="video/mp4" />
+              </video>
+            <?php endforeach; ?>
+          </div>
+        </section>
+      </div>
     </main>
 
     <!-- Lightbox Modal -->
@@ -595,6 +625,31 @@ function getAlbumCover($albumId, $conn) {
       <div class="lightbox-content" id="lightboxContent"></div>
     </div>
 
+    <script>
+      // Tab switching logic
+      const tabs = document.querySelectorAll('#profileTabs .tab');
+      const tabContents = {
+        posts: document.querySelector('.profile-main-grid'),
+        friends: null, // implement if needed
+        photos: document.getElementById('tab-photos'),
+        videos: document.getElementById('tab-videos'),
+        more: null // implement if needed
+      };
+      tabs.forEach(tab => {
+        tab.addEventListener('click', function(e) {
+          e.preventDefault();
+          tabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          Object.values(tabContents).forEach(c => { if (c) c.style.display = 'none'; });
+          const tabKey = tab.getAttribute('data-tab');
+          if (tabKey === 'posts') {
+            tabContents.posts.style.display = '';
+          } else if (tabContents[tabKey]) {
+            tabContents[tabKey].style.display = '';
+          }
+        });
+      });
+    </script>
     <script src="./script/dashboard.js"></script>
   </body>
 </html>
