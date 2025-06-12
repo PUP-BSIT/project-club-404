@@ -296,8 +296,22 @@ $unreadResult->close();
                 echo $postCount;
               ?>
             </strong><span>Posts</span></li>
-            <li><strong>15.2 K</strong><span>Followers</span></li>
-            <li><strong>1.8 K</strong><span>Following</span></li>
+            <li><strong>
+              <?php
+                // Count all users except the current user (for followers)
+                $followersCountRes = $conn->query("SELECT COUNT(*) AS total FROM users WHERE id != " . intval($_SESSION['id']));
+                $followersCount = $followersCountRes ? $followersCountRes->fetch_assoc()['total'] : 0;
+                echo number_format($followersCount);
+              ?>
+            </strong><span>Followers</span></li>
+            <li><strong>
+              <?php
+                // Count all users except the current user (for following)
+                $followingCountRes = $conn->query("SELECT COUNT(*) AS total FROM users WHERE id != " . intval($_SESSION['id']));
+                $followingCount = $followingCountRes ? $followingCountRes->fetch_assoc()['total'] : 0;
+                echo number_format($followingCount);
+              ?>
+            </strong><span>Following</span></li>
           </ul>
         </section>
 
@@ -369,8 +383,8 @@ $unreadResult->close();
 
             <div class="create-post-actions">
               <div class="media-actions">
-                <button type="button" class="btn-add" onclick="document.getElementById('postImageInput').click()">+ Photo</button>
-                <button type="button" class="btn-add" onclick="document.getElementById('postVideoInput').click()">+ Video</button>
+                <button type="button" class="media-upload-btn photo" onclick="document.getElementById('postImageInput').click()">+ Photo</button>
+                <button type="button" class="media-upload-btn video" onclick="document.getElementById('postVideoInput').click()">+ Video</button>
                 <!-- Hidden File Inputs -->
                 <input type="file" name="post_images[]" accept="image/*" multiple id="postImageInput" hidden>
                 <input type="file" name="post_videos[]" accept="video/*" multiple id="postVideoInput" hidden>
@@ -584,48 +598,42 @@ $unreadResult->close();
 
         <!-- Suggested Friends -->
         <section class="glass card">
-          <h3 class="card-title">Suggested Connections</h3>
+          <h3 class="card-title">Friends</h3>
           <ul class="suggestions" id="suggestion_list">
-
-            <!-- Initial Visible Users -->
-            <li class="suggestion">
-              <img class="avatar avatar--sm" src="./assets/profile/chick.jpg" alt="">
-              <div class="user-meta">
-                <h4>Mingyu</h4>
-                <p>Rapper</p>
-              </div>
-              <button class="btn btn--primary btn--sm">Connect</button>
-            </li>
-
-            <li class="suggestion">
-              <img class="avatar avatar--sm" src="assets/profile/cat.jpg" alt="">
-              <div class="user-meta">
-                <h4>Hoshi</h4>
-                <p>RAWRRRRRR</p>
-              </div>
-              <button class="btn btn--primary btn--sm">Connect</button>
-            </li>
-
-            <!-- Hidden Initially -->
-            <li class="suggestion hidden">
-              <img class="avatar avatar--sm" src="./assets/profile/penguin.jpg" alt="">
-              <div class="user-meta">
-                <h4>Yasmin</h4>
-                <p>Developer</p>
-              </div>
-              <button class="btn btn--primary btn--sm">Connect</button>
-            </li>
-
-            <li class="suggestion hidden">
-              <img class="avatar avatar--sm" src="./assets/profile/frog.jpg" alt="">
-              <div class="user-meta">
-                <h4>Ken</h4>
-                <p>Artist</p>
-              </div>
-              <button class="btn btn--primary btn--sm">Connect</button>
-            </li>
+            <?php
+              // Fetch all users except the current usericture
+              $suggestedUsers = $conn->query("
+                SELECT u.id, u.first_name, u.last_name, u.user_name, ud.profile_picture
+                FROM users u
+                LEFT JOIN user_details ud ON u.id = ud.id_fk
+                WHERE u.id != " . intval($_SESSION['id'])
+              );
+              if ($suggestedUsers && $suggestedUsers->num_rows > 0):
+                $count = 0;
+                while ($user = $suggestedUsers->fetch_assoc()):
+                  $profilePic = !empty($user['profile_picture']) ? $user['profile_picture'] : 'default.png';
+                  $avatarPath = './assets/profile/' . $profilePic;
+                  if (!file_exists($avatarPath)) {
+                    $avatarPath = './assets/profile/default.png';
+                  }
+                  $isHidden = $count >= 2 ? 'hidden' : '';
+            ?>
+              <li class="suggestion <?= $isHidden ?>">
+                <img class="avatar avatar--sm" src="<?= htmlspecialchars($avatarPath) ?>" alt="">
+                <div class="user-meta">
+                  <h4><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></h4>
+                  <p>@<?= htmlspecialchars($user['user_name']) ?></p>
+                </div>
+                <button class="btn btn--primary btn--sm">Connect</button>
+              </li>
+            <?php
+                $count++;
+                endwhile;
+              else:
+            ?>
+              <li class="suggestion">No users to suggest.</li>
+            <?php endif; ?>
           </ul>
-
           <button class="see-more" id="seeMoreBtn">See More</button>
         </section>
       </aside>
