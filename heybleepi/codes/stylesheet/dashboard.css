@@ -22,6 +22,39 @@ body.page {
   font-family: system-ui, sans-serif;
   color: white;
   margin: 0;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Remove or override these for profile.php scrolling */
+body.page.profile-page {
+  height: auto !important;
+  min-height: 100vh !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  display: block !important;
+  position: static !important;
+}
+
+html {
+  height: auto !important;
+  min-height: 100vh !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+body.profile-page .top-nav {
+  position: static !important;
+}
+
+/* Prevent html/body from blocking scroll on profile page */
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 /*  ====  UTILITIES  ==== */
@@ -359,11 +392,14 @@ body.page {
 }
 
 .feed {
-  flex: 1;
-  min-width: 0;
+  flex: 1 1 auto;
+  height: calc(100vh - 72px);
+  overflow-y: auto;
+  padding-bottom: 24px;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  padding-top: 72px;
 }
 
 .sidebar--left {
@@ -558,6 +594,42 @@ body.page {
 .action-group {
   display: flex;
   gap: .45rem;
+}
+
+/* Modern media upload buttons */
+.media-upload-btn {
+  background: var(--glass);
+  color: #fff;
+  border: 1px solid var(--glass-border);
+  border-radius: 9999px;
+  padding: 0.5rem 1.2rem;
+  margin-right: 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border 0.2s;
+  box-shadow: 0 2px 8px rgba(138, 79, 255, 0.08);
+}
+
+.media-upload-btn i {
+  font-size: 1.2em;
+}
+
+.media-upload-btn.photo {
+  background: linear-gradient(90deg, var(--primary), #a084e8);
+}
+
+.media-upload-btn.video {
+  background: linear-gradient(90deg, var(--secondary), #ffb6e6);
+}
+
+.media-upload-btn:hover {
+  filter: brightness(1.1);
+  border-color: #fff;
+  color: #fff;
 }
 
 /*  Media preview */
@@ -1419,11 +1491,87 @@ textarea:focus {
 }
 
 .btn--secondary {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--secondary);
+  color: #fff;
+  transition: background .2s;
 }
 
 .btn--secondary:hover {
-  background-color: rgba(255, 255, 255, 0.15);
+  background: #ff3e9e;
+}
+
+.btn--sm {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8rem;
+  border-radius: 12px;
+  margin-left: 4px;
+}
+
+/* ==== STICKY LAYOUT FOR DASHBOARD/PROFILE ==== */
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+body.page {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.top-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  z-index: 100;
+}
+
+.layout {
+  display: flex;
+  flex: 1 1 auto;
+  height: 95vh;
+  margin-top: 80px;
+  overflow: hidden;
+}
+
+.sidebar--left,
+.sidebar--right {
+  height: calc(95vh - 72px);
+  position: sticky;
+  top: 72px;
+  align-self: flex-start;
+  z-index: 2;
+  overflow-y: auto;
+}
+
+.feed {
+  flex: 1 1 auto;
+  height: calc(100vh - 72px);
+  overflow-y: auto;
+  padding-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-top: 72px;
+}
+
+@media (max-width: 900px) {
+
+  .sidebar--left,
+  .sidebar--right,
+  .layout {
+    position: static !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .top-nav {
+    position: static;
+    width: 100%;
+  }
 }

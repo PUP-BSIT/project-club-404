@@ -190,6 +190,20 @@ $userImages = array_filter($mediaPosts, function($m) { return $m['media_type'] =
 $userVideos = array_filter($mediaPosts, function($m) { return $m['media_type'] === 'video'; });
 // For gallery, get only the 9 latest images
 $galleryImages = array_slice($userImages, 0, 9);
+
+// Fetch all users except the current user for the friends tab
+$allUsers = [];
+$usersResult = $conn->query("
+  SELECT u.id, u.first_name, u.last_name, u.user_name, ud.profile_picture
+  FROM users u
+  LEFT JOIN user_details ud ON u.id = ud.id_fk
+  WHERE u.id != " . intval($_SESSION['id'])
+);
+if ($usersResult) {
+  while ($row = $usersResult->fetch_assoc()) {
+    $allUsers[] = $row;
+  }
+}
 ?>
 
 <!DOCTYPE html>
@@ -208,7 +222,7 @@ $galleryImages = array_slice($userImages, 0, 9);
     </script>
   </head>
 
-  <body class="page">
+  <body class="page profile-page">
     <!-- Top Navbar -->
     <header class="top-nav glass">
       <h1 class="brand">HEYBLEEPI</h1>
@@ -263,7 +277,7 @@ $galleryImages = array_slice($userImages, 0, 9);
           <img class="avatar avatar--sm2" src="./assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>" alt="">
           <div class="user-basic-info">
             <h2><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></h2>
-            <p>@<?= htmlspecialchars($user['user_name']) ?> · 81</p>
+            <p>@<?= htmlspecialchars($user['user_name']) ?></p>
           </div>
           <div class="profile-buttons">
             <button class="btn btn--primary">Add to Story</button>
@@ -373,8 +387,8 @@ $galleryImages = array_slice($userImages, 0, 9);
               <div class="create-post-actions">
                 <div class="media-actions">
                   <!-- Add Media Buttons -->
-                  <button type="button" class="btn-add" onclick="document.getElementById('postImageInput').click()">+ Photo</button>
-                  <button type="button" class="btn-add" onclick="document.getElementById('postVideoInput').click()">+ Video</button>
+                  <button type="button" class="media-upload-btn photo" onclick="document.getElementById('postImageInput').click()">+ Photo</button>
+                  <button type="button" class="media-upload-btn video" onclick="document.getElementById('postVideoInput').click()">+ Video</button>
 
                   <!-- Hidden File Inputs -->
                   <input type="file" name="post_images[]" accept="image/*" multiple id="postImageInput" hidden>
@@ -617,6 +631,27 @@ $galleryImages = array_slice($userImages, 0, 9);
           </div>
         </section>
       </div>
+
+      <!-- Friends Tab Content -->
+      <div id="tab-friends" class="profile-tab-content" style="display:none;">
+        <section class="glass card">
+          <h4 class="card-title">All Users</h4>
+          <ul style="list-style:none; padding:0; margin:0;">
+            <?php foreach ($allUsers as $user): ?>
+              <?php
+                $profilePic = !empty($user['profile_picture']) ? $user['profile_picture'] : 'default.png';
+              ?>
+              <li style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                <img class="avatar avatar--sm" src="./assets/profile/<?= htmlspecialchars($profilePic) ?>" alt="">
+                <div>
+                  <strong><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></strong>
+                  <div style="font-size:0.85em;color:#aaa;">@<?= htmlspecialchars($user['user_name']) ?></div>
+                </div>
+              </li>
+            <?php endforeach; ?>
+          </ul>
+        </section>
+      </div>
     </main>
 
     <!-- Lightbox Modal -->
@@ -630,7 +665,7 @@ $galleryImages = array_slice($userImages, 0, 9);
       const tabs = document.querySelectorAll('#profileTabs .tab');
       const tabContents = {
         posts: document.querySelector('.profile-main-grid'),
-        friends: null, // implement if needed
+        friends: document.getElementById('tab-friends'),
         photos: document.getElementById('tab-photos'),
         videos: document.getElementById('tab-videos'),
         more: null // implement if needed
