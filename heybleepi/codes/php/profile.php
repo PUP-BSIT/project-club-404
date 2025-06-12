@@ -48,12 +48,14 @@ $unreadResult->bind_result($unread_count);
 $unreadResult->fetch();
 $unreadResult->close();
 
+// Use the username from the URL if present, otherwise use the logged-in user
+$username = isset($_GET['user']) ? $_GET['user'] : $_SESSION['username'];
+
 // Fetch user data by username
 $sql = "SELECT users.*, user_details.bio, user_details.work, user_details.school, user_details.home, user_details.religion, user_details.relationship_status, user_details.profile_picture, user_details.profile_cover
         FROM users
         LEFT JOIN user_details ON users.id = user_details.id_fk
         WHERE users.user_name = ?";
-
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $username);
 $stmt->execute();
@@ -64,90 +66,101 @@ if ($result->num_rows === 0) {
   exit();
 }
 
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['comment_post_id'], $_POST['comment_text'])) {
-    $user_id = $_SESSION['id'];
-    $post_id = intval($_POST['comment_post_id']);
-    $comment_text = trim($_POST['comment_text']);
-
-    if (!empty($comment_text)) {
-        $stmt = $conn->prepare("INSERT INTO comments (post_id, user_id, comment_text) VALUES (?, ?, ?)");
-        $stmt->bind_param("iis", $post_id, $user_id, $comment_text);
-        $stmt->execute();
-        $stmt->close();
-    }
-
-    header("Location: profile.php");
-    exit();
-}
-
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['post_content'])) {
-  $user_id = $_SESSION['id'];
-  $post_content = trim($_POST['post_content']);
-
-  // Step 1: insert the post
-  $stmt = $conn->prepare("INSERT INTO posts (user_id, content) VALUES (?, ?)");
-  $stmt->bind_param("is", $user_id, $post_content);
-  $stmt->execute();
-  $post_id = $stmt->insert_id;
-  $stmt->close();
-
-  // Step 2: upload media
-  $upload_dir = "uploads/";
-  if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
-
-  // Images
-  if (!empty($_FILES['post_images']['name'][0])) {
-    foreach ($_FILES['post_images']['tmp_name'] as $key => $tmp_name) {
-      if ($_FILES['post_images']['error'][$key] === UPLOAD_ERR_OK) {
-        $file_name = time() . '_' . basename($_FILES['post_images']['name'][$key]);
-        $target = $upload_dir . $file_name;
-        if (move_uploaded_file($tmp_name, $target)) {
-          $mediaStmt = $conn->prepare("INSERT INTO post_media (post_id, file_path, media_type) VALUES (?, ?, 'image')");
-          $mediaStmt->bind_param("is", $post_id, $target);
-          $mediaStmt->execute();
-          $mediaStmt->close();
-        }
-      }
-    }
-  }
-
-  // Videos
-  if (!empty($_FILES['post_videos']['name'][0])) {
-    foreach ($_FILES['post_videos']['tmp_name'] as $key => $tmp_name) {
-      if ($_FILES['post_videos']['error'][$key] === UPLOAD_ERR_OK) {
-        $file_name = time() . '_' . basename($_FILES['post_videos']['name'][$key]);
-        $target = $upload_dir . $file_name;
-        if (move_uploaded_file($tmp_name, $target)) {
-          $mediaStmt = $conn->prepare("INSERT INTO post_media (post_id, file_path, media_type) VALUES (?, ?, 'video')");
-          $mediaStmt->bind_param("is", $post_id, $target);
-          $mediaStmt->execute();
-          $mediaStmt->close();
-        }
-      }
-    }
-  }
-
-  header("Location: profile.php");
-  exit();
-}
-
-function getMediaClass($path) {
-    $size = @getimagesize($path);
-    if (!$size) return 'landscape'; // fallback
-
-    $width = $size[0];
-    $height = $size[1];
-
-    $ratio = $width / $height;
-
-    if ($ratio > 1.2) return 'landscape';
-    elseif ($ratio < 0.8) return 'portrait';
-    else return 'square';
-}
-
 $user = $result->fetch_assoc();
+$userId = $user['id'];
 
-$userId = $_SESSION['id'];
+// --- MOVE POST/COMMENT HANDLERS HERE, BEFORE ANY HTML OUTPUT ---
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+  // Handle creating a post (only allow if viewing own profile)
+  if (isset($_POST['post_content']) && $userId == $_SESSION['id']) {
+    $post_content = trim($_POST['post_content']);
+    $upload_dir = "uploads/";
+    if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
+
+    // Insert post first to get post_id
+    $stmt = $conn->prepare("INSERT INTO posts (user_id, content) VALUES (?, ?)");
+    $stmt->bind_param("is", $userId, $post_content);
+    $stmt->execute();
+    $post_id = $stmt->insert_id;
+    $stmt->close();
+
+    // Handle multiple image uploads
+    if (!empty($_FILES['post_images']['name'][0])) {
+      foreach ($_FILES['post_images']['tmp_name'] as $key => $tmp_name) {
+        if ($_FILES['post_images']['error'][$key] === UPLOAD_ERR_OK) {
+          $filename = time() . '_img_' . $key . '_' . basename($_FILES['post_images']['name'][$key]);
+          $target = $upload_dir . $filename;
+          if (move_uploaded_file($tmp_name, $target)) {
+            $mediaStmt = $conn->prepare("INSERT INTO post_media (post_id, file_path, media_type) VALUES (?, ?, 'image')");
+            $mediaStmt->bind_param("is", $post_id, $target);
+            $mediaStmt->execute();
+            $mediaStmt->close();
+          }
+        }
+      }
+    }
+
+    // Handle multiple video uploads
+    if (!empty($_FILES['post_videos']['name'][0])) {
+      foreach ($_FILES['post_videos']['tmp_name'] as $key => $tmp_name) {
+        if ($_FILES['post_videos']['error'][$key] === UPLOAD_ERR_OK) {
+          $filename = time() . '_vid_' . $key . '_' . basename($_FILES['post_videos']['name'][$key]);
+          $target = $upload_dir . $filename;
+          if (move_uploaded_file($tmp_name, $target)) {
+            $mediaStmt = $conn->prepare("INSERT INTO post_media (post_id, file_path, media_type) VALUES (?, ?, 'video')");
+            $mediaStmt->bind_param("is", $post_id, $target);
+            $mediaStmt->execute();
+            $mediaStmt->close();
+          }
+        }
+      }
+    }
+
+    // Redirect to correct profile
+    if ($userId == $_SESSION['id']) {
+      header("Location: profile.php");
+    } else {
+      header("Location: profile.php?user=" . urlencode($user['user_name']));
+    }
+    exit();
+  }
+
+  // Handle commenting on a post (allow for logged-in user)
+  if (isset($_POST['comment_post_id'], $_POST['comment_text'])) {
+    $post_id = intval($_POST['comment_post_id']);
+    $comment = trim($_POST['comment_text']);
+
+    if (!empty($comment)) {
+      $stmt = $conn->prepare("INSERT INTO comments (user_id, post_id, comment_text) VALUES (?, ?, ?)");
+      $stmt->bind_param("iis", $_SESSION['id'], $post_id, $comment);
+      $stmt->execute();
+      $stmt->close();
+
+      // Add notification to post owner
+      $ownerStmt = $conn->prepare("SELECT user_id FROM posts WHERE id = ?");
+      $ownerStmt->bind_param("i", $post_id);
+      $ownerStmt->execute();
+      $ownerStmt->bind_result($owner_id);
+      $ownerStmt->fetch();
+      $ownerStmt->close();
+
+      if ($owner_id != $_SESSION['id']) {
+        $notifStmt = $conn->prepare("INSERT INTO notifications (user_id, actor_id, post_id, type) VALUES (?, ?, ?, 'comment')");
+        $notifStmt->bind_param("iii", $owner_id, $_SESSION['id'], $post_id);
+        $notifStmt->execute();
+        $notifStmt->close();
+      }
+    }
+
+    // Redirect to correct profile
+    if ($userId == $_SESSION['id']) {
+      header("Location: profile.php");
+    } else {
+      header("Location: profile.php?user=" . urlencode($user['user_name']));
+    }
+    exit();
+  }
+}
 
 // Fetch all media for the user's posts from post_media table
 $mediaStmt = $conn->prepare("
@@ -162,6 +175,7 @@ $mediaStmt->execute();
 $mediaResult = $mediaStmt->get_result();
 $mediaPosts = $mediaResult->fetch_all(MYSQLI_ASSOC);
 
+// Fetch albums for the profile owner
 $albumStmt = $conn->prepare("
   SELECT a.*, COUNT(ap.id) AS media_count
   FROM albums a
@@ -170,7 +184,7 @@ $albumStmt = $conn->prepare("
   GROUP BY a.id
   ORDER BY a.created_at DESC
 ");
-$albumStmt->bind_param("i", $_SESSION['id']);
+$albumStmt->bind_param("i", $userId);
 $albumStmt->execute();
 $albumResult = $albumStmt->get_result();
 $albums = $albumResult->fetch_all(MYSQLI_ASSOC);
@@ -369,47 +383,38 @@ if ($usersResult) {
 
         <!-- Create Post -->
         <section class="right-column">
+          <?php if ($userId == $_SESSION['id']): ?>
           <div class="glass create-post">
-            <form method="POST" action="profile.php"  enctype="multipart/form-data">
+            <form method="POST" action="profile.php" enctype="multipart/form-data">
               <div class="create-post-header">
                 <img class="avatar avatar--sm" src="./assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>" alt="">
                 <div class="poster-info">
-                  <a href="profile.php" class="poster-name"><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></a>
-                  <p>@<?php echo htmlspecialchars($user['user_name']); ?></p>
+                  <a href="profile.php" class="poster-name"><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></a>
+                  <p>@<?= htmlspecialchars($user['user_name']); ?></p>
                 </div>
               </div>
-
               <textarea class="create-post-input" name="post_content" placeholder="What's happening in your galaxy?" required></textarea>
-
               <!-- Media Preview Grid -->
               <div id="mediaPreviewGrid" class="media-preview-grid"></div>
-
               <div class="create-post-actions">
                 <div class="media-actions">
-                  <!-- Add Media Buttons -->
                   <button type="button" class="media-upload-btn photo" onclick="document.getElementById('postImageInput').click()">+ Photo</button>
                   <button type="button" class="media-upload-btn video" onclick="document.getElementById('postVideoInput').click()">+ Video</button>
-
-                  <!-- Hidden File Inputs -->
                   <input type="file" name="post_images[]" accept="image/*" multiple id="postImageInput" hidden>
                   <input type="file" name="post_videos[]" accept="video/*" multiple id="postVideoInput" hidden>
                 </div>
-
                 <div class="minor-actions">
                   <button class="icon-btn" type="button"><i class="ri-emotion-line"></i></button>
                   <button class="icon-btn" type="button"><i class="ri-map-pin-line"></i></button>
                 </div>
-
                 <button class="btn btn--primary" type="submit">Post</button>
               </div>
-
             </form>
           </div>
+          <?php endif; ?>
 
           <!-- Posts will appear here -->
           <?php
-          $userId = $_SESSION['id'];
-
           $query = "
             SELECT
               p.id AS post_id,
@@ -436,10 +441,9 @@ if ($usersResult) {
           ";
 
           $stmt = $conn->prepare($query);
-          $stmt->bind_param("i", $_SESSION['id']);
+          $stmt->bind_param("i", $userId);
           $stmt->execute();
           $result = $stmt->get_result();
-
           ?>
 
           <?php while ($post = $result->fetch_assoc()): ?>

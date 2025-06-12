@@ -423,12 +423,19 @@ $unreadResult->close();
         <?php while ($post = $posts->fetch_assoc()): ?>
           <article class="glass post">
             <header class="post-header">
-              <img class="avatar avatar--sm" src="./assets/profile/<?= htmlspecialchars($post['profile_picture'] ?? 'default.png') ?>" alt="">
+              <a href="profile.php?user=<?= urlencode($post['user_name']) ?>">
+                <img class="avatar avatar--sm" src="./assets/profile/<?= htmlspecialchars($post['profile_picture'] ?? 'default.png') ?>" alt="">
+              </a>
               <div>
-                <h4><?= htmlspecialchars($post['first_name'] . ' ' . $post['last_name']) ?></h4>
+                <!-- Make user's name a link to their profile page -->
+                <a href="profile.php?user=<?= urlencode($post['user_name']) ?>" class="poster-name">
+                  <?= htmlspecialchars($post['first_name'] . ' ' . $post['last_name']) ?>
+                </a>
+                <div style="font-size:0.9em;color:#888;">
+                  @<?= htmlspecialchars($post['user_name']) ?>
+                </div>
                 <time><?= date("g:i A", strtotime($post['created_at'])) ?></time>
               </div>
-
               <?php if ($post['user_id'] == $_SESSION['id']): ?>
                 <div class="post-options" style="margin-left: auto;">
                   <button class="icon-btn toggle-options"><i class="ri-more-fill"></i></button>
@@ -443,7 +450,6 @@ $unreadResult->close();
                   </ul>
                 </div>
               <?php endif; ?>
-
             </header>
 
             <div class="post-content" data-post-id="<?= $post['id'] ?>">
@@ -601,7 +607,7 @@ $unreadResult->close();
           <h3 class="card-title">Friends</h3>
           <ul class="suggestions" id="suggestion_list">
             <?php
-              // Fetch all users except the current usericture
+              // Fetch all users except the current user, join user_details for profile_picture
               $suggestedUsers = $conn->query("
                 SELECT u.id, u.first_name, u.last_name, u.user_name, ud.profile_picture
                 FROM users u
@@ -619,10 +625,14 @@ $unreadResult->close();
                   $isHidden = $count >= 2 ? 'hidden' : '';
             ?>
               <li class="suggestion <?= $isHidden ?>">
-                <img class="avatar avatar--sm" src="<?= htmlspecialchars($avatarPath) ?>" alt="">
+                <a href="profile.php?user=<?= urlencode($user['user_name']) ?>">
+                  <img class="avatar avatar--sm" src="<?= htmlspecialchars($avatarPath) ?>" alt="">
+                </a>
                 <div class="user-meta">
-                  <h4><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></h4>
-                  <p>@<?= htmlspecialchars($user['user_name']) ?></p>
+                  <a href="profile.php?user=<?= urlencode($user['user_name']) ?>" style="text-decoration:none;color:inherit;">
+                    <h4><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></h4>
+                    <p>@<?= htmlspecialchars($user['user_name']) ?></p>
+                  </a>
                 </div>
                 <button class="btn btn--primary btn--sm">Connect</button>
               </li>
