@@ -203,7 +203,7 @@ function getAlbumCover($albumId, $conn) {
 $userImages = array_filter($mediaPosts, function($m) { return $m['media_type'] === 'image'; });
 $userVideos = array_filter($mediaPosts, function($m) { return $m['media_type'] === 'video'; });
 // For gallery, get only the 9 latest images
-$galleryImages = array_slice($userImages, 0, 9);
+$galleryImages = array_slice($userImages, 0, 10);
 
 // Fetch all users except the current user for the friends tab
 $allUsers = [];
@@ -293,16 +293,18 @@ if ($usersResult) {
             <h2><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></h2>
             <p>@<?= htmlspecialchars($user['user_name']) ?></p>
           </div>
+          <?php if ($userId == $_SESSION['id']): ?>
           <div class="profile-buttons">
             <button class="btn btn--primary">Add to Story</button>
             <button class="btn btn--secondary" onclick="window.location.href='profile_edit.php'">Edit Profile</button>
           </div>
+          <?php endif; ?>
         </div>
       </div>
 
       <nav class="profile-tabs glass" id="profileTabs">
         <a class="tab active" href="#" data-tab="posts">Posts</a>
-        <a class="tab" href="#" data-tab="friends">Friends</a>
+        <a class="tab" href="#" data-tab="friends">Users</a>
         <a class="tab" href="#" data-tab="photos">Photos</a>
         <a class="tab" href="#" data-tab="videos">Videos</a>
         <a class="tab" href="#" data-tab="more">More</a>
