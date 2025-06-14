@@ -228,11 +228,6 @@ $unreadResult->close();
           <i class="ri-search-line search-icon"></i>
         </form>
 
-        <!-- Create Post -->
-        <button class="icon-btn icon-btn--primary" aria-label="Create post">
-          <i class="ri-add-line ri-lg"></i>
-        </button>
-
         <!-- Notification Wrapper -->
         <div class="notification-wrapper" id="notification_wrapper">
           <button class="icon-btn" id="notificationBtn" aria-label="Notifications">
@@ -263,8 +258,6 @@ $unreadResult->close();
           </div>
         </div>
 
-        <!-- Profile -->
-        <img class="avatar avatar--sm" src="./assets/profile/<?= htmlspecialchars($_SESSION['avatar'] ?? 'default.png') ?>" alt="">
       </div>
     </header>
 
@@ -390,7 +383,6 @@ $unreadResult->close();
                 <input type="file" name="post_videos[]" accept="video/*" multiple id="postVideoInput" hidden>
               </div>
               <div class="minor-actions">
-                <button class="icon-btn" type="button"><i class="ri-emotion-line"></i></button>
                 <button class="icon-btn" type="button"><i class="ri-map-pin-line"></i></button>
               </div>
               <button class="btn btn--primary" type="submit">Post</button>
@@ -602,9 +594,9 @@ $unreadResult->close();
       <!-- RIGHT SIDEBAR -->
       <aside class="sidebar sidebar--right">
 
-        <!-- Suggested Friends -->
+        <!-- Suggested Users -->
         <section class="glass card">
-          <h3 class="card-title">Friends</h3>
+          <h3 class="card-title">Users</h3>
           <ul class="suggestions" id="suggestion_list">
             <?php
               // Fetch all users except the current user, join user_details for profile_picture
