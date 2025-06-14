@@ -38,7 +38,7 @@
 
 To explore without registering:
 
-- **Email:** `joe123@example`
+- **Email:** `joe123@example.com`
 - **Password:** `joe123`
 
 ---
