@@ -221,12 +221,14 @@ $unreadResult->close();
 
       <div class="nav-actions">
         <!-- Search -->
-        <form class="search">
+        <div class="search" style="position: relative;">
           <input class="search-input"
+            id="searchInput"
             type="text"
             placeholder="Search in space…" />
           <i class="ri-search-line search-icon"></i>
-        </form>
+          <div id="searchResults" class="search-results"></div>
+        </div>
 
         <!-- Notification Wrapper -->
         <div class="notification-wrapper" id="notification_wrapper">
@@ -310,12 +312,12 @@ $unreadResult->close();
 
         <!-- Navigation -->
         <nav class="glass card nav-list">
-          <a class="nav-item" href="#">
+          <a class="nav-item <?= basename($_SERVER['PHP_SELF']) === 'dashboard.php' ? 'nav-item--active' : '' ?>" href="dashboard.php">
             <i class="ri-home-4-line"></i>
             Home
           </a>
 
-          <a class="nav-item" href="messages.php">
+          <a class="nav-item <?= basename($_SERVER['PHP_SELF']) === 'messages.php' ? 'nav-item--active' : '' ?>" href="messages.php">
             <i class="ri-message-3-line"></i>
             <span class="nav-label">
               Messages
@@ -325,7 +327,7 @@ $unreadResult->close();
             </span>
           </a>
 
-          <a class="nav-item" href="profile.php">
+          <a class="nav-item <?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'nav-item--active' : '' ?>" href="profile.php">
             <i class="ri-user-line"></i>
             Profile
           </a>
@@ -580,8 +582,15 @@ $unreadResult->close();
                     <small style="color:gray;"> – <?= date("M d, g:i A", strtotime($comment['commented_at'])) ?></small>
 
                     <?php if ($comment['user_id'] == $_SESSION['id']): ?>
-                      <button class="btn--sm btn-edit-comment-dashboard" data-id="<?= $comment['id'] ?>">Edit</button>
-                      <button class="btn--sm btn-delete-comment-dashboard" data-id="<?= $comment['id'] ?>">Delete</button>
+                      <div class="comment-options">
+                        <button class="icon-btn toggle-comment-options" aria-label="Options">
+                          <i class="ri-more-fill"></i>
+                        </button>
+                        <ul class="comment-dropdown hidden">
+                          <li><button class="btn-edit-comment-dashboard" data-id="<?= $comment['id'] ?>">Edit</button></li>
+                          <li><button class="btn-delete-comment-dashboard" data-id="<?= $comment['id'] ?>">Delete</button></li>
+                        </ul>
+                      </div>
                     <?php endif; ?>
                   </div>
                 <?php endwhile; ?>
@@ -590,55 +599,6 @@ $unreadResult->close();
           </article>
         <?php endwhile; ?>
       </section>
-
-      <!-- RIGHT SIDEBAR -->
-      <aside class="sidebar sidebar--right">
-
-        <!-- Suggested Users -->
-        <section class="glass card">
-          <h3 class="card-title">Users</h3>
-          <ul class="suggestions" id="suggestion_list">
-            <?php
-              // Fetch all users except the current user, join user_details for profile_picture
-              $suggestedUsers = $conn->query("
-                SELECT u.id, u.first_name, u.last_name, u.user_name, ud.profile_picture
-                FROM users u
-                LEFT JOIN user_details ud ON u.id = ud.id_fk
-                WHERE u.id != " . intval($_SESSION['id'])
-              );
-              if ($suggestedUsers && $suggestedUsers->num_rows > 0):
-                $count = 0;
-                while ($user = $suggestedUsers->fetch_assoc()):
-                  $profilePic = !empty($user['profile_picture']) ? $user['profile_picture'] : 'default.png';
-                  $avatarPath = './assets/profile/' . $profilePic;
-                  if (!file_exists($avatarPath)) {
-                    $avatarPath = './assets/profile/default.png';
-                  }
-                  $isHidden = $count >= 2 ? 'hidden' : '';
-            ?>
-              <li class="suggestion <?= $isHidden ?>">
-                <a href="profile.php?user=<?= urlencode($user['user_name']) ?>">
-                  <img class="avatar avatar--sm" src="<?= htmlspecialchars($avatarPath) ?>" alt="">
-                </a>
-                <div class="user-meta">
-                  <a href="profile.php?user=<?= urlencode($user['user_name']) ?>" style="text-decoration:none;color:inherit;">
-                    <h4><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></h4>
-                    <p>@<?= htmlspecialchars($user['user_name']) ?></p>
-                  </a>
-                </div>
-                <button class="btn btn--primary btn--sm">Connect</button>
-              </li>
-            <?php
-                $count++;
-                endwhile;
-              else:
-            ?>
-              <li class="suggestion">No users to suggest.</li>
-            <?php endif; ?>
-          </ul>
-          <button class="see-more" id="seeMoreBtn">See More</button>
-        </section>
-      </aside>
     </main>
 
     <!-- ☰ MOBILE NAV -->

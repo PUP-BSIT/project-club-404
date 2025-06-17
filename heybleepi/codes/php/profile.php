@@ -591,8 +591,16 @@ if ($usersResult) {
                       <small style="color:gray;"> – <?= date("M d, g:i A", strtotime($comment['commented_at'])) ?></small>
 
                       <?php if ($comment['user_id'] == $_SESSION['id']): ?>
-                        <button class="btn--sm btn-edit-comment" data-id="<?= $comment['id'] ?>">Edit</button>
-                        <button class="btn--sm btn-delete-comment" data-id="<?= $comment['id'] ?>">Delete</button>
+                        <div class="comment-options">
+                          <button class="icon-btn toggle-comment-options" aria-label="Options">
+                            <i class="ri-more-fill"></i>
+                          </button>
+                          <ul class="comment-dropdown hidden">
+                            <li><button class="btn--sm btn-edit-comment" data-id="<?= $comment['id'] ?>">Edit</button></li>
+                            <li><button class="btn--sm btn-delete-comment" data-id="<?= $comment['id'] ?>">Delete</button></li>
+                          </ul>
+                        </div>
+
                       <?php endif; ?>
                     </div>
                   <?php endwhile; ?>
