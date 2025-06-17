@@ -528,3 +528,53 @@ document.getElementById('lightbox').addEventListener('click', function (e) {
 document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') closeLightbox();
 });
+
+// Search Users
+document.addEventListener("DOMContentLoaded", function () {
+  const input = document.getElementById("searchInput");
+  const resultsContainer = document.getElementById("searchResults");
+
+  if (!input || !resultsContainer) return;
+
+  input.addEventListener("input", function () {
+    const query = input.value.trim();
+
+    if (query.length < 1) {
+      resultsContainer.innerHTML = "";
+      resultsContainer.classList.remove("visible");
+      return;
+    }
+
+    fetch(`search_users.php?q=${encodeURIComponent(query)}`)
+      .then(res => res.text())
+      .then(html => {
+        resultsContainer.innerHTML = html;
+        resultsContainer.classList.toggle("visible", html.trim().length > 0);
+      });
+  });
+
+  document.addEventListener("click", function (e) {
+    if (!resultsContainer.contains(e.target) && e.target !== input) {
+      resultsContainer.innerHTML = "";
+      resultsContainer.classList.remove("visible");
+    }
+  });
+});
+
+// Dropdown toggle option for comment
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.toggle-comment-options').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const dropdown = btn.closest('.comment-options').querySelector('.comment-dropdown');
+      document.querySelectorAll('.comment-dropdown').forEach(d => {
+        if (d !== dropdown) d.classList.add('hidden');
+      });
+      dropdown.classList.toggle('hidden');
+    });
+  });
+
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.comment-dropdown').forEach(d => d.classList.add('hidden'));
+  });
+});
