@@ -76,9 +76,12 @@ function deleteAccount(id) {
   })
   .then((response) => response.text())
   .then((responseText) => {
-    console.log(responseText);
     alert(responseText);
-    // window.location.reload(); // reloads the window.
+    
+    if (responseText == "Account deletion success, see you again!") {
+        window.location.href = "index.php"; // logout.
+    }
+    
   })
   .catch((error) => {
     console.error("Fetch error:", error);
@@ -93,6 +96,14 @@ function updateAccountInformation() {
   const usernameInput = document.querySelector("#username_input");
   const emailInput = document.querySelector("#email");
   const birthdateInput = document.querySelector("#birthdate");
+  
+  if(!firstNameInput.value.trim() ||
+    !lastNameInput.value.trim() || 
+    !usernameInput.value.trim() ||
+    !birthdateInput.value.trim()) {
+      alert("Please fill the important fields.");
+      return;
+  }
 
   fetch(updateEndpointLocation, {
     method: "POST",
@@ -114,6 +125,13 @@ function changePassword() {
   const currentPasswordInput = document.querySelector("#old_password");
   const newPasswordInput = document.querySelector("#new_password");
   const confirmPasswordInput = document.querySelector("#confirm_new_password");
+  
+  if(!currentPasswordInput.value.trim() ||
+    !newPasswordInput.value.trim() ||
+    !confirmPasswordInput.value.trim()) {
+        alert("Please fill the important fields.");
+        return;
+    }
 
   fetch(updatePasswordEndpoint, {
     method: "POST",
