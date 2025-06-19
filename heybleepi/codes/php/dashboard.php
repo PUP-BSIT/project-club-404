@@ -380,10 +380,12 @@ $unreadResult->close();
               <div class="media-actions">
                 <button type="button" class="media-upload-btn photo" onclick="document.getElementById('postImageInput').click()">+ Photo</button>
                 <button type="button" class="media-upload-btn video" onclick="document.getElementById('postVideoInput').click()">+ Video</button>
+
                 <!-- Hidden File Inputs -->
                 <input type="file" name="post_images[]" accept="image/*" multiple id="postImageInput" hidden>
                 <input type="file" name="post_videos[]" accept="video/*" multiple id="postVideoInput" hidden>
               </div>
+             
               <div class="minor-actions">
                 <button class="icon-btn" type="button"><i class="ri-map-pin-line"></i></button>
               </div>
