@@ -239,47 +239,50 @@ if ($usersResult) {
   <body class="page profile-page">
     <!-- Top Navbar -->
     <header class="top-nav glass">
-      <h1 class="brand">HEYBLEEPI</h1>
-      <nav class="nav-actions">
-        <a class="icon-btn" href="dashboard.php" title="Home"><i class="ri-home-4-line"></i></a>
+      <div style="display: flex; align-items: center; width: 100%; justify-content: space-between;">
+        <h1 class="brand">HEYBLEEPI</h1>
 
-        <a class="icon-btn" href="messages.php" title="Messages">
-          <i class="ri-message-3-line"></i>
-          <?php if ($unreadMessages > 0): ?>
-            <span class="badge  badge--message"><?= $unreadMessages ?></span>
-          <?php endif; ?>
-        </a>
+        <nav class="nav-actions">
+          <a class="icon-btn" href="dashboard.php" title="Home"><i class="ri-home-4-line"></i></a>
 
-        <div class="notification-wrapper" id="notification_wrapper">
-          <button class="icon-btn" id="notificationBtn" aria-label="Notifications">
-            <i class="ri-notification-3-line ri-lg"></i>
-            <?php if ($unread_count > 0): ?>
-              <span class="badge" id="notification_count"><?= $unread_count ?></span>
+          <a class="icon-btn" href="messages.php" title="Messages">
+            <i class="ri-message-3-line"></i>
+            <?php if ($unreadMessages > 0): ?>
+              <span class="badge badge--message"><?= $unreadMessages ?></span>
             <?php endif; ?>
-          </button>
+          </a>
 
-          <div class="notification-dropdown" id="notification_dropdown">
-            <h4>Notifications</h4>
-            <ul>
-              <?php if (empty($notifications)): ?>
-                <li>No new notifications.</li>
-              <?php else: ?>
-                <?php foreach ($notifications as $notification): ?>
-                  <li>
-                    <strong><?= htmlspecialchars($notification['actor_first_name'] . ' ' . $notification['actor_last_name']) ?></strong>
-                    <?= htmlspecialchars($notification['type']) ?> your post.
-                    <br><small><?= date("M d, g:i A", strtotime($notification['created_at'])) ?></small>
-                  </li>
-                <?php endforeach; ?>
+          <div class="notification-wrapper" id="notification_wrapper">
+            <button class="icon-btn" id="notificationBtn" aria-label="Notifications">
+              <i class="ri-notification-3-line ri-lg"></i>
+              <?php if ($unread_count > 0): ?>
+                <span class="badge" id="notification_count"><?= $unread_count ?></span>
               <?php endif; ?>
-            </ul>
+            </button>
 
-            <form method="POST" action="mark_notifications_read.php">
-              <button class="mark-read" type="submit" name="mark_read" id="markAllReadBtn">Mark all as read</button>
-            </form>
+            <div class="notification-dropdown" id="notification_dropdown">
+              <h4>Notifications</h4>
+              <ul>
+                <?php if (empty($notifications)): ?>
+                  <li>No new notifications.</li>
+                <?php else: ?>
+                  <?php foreach ($notifications as $notification): ?>
+                    <li>
+                      <strong><?= htmlspecialchars($notification['actor_first_name'] . ' ' . $notification['actor_last_name']) ?></strong>
+                      <?= htmlspecialchars($notification['type']) ?> your post.
+                      <br><small><?= date("M d, g:i A", strtotime($notification['created_at'])) ?></small>
+                    </li>
+                  <?php endforeach; ?>
+                <?php endif; ?>
+              </ul>
+
+              <form method="POST" action="mark_notifications_read.php">
+                <button class="mark-read" type="submit" name="mark_read" id="markAllReadBtn">Mark all as read</button>
+              </form>
+            </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      </div>
     </header>
 
     <!-- Main Layout -->
@@ -295,8 +298,8 @@ if ($usersResult) {
           </div>
           <?php if ($userId == $_SESSION['id']): ?>
           <div class="profile-buttons">
-            <button class="btn btn--primary">Add to Story</button>
-            <button class="btn btn--secondary" onclick="window.location.href='profile_edit.php'">Edit Profile</button>
+            <button class="btn btn--action">Add to Story</button>
+            <button class="btn btn--action" onclick="window.location.href='profile_edit.php'">Edit Profile</button>
           </div>
           <?php endif; ?>
         </div>
@@ -362,7 +365,7 @@ if ($usersResult) {
           <section class="glass card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
               <h4 class="card-title" style="margin: 0;">Albums</h4>
-              <a href="create_album.php" class="btn btn--primary" style="font-size: 0.95em; padding: 6px 16px;">+ Create Album</a>
+              <a href="create_album.php" class="btn btn--action create-album-btn" style="font-size: 0.95em; padding: 6px 16px;">+ Create Album</a>
             </div>
             <div class="photo-grid">
               <?php if (empty($albums)): ?>
@@ -406,10 +409,12 @@ if ($usersResult) {
                   <input type="file" name="post_videos[]" accept="video/*" multiple id="postVideoInput" hidden>
                 </div>
                 <div class="minor-actions">
-                  <button class="icon-btn" type="button"><i class="ri-emotion-line"></i></button>
-                  <button class="icon-btn" type="button"><i class="ri-map-pin-line"></i></button>
+                  <input type="hidden" name="location" id="postLocation">
+                  <button class="icon-btn" type="button" id="getLocationBtn" title="Add location">
+                    <i class="ri-map-pin-line"></i>
+                  </button>
                 </div>
-                <button class="btn btn--primary" type="submit">Post</button>
+                <button class="btn btn--action" type="submit">Post</button>
               </div>
             </form>
           </div>

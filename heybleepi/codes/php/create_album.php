@@ -1,3 +1,4 @@
+
 <?php
 session_start();
 require_once 'configuration.php';
@@ -28,7 +29,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   foreach ($_FILES['media_files']['tmp_name'] as $index => $tmpPath) {
     if ($_FILES['media_files']['error'][$index] === UPLOAD_ERR_OK) {
       $originalName = basename($_FILES['media_files']['name'][$index]);
-      $mediaType = explode('/', $_FILES['media_files']['type'][$index])[0]; // image/video
+
+      $mimeType = mime_content_type($tmpPath);
+      $mediaType = strpos($mimeType, 'video') !== false ? 'video' :
+                  (strpos($mimeType, 'image') !== false ? 'image' : 'other');
+
+      if (!in_array($mediaType, ['image', 'video'])) {
+        continue; // Skip unsupported files
+      }
+
       $uniqueName = time() . '_' . $index . '_' . $originalName;
       $targetPath = $uploadDir . $uniqueName;
 
@@ -54,141 +63,125 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <link rel="stylesheet" href="stylesheet/dashboard.css">
   <style>
     .album-form-container {
-      max-width: 600px;
-      margin: 30px auto;
-      background: #fff;
+      max-width: 800px;
+      margin: 60px auto;
+      background: rgba(255, 255, 255, 0.05);
       padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    }
-    input, textarea, select {
-      width: 100%;
-      margin-bottom: 1rem;
-      padding: 0.8rem;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    input[type="file"] {
-      border: none;
-    }
-    button {
-      padding: 0.8rem 1.5rem;
-      border: none;
-      border-radius: 5px;
-      background-color: var(--primary, #4CAF50);
+      border-radius: 16px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       color: white;
+      overflow: visible;
+    }
+    .album-form-container h2 {
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      margin-bottom: 1rem;
+    }
+    input, textarea {
+      padding: 0.75rem;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.05);
+      color: white;
+    }
+    input::file-selector-button {
+      background: var(--primary);
+      color: white;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 8px;
+      margin-right: 10px;
       cursor: pointer;
+    }
+    .media-upload-btn {
+      background: linear-gradient(90deg, var(--primary), #6f8eff);
+      color: white;
+      padding: 0.6rem 1.2rem;
+      border-radius: 9999px;
+      margin: 0.5rem 0;
+      display: inline-block;
+      cursor: pointer;
+      text-align: center;
+    }
+    .btn-submit {
+      background: var(--primary);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 9999px;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+      display: block;
+      width: 100%;
+      margin-top: 1rem;
     }
     #albumPreview {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 12px;
       margin-top: 15px;
+      max-height: none;
     }
-
-    #albumPreview img,
-    #albumPreview video {
-      border-radius: 8px;
-      max-width: 150px;
-      max-height: 150px;
+    #albumPreview img, #albumPreview video {
+      border-radius: 12px;
+      max-width: 120px;
+      max-height: 120px;
       object-fit: cover;
     }
 
-    /* Layout classes */
-    .layout-grid img,
-    .layout-grid video {
-      flex: 1 0 calc(33% - 10px);
-      max-width: calc(33.33% - 10px);
-      height: 120px;
-    }
+    @media (max-width: 768px) {
+      .album-form-container {
+        padding: 1rem;
+        max-width: 95vw;
+      }
 
-    .layout-collage img:nth-child(1),
-    .layout-collage video:nth-child(1) {
-      flex: 2 0 calc(66% - 10px);
-      max-width: calc(66.66% - 10px);
-      height: 200px;
+      #albumPreview img,
+      #albumPreview video {
+        max-width: 100px;
+        max-height: 100px;
+      }
     }
-
-    .layout-collage img,
-    .layout-collage video {
-      flex: 1 0 calc(33% - 10px);
-      max-width: calc(33.33% - 10px);
-      height: 100px;
-    }
-
-    .layout-row img,
-    .layout-row video {
-      flex: 1 0 100%;
-      max-width: 100%;
-      height: auto;
-    }
-
   </style>
 </head>
 <body class="page">
-
   <div class="album-form-container">
+    <h2>Create Album</h2>
     <form action="create_album.php" method="POST" enctype="multipart/form-data">
-      <label>Album Title:</label>
-      <input type="text" name="title" required><br>
-
-      <label>Description:</label>
-      <textarea name="description"></textarea><br>
-
-      <label>Choose Layout:</label>
-      <select name="layout" id="layoutSelect" onchange="updateLayoutPreview()">
-        <option value="grid">Grid</option>
-        <option value="collage">Collage</option>
-        <option value="row">Row</option>
-      </select><br><br>
-
-       <div id="media-container">
-        <input type="file" name="media_files[]" accept="image/*,video/*" required>
+      <div class="form-field">
+        <label>Album Title:</label>
+        <input type="text" name="title" required>
       </div>
 
-      <button type="button" onclick="addFileInput()">+ Add More</button>
+      <div class="form-field">
+        <label>Description:</label>
+        <textarea name="description" rows="3"></textarea>
+      </div>
 
-      <button type="submit">Create Album</button>
+      <div class="form-field" style="gap: 1rem;">
+        <input type="file" id="photoInput" name="media_files[]" accept="image/*" style="display: none;" multiple>
+        <input type="file" id="videoInput" name="media_files[]" accept="video/*" style="display: none;" multiple>
+
+        <button type="button" class="media-upload-btn photo" onclick="document.getElementById('photoInput').click()">+ Photo</button>
+        <button type="button" class="media-upload-btn video" onclick="document.getElementById('videoInput').click()">+ Video</button>
+      </div>
+
+
+      <div id="albumPreview"></div>
+
+      <button class="btn-submit" type="submit">Create Album</button>
     </form>
-
-    <!-- Layout Preview -->
-    <h4>Album Preview:</h4>
-    <div id="layoutPreview" style="margin-top:10px;">
-      <img id="layoutImage" src="layouts/grid.png" style="max-width:200px; border: 1px solid #ccc;">
-    </div>
   </div>
 
   <script>
-    function addFileInput() {
-      const container = document.getElementById('media-container');
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.name = 'media_files[]';
-      input.accept = 'image/*,video/*';
-      container.appendChild(input);
-    }
-
-    const container = document.getElementById('media-container');
-    const preview = document.getElementById('albumPreview');
-    const layoutSelect = document.getElementById('layoutSelect');
-
-    function addFileInput() {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.name = 'media_files[]';
-      input.accept = 'image/*,video/*';
-      input.addEventListener('change', previewMedia);
-      container.appendChild(input);
-    }
-
-    function previewMedia() {
-      preview.innerHTML = ''; // clear old previews
-
-      const files = [...document.querySelectorAll('input[type="file"][name="media_files[]"]')]
-        .map(input => input.files[0])
-        .filter(f => f);
-
-      files.forEach(file => {
+    function previewMedia(files) {
+      const preview = document.getElementById('albumPreview');
+      Array.from(files).forEach(file => {
         const type = file.type.split('/')[0];
         const url = URL.createObjectURL(file);
 
@@ -203,19 +196,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           preview.appendChild(vid);
         }
       });
-
-      updateLayoutPreview();
     }
 
-    function updateLayoutPreview() {
-      const layout = layoutSelect.value;
-      preview.className = ''; // clear all classes
-      preview.classList.add(`layout-${layout}`);
-    }
+    document.getElementById('photoInput').addEventListener('change', function(e) {
+      previewMedia(e.target.files);
+    });
 
-    // Initial setup
-    document.querySelector('input[type="file"][name="media_files[]"]').addEventListener('change', previewMedia);
-    layoutSelect.addEventListener('change', updateLayoutPreview);
+    document.getElementById('videoInput').addEventListener('change', function(e) {
+      previewMedia(e.target.files);
+    });
   </script>
 
 </body>
