@@ -61,28 +61,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta charset="UTF-8">
   <title>Create Album</title>
   <link rel="stylesheet" href="stylesheet/dashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
   <style>
+    .back-to-profile {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+      padding: 0.5rem 1rem;
+      border-radius: 0px;
+      color: white;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(6px);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      margin-bottom: 1.5rem;
+      max-width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .back-to-profile .arrow {
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
     .album-form-container {
-      max-width: 800px;
+      width: 100%;
+      max-width: 1100px;
       margin: 60px auto;
       background: rgba(255, 255, 255, 0.05);
-      padding: 2rem;
+      padding: 2.5rem;
       border-radius: 16px;
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.1);
       color: white;
       overflow: visible;
+      box-sizing: border-box;
     }
+
     .album-form-container h2 {
       margin-bottom: 1.5rem;
       text-align: center;
     }
+
     .form-field {
       display: flex;
       flex-direction: column;
       gap: 0.25rem;
       margin-bottom: 1rem;
     }
+
     input, textarea {
       padding: 0.75rem;
       border-radius: 10px;
@@ -90,6 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       background: rgba(255, 255, 255, 0.05);
       color: white;
     }
+
     input::file-selector-button {
       background: var(--primary);
       color: white;
@@ -99,28 +131,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       margin-right: 10px;
       cursor: pointer;
     }
-    .media-upload-btn {
-      background: linear-gradient(90deg, var(--primary), #6f8eff);
-      color: white;
-      padding: 0.6rem 1.2rem;
-      border-radius: 9999px;
-      margin: 0.5rem 0;
-      display: inline-block;
-      cursor: pointer;
-      text-align: center;
+
+    .media-buttons {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1rem;
     }
-    .btn-submit {
-      background: var(--primary);
+
+    .media-upload-btn {
+      background: linear-gradient(90deg, #6f8eff, #ffb6e6);
       color: white;
-      padding: 0.75rem 1.5rem;
+      padding: 0.5rem 1.25rem;
+      border-radius: 9999px;
+      border: none;
+      font-size: 0.95rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.3s ease;
+    }
+
+    .submit-container {
+      display: flex;
+      justify-content: flex-end;
+      width: 100%;
+      margin-top: 1.5rem;
+    }
+
+    .btn-submit {
+      background: linear-gradient(to right, #4f8aff, #2f6ee5);
+      color: white;
+      padding: 0.65rem 1.5rem;
       border-radius: 9999px;
       border: none;
       cursor: pointer;
       font-weight: 500;
-      display: block;
-      width: 100%;
-      margin-top: 1rem;
+      width: auto;
+      display: inline-block;
+      text-align: center;
+      box-shadow: 0 0 0 transparent;
+      transition: all 0.3 ease-in-out;
     }
+
+    .btn-submit:hover {
+      box-shadow: 0 0 12px 3px rgba(79, 138, 255, 0.6);
+    }
+
+    .btn-submit:active {
+      box-shadow: 0 0 16px 4px rgba(47, 110, 229, 0.7);
+      transform: scale(0.98);
+    }
+
     #albumPreview {
       display: flex;
       flex-wrap: wrap;
@@ -128,11 +192,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       margin-top: 15px;
       max-height: none;
     }
+
     #albumPreview img, #albumPreview video {
       border-radius: 12px;
       max-width: 120px;
       max-height: 120px;
       object-fit: cover;
+    }
+
+    @media (max-width: 480px) {
+      .back-to-profile {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.75rem;
+        gap: 0.35rem;
+      }
+
+      .media-buttons {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .media-upload-btn {
+        width: 100%;
+        text-align: center;
+      }
+
+      .submit-container {
+        justify-content: center;
+      }
+
+      .btn-submit {
+        width: 100%;
+      }
     }
 
     @media (max-width: 768px) {
@@ -149,11 +240,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
   </style>
 </head>
+
 <body class="page">
+
+  <a href="profile.php" class="back-to-profile">
+    <span class="arrow">←</span> Back to Profile
+  </a>
+
   <div class="album-form-container">
     <h2>Create Album</h2>
     <form action="create_album.php" method="POST" enctype="multipart/form-data">
-      <div class="form-field">
+
+    <div class="form-field">
         <label>Album Title:</label>
         <input type="text" name="title" required>
       </div>
@@ -163,18 +261,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <textarea name="description" rows="3"></textarea>
       </div>
 
-      <div class="form-field" style="gap: 1rem;">
+      <!-- Media Buttons Row -->
+      <div class="form-field media-buttons">
         <input type="file" id="photoInput" name="media_files[]" accept="image/*" style="display: none;" multiple>
         <input type="file" id="videoInput" name="media_files[]" accept="video/*" style="display: none;" multiple>
 
-        <button type="button" class="media-upload-btn photo" onclick="document.getElementById('photoInput').click()">+ Photo</button>
-        <button type="button" class="media-upload-btn video" onclick="document.getElementById('videoInput').click()">+ Video</button>
+        <button type="button" class="media-upload-btn" onclick="document.getElementById('photoInput').click()">+ Photo</button>
+        <button type="button" class="media-upload-btn" onclick="document.getElementById('videoInput').click()">+ Video</button>
       </div>
 
-
+      <!-- Media Preview -->
       <div id="albumPreview"></div>
 
-      <button class="btn-submit" type="submit">Create Album</button>
+      <!-- Submit Button Bottom Right -->
+      <div class="submit-container">
+        <button class="btn-submit" type="submit">Create Album</button>
+      </div>
+
     </form>
   </div>
 
