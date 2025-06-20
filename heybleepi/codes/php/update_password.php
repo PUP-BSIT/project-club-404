@@ -8,8 +8,16 @@ if (!isset($_SESSION['username'])) {
 }
 
 $currentId = $_SESSION['id'];
-$currentUsername = $_SESSION['username'];
-$currentPassword = $_SESSION['password'];
+
+$sql = "SELECT * FROM users WHERE id = {$currentId}";
+$result = mysqli_query($conn, $sql);
+$currentPassword = null;
+
+if ($row = mysqli_fetch_assoc($result)) {
+    $currentPassword = $row['password'];
+} else {
+    die("Fetch Error.");
+}
 
 $currentPasswordInput = $_POST['password'];
 $newPassword = password_hash($_POST['new_password'], PASSWORD_DEFAULT);
@@ -19,14 +27,14 @@ if(password_verify($currentPasswordInput, $currentPassword)) {
           SET password = '${newPassword}' 
           WHERE id = ${currentId}";
   $result = mysqli_query($conn, $sql);
+} else {
+    die("Incorrect Current Password");
 }
 
 if(!$result) {
    echo "Error:" . $sql . "<br>" . mysqli_error($conn); 
-//   echo "Error occurred.";
 }
 
 echo "Password change success";
-$_SESSION['password'] = $newPassword; 
 mysqli_close($conn);
 ?>

@@ -20,16 +20,20 @@ $updatedBirthdate = $_POST['birthdate'] ?? "";
 
 // Update query
 $sql = "UPDATE users 
-        SET user_name ='${updatedUsername}', 
-        first_name='${updatedFirstName}', 
-        middle_name='${updatedMiddleName}', 
-        last_name='${updatedLastName}',
-        email='${updatedEmail}', 
-        birthdate='${updatedBirthdate}' 
-        WHERE id='${currentId}'";
+        SET user_name = '${updatedUsername}', 
+        first_name = '${updatedFirstName}', 
+        middle_name = '${updatedMiddleName}', 
+        last_name = '${updatedLastName}',
+        email = '${updatedEmail}', 
+        birthdate = '${updatedBirthdate}' 
+        WHERE id = '${currentId}';
+        
+        UPDATE messages 
+        SET user_name = '${updatedUsername}'
+        WHERE user_id = '${currentId}';
+    ";
       
-if(!mysqli_query($conn, $sql)) {
-  echo "Error:" . $sql . "<br>" . mysqli_error($conn); 
+if(!mysqli_multi_query($conn, $sql)) {
   echo "Failed to update account information";
 }
 
