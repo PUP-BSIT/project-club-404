@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./stylesheet/form_style.css" />
+    <link rel="stylesheet" href="\project-club-404\heybleepi\codes\stylesheet\form_style.css" />
   </head>
 
   <body>
@@ -192,6 +192,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </div>
     </div>
 
-    <script src="./script/form_script.js"></script>
+    <script src="project-club-404/heybleepi/codes/script/form_script.js"></script>
   </body>
 </html>
