@@ -116,7 +116,7 @@ $conn->close();
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@4.6.4/dist/index.min.js"></script>
-  <link rel="stylesheet" href="./stylesheet/messages.css" />
+  <link rel="stylesheet" href="../stylesheet/messages.css" />
 </head>
 <body class="page">
   <header class="top-nav glass">
@@ -159,7 +159,7 @@ $conn->close();
         <div class="message-preview">
           <div class="comment-box">
             <div class="comment-header">
-            <img src="./assets/profile/<?= htmlspecialchars($row['profile_picture'] ?? 'rawr.png') ?>" alt="Avatar" class="avatar avatar--sm" />
+            <img src="../assets/profile/<?= htmlspecialchars($row['profile_picture'] ?? 'rawr.png') ?>" alt="Avatar" class="avatar avatar--sm" />
               <div class="preview-text">
                 <h4><?= htmlspecialchars($row['user_name']) ?></h4>
                 <p><?= htmlspecialchars($row['message']) ?></p>
@@ -186,6 +186,6 @@ $conn->close();
     <?php endif; ?>
   </div>
 
-  <script src="./script/messages.js"></script>
+  <script src="../script/messages.js"></script>
 </body>
 </html>
