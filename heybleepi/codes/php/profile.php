@@ -196,7 +196,7 @@ function getAlbumCover($albumId, $conn) {
   $stmt->bind_result($path);
   $stmt->fetch();
   $stmt->close();
-  return $path ? $path : './assets/profile/default.png';
+  return $path ? $path : '../assets/profile/default.png';
 }
 
 // Fetch all user images and videos for tabs
@@ -227,12 +227,12 @@ if ($usersResult) {
     <title>HEYBLEEPI | <?php echo htmlspecialchars($user['user_name']); ?>'s Profile</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="./stylesheet/dashboard.css" />
+    <link rel="stylesheet" href="../stylesheet/dashboard.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
     <script>
       const CURRENT_USER_NAME = <?= json_encode($user['first_name'] . ' ' . $user['last_name']) ?>;
       const CURRENT_USER_USERNAME = <?= json_encode($user['user_name']) ?>;
-      const CURRENT_USER_AVATAR = <?= json_encode("./assets/profile/" . ($user['avatar'] ?? "rawr.png")) ?>;
+      const CURRENT_USER_AVATAR = <?= json_encode("../assets/profile/" . ($user['avatar'] ?? "rawr.png")) ?>;
     </script>
   </head>
 
@@ -288,9 +288,9 @@ if ($usersResult) {
     <main class="profile-container">
       <!-- Banner + Profile info -->
       <div class="profile-top glass">
-        <img class="banner-img" src="./assets/profile/<?= htmlspecialchars($user['profile_cover'] ?? 'banner.jpg') ?>" alt="Banner" />
+        <img class="banner-img" src="../assets/profile/<?= htmlspecialchars($user['profile_cover'] ?? 'banner.jpg') ?>" alt="Banner" />
         <div class="profile-info-bar">
-          <img class="avatar avatar--sm2" src="./assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>" alt="">
+          <img class="avatar avatar--sm2" src="../assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>" alt="">
           <div class="user-basic-info">
             <h2><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></h2>
             <p>@<?= htmlspecialchars($user['user_name']) ?></p>
@@ -389,7 +389,7 @@ if ($usersResult) {
           <div class="glass create-post">
             <form method="POST" action="profile.php" enctype="multipart/form-data">
               <div class="create-post-header">
-                <img class="avatar avatar--sm" src="./assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>" alt="">
+                <img class="avatar avatar--sm" src="../assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>" alt="">
                 <div class="poster-info">
                   <a href="profile.php" class="poster-name"><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></a>
                   <p>@<?= htmlspecialchars($user['user_name']); ?></p>
@@ -466,7 +466,7 @@ if ($usersResult) {
 
             <article class="glass post">
               <header class="post-header">
-                <img class="avatar avatar--sm" src="./assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>" alt="User Avatar">
+                <img class="avatar avatar--sm" src="../assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>" alt="User Avatar">
                 <div>
                   <h4><?= htmlspecialchars($post['first_name'] . ' ' . $post['last_name']) ?></h4>
                   <time><?= date("M d, g:i A", strtotime($post['created_at'])) ?></time>
@@ -648,7 +648,7 @@ if ($usersResult) {
                 $profilePic = !empty($user['profile_picture']) ? $user['profile_picture'] : 'rawr.png';
               ?>
               <li style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-                <img class="avatar avatar--sm" src="./assets/profile/<?= htmlspecialchars($profilePic) ?>" alt="">
+                <img class="avatar avatar--sm" src="../assets/profile/<?= htmlspecialchars($profilePic) ?>" alt="">
                 <div>
                   <strong><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></strong>
                   <div style="font-size:0.85em;color:#aaa;">@<?= htmlspecialchars($user['user_name']) ?></div>
@@ -691,6 +691,6 @@ if ($usersResult) {
         });
       });
     </script>
-    <script src="./script/dashboard.js"></script>
+    <script src="../script/dashboard.js"></script>
   </body>
 </html>
