@@ -207,7 +207,7 @@ $unreadResult->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>HEYBLEEPI! – Social Media Dashboard</title>
 
-    <link rel="stylesheet" href="./stylesheet/dashboard.css" />
+    <link rel="stylesheet" href="../stylesheet/dashboard.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
@@ -272,9 +272,9 @@ $unreadResult->close();
         <!-- Profile Card -->
         <section class="glass card card--profile">
           <?php
-          $postAvatarPath = './assets/profile/' . ($_SESSION['avatar'] ?? 'default.png');
+          $postAvatarPath = '../assets/profile/' . ($_SESSION['avatar'] ?? 'rawr.png');
           if (!file_exists($postAvatarPath)) {
-            $postAvatarPath = './assets/profile/default.png';
+            $postAvatarPath = '../assets/profile/default.png';
           }
           ?>
           <img class="avatar avatar--sm" src="<?= $postAvatarPath ?>" alt="">
@@ -358,9 +358,9 @@ $unreadResult->close();
             <div class="create-post-header">
 
               <?php
-              $postAvatarPath = './assets/profile/' . ($_SESSION['avatar'] ?? 'default.png');
+              $postAvatarPath = '../assets/profile/' . ($_SESSION['avatar'] ?? 'rawr.png');
               if (!file_exists($postAvatarPath)) {
-                $postAvatarPath = './assets/profile/default.png';
+                $postAvatarPath = '../assets/profile/default.png';
               }
               ?>
               <img class="avatar avatar--sm" src="<?= $postAvatarPath ?>" alt="">
@@ -420,7 +420,7 @@ $unreadResult->close();
           <article class="glass post">
             <header class="post-header">
               <a href="profile.php?user=<?= urlencode($post['user_name']) ?>">
-                <img class="avatar avatar--sm" src="./assets/profile/<?= htmlspecialchars($post['profile_picture'] ?? 'default.png') ?>" alt="">
+                <img class="avatar avatar--sm" src="../assets/profile/<?= htmlspecialchars($post['profile_picture'] ?? 'default.png') ?>" alt="">
               </a>
               <div>
                 <!-- Make user's name a link to their profile page -->
@@ -618,6 +618,6 @@ $unreadResult->close();
       <div class="lightbox-content" id="lightboxContent"></div>
     </div>
 
-    <script src="./script/dashboard.js"></script>
+    <script src="../script/dashboard.js"></script>
   </body>
 </html>
