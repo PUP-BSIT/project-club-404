@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               <h1 class="heading">HeyBleepi</h1>
               <p class="subheading">Connect with friends across the galaxy</p>
               <div class="image-container">
-                <img src="./assets/heybleepi-mascot.jpg" alt="HeyBleepi Cat Mascot" class="mascot" />
+                <img src="../assets/heybleepi-mascot.jpg" alt="HeyBleepi Cat Mascot" class="mascot" />
               </div>
               <p class="description">
                 Join thousands of space explorers connecting across the universe
@@ -122,11 +122,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="social-connection">
                   <button type="button" class="account-btn">
-                    <img src="./assets/connected_accounts/devhive.jpg" alt="Devhive logo">
+                    <img src="../assets/connected_accounts/devhive.jpg" alt="Devhive logo">
                     Devhive
                   </button>
                   <button type="button" class="account-btn">
-                    <img src="./assets/connected_accounts/hershell.png" alt="Hershell logo">
+                    <img src="../assets/connected_accounts/hershell.png" alt="Hershell logo">
                     Hershell
                   </button>
                 </div>
