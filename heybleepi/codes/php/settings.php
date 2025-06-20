@@ -30,7 +30,7 @@ if ($result->num_rows > 0) {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
-    <link href="./stylesheet/settings.css" rel="stylesheet">
+    <link href="../stylesheet/settings.css" rel="stylesheet">
     <title>Settings</title>
   </head>
 
@@ -208,22 +208,6 @@ if ($result->num_rows > 0) {
               Save Changes
           </button>
         </form>
-
-        <div id="connected_accts_container">
-          <h4>Connected Accounts</h4>
-          <div class="account-buttons">
-
-            <button class="account-btn">
-              <img src="./assets/connected_accounts/devhive.jpg" alt="devhive">
-              Connect to Devhive
-            </button>
-
-            <button class="account-btn">
-              <img src="./assets/connected_accounts/hershell.png" alt="hershell">
-              Connect to Hershell
-            </button>
-          </div>
-        </div>
       </div>
 
       <div id="privacy_settings_container" 
@@ -291,6 +275,6 @@ if ($result->num_rows > 0) {
     </div>
     <!-- End of Section -->
 
-    <script src="./script/settings.js"></script>
+    <script src="../script/settings.js"></script>
   </body>
 </html>
