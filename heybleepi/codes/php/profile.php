@@ -203,7 +203,7 @@ function getAlbumCover($albumId, $conn) {
 $userImages = array_filter($mediaPosts, function($m) { return $m['media_type'] === 'image'; });
 $userVideos = array_filter($mediaPosts, function($m) { return $m['media_type'] === 'video'; });
 // For gallery, get only the 9 latest images
-$galleryImages = array_slice($userImages, 0, 10);
+$galleryImages = array_slice($userImages, 0, 9);
 
 // Fetch all users except the current user for the friends tab
 $allUsers = [];
@@ -239,50 +239,49 @@ if ($usersResult) {
   <body class="page profile-page">
     <!-- Top Navbar -->
     <header class="top-nav glass">
-      <div style="display: flex; align-items: center; width: 100%; justify-content: space-between;">
+      <a href="dashboard.php" style="text-decoration: none; color: inherit;">
         <h1 class="brand">HEYBLEEPI</h1>
+      </a>
+      <nav class="nav-actions">
+        <a class="icon-btn" href="dashboard.php" title="Home"><i class="ri-home-4-line"></i></a>
 
-        <nav class="nav-actions">
-          <a class="icon-btn" href="dashboard.php" title="Home"><i class="ri-home-4-line"></i></a>
+        <a class="icon-btn" href="messages.php" title="Messages">
+          <i class="ri-message-3-line"></i>
+          <?php if ($unreadMessages > 0): ?>
+            <span class="badge  badge--message"><?= $unreadMessages ?></span>
+          <?php endif; ?>
+        </a>
 
-          <a class="icon-btn" href="messages.php" title="Messages">
-            <i class="ri-message-3-line"></i>
-            <?php if ($unreadMessages > 0): ?>
-              <span class="badge badge--message"><?= $unreadMessages ?></span>
+        <div class="notification-wrapper" id="notification_wrapper">
+          <button class="icon-btn" id="notificationBtn" aria-label="Notifications">
+            <i class="ri-notification-3-line ri-lg"></i>
+            <?php if ($unread_count > 0): ?>
+              <span class="badge" id="notification_count"><?= $unread_count ?></span>
             <?php endif; ?>
-          </a>
+          </button>
 
-          <div class="notification-wrapper" id="notification_wrapper">
-            <button class="icon-btn" id="notificationBtn" aria-label="Notifications">
-              <i class="ri-notification-3-line ri-lg"></i>
-              <?php if ($unread_count > 0): ?>
-                <span class="badge" id="notification_count"><?= $unread_count ?></span>
+          <div class="notification-dropdown" id="notification_dropdown">
+            <h4>Notifications</h4>
+            <ul>
+              <?php if (empty($notifications)): ?>
+                <li>No new notifications.</li>
+              <?php else: ?>
+                <?php foreach ($notifications as $notification): ?>
+                  <li>
+                    <strong><?= htmlspecialchars($notification['actor_first_name'] . ' ' . $notification['actor_last_name']) ?></strong>
+                    <?= htmlspecialchars($notification['type']) ?> your post.
+                    <br><small><?= date("M d, g:i A", strtotime($notification['created_at'])) ?></small>
+                  </li>
+                <?php endforeach; ?>
               <?php endif; ?>
-            </button>
+            </ul>
 
-            <div class="notification-dropdown" id="notification_dropdown">
-              <h4>Notifications</h4>
-              <ul>
-                <?php if (empty($notifications)): ?>
-                  <li>No new notifications.</li>
-                <?php else: ?>
-                  <?php foreach ($notifications as $notification): ?>
-                    <li>
-                      <strong><?= htmlspecialchars($notification['actor_first_name'] . ' ' . $notification['actor_last_name']) ?></strong>
-                      <?= htmlspecialchars($notification['type']) ?> your post.
-                      <br><small><?= date("M d, g:i A", strtotime($notification['created_at'])) ?></small>
-                    </li>
-                  <?php endforeach; ?>
-                <?php endif; ?>
-              </ul>
-
-              <form method="POST" action="mark_notifications_read.php">
-                <button class="mark-read" type="submit" name="mark_read" id="markAllReadBtn">Mark all as read</button>
-              </form>
-            </div>
+            <form method="POST" action="mark_notifications_read.php">
+              <button class="mark-read" type="submit" name="mark_read" id="markAllReadBtn">Mark all as read</button>
+            </form>
           </div>
-        </nav>
-      </div>
+        </div>
+      </nav>
     </header>
 
     <!-- Main Layout -->
@@ -296,18 +295,16 @@ if ($usersResult) {
             <h2><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></h2>
             <p>@<?= htmlspecialchars($user['user_name']) ?></p>
           </div>
-          <?php if ($userId == $_SESSION['id']): ?>
           <div class="profile-buttons">
-            <button class="btn btn--action">Add to Story</button>
-            <button class="btn btn--action" onclick="window.location.href='profile_edit.php'">Edit Profile</button>
+            <button class="btn btn--primary">Add to Story</button>
+            <button class="btn btn--secondary" onclick="window.location.href='profile_edit.php'">Edit Profile</button>
           </div>
-          <?php endif; ?>
         </div>
       </div>
 
       <nav class="profile-tabs glass" id="profileTabs">
         <a class="tab active" href="#" data-tab="posts">Posts</a>
-        <a class="tab" href="#" data-tab="friends">Users</a>
+        <a class="tab" href="#" data-tab="friends">Friends</a>
         <a class="tab" href="#" data-tab="photos">Photos</a>
         <a class="tab" href="#" data-tab="videos">Videos</a>
         <a class="tab" href="#" data-tab="more">More</a>
@@ -365,7 +362,7 @@ if ($usersResult) {
           <section class="glass card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
               <h4 class="card-title" style="margin: 0;">Albums</h4>
-              <a href="create_album.php" class="btn btn--action create-album-btn" style="font-size: 0.95em; padding: 6px 16px;">+ Create Album</a>
+              <a href="create_album.php" class="btn btn--primary" style="font-size: 0.95em; padding: 6px 16px;">+ Create Album</a>
             </div>
             <div class="photo-grid">
               <?php if (empty($albums)): ?>
@@ -409,12 +406,10 @@ if ($usersResult) {
                   <input type="file" name="post_videos[]" accept="video/*" multiple id="postVideoInput" hidden>
                 </div>
                 <div class="minor-actions">
-                  <input type="hidden" name="location" id="postLocation">
-                  <button class="icon-btn" type="button" id="getLocationBtn" title="Add location">
-                    <i class="ri-map-pin-line"></i>
-                  </button>
+                  <button class="icon-btn" type="button"><i class="ri-emotion-line"></i></button>
+                  <button class="icon-btn" type="button"><i class="ri-map-pin-line"></i></button>
                 </div>
-                <button class="btn btn--action" type="submit">Post</button>
+                <button class="btn btn--primary" type="submit">Post</button>
               </div>
             </form>
           </div>
@@ -596,16 +591,8 @@ if ($usersResult) {
                       <small style="color:gray;"> – <?= date("M d, g:i A", strtotime($comment['commented_at'])) ?></small>
 
                       <?php if ($comment['user_id'] == $_SESSION['id']): ?>
-                        <div class="comment-options">
-                          <button class="icon-btn toggle-comment-options" aria-label="Options">
-                            <i class="ri-more-fill"></i>
-                          </button>
-                          <ul class="comment-dropdown hidden">
-                            <li><button class="btn--sm btn-edit-comment" data-id="<?= $comment['id'] ?>">Edit</button></li>
-                            <li><button class="btn--sm btn-delete-comment" data-id="<?= $comment['id'] ?>">Delete</button></li>
-                          </ul>
-                        </div>
-
+                        <button class="btn--sm btn-edit-comment" data-id="<?= $comment['id'] ?>">Edit</button>
+                        <button class="btn--sm btn-delete-comment" data-id="<?= $comment['id'] ?>">Delete</button>
                       <?php endif; ?>
                     </div>
                   <?php endwhile; ?>
@@ -658,7 +645,7 @@ if ($usersResult) {
           <ul style="list-style:none; padding:0; margin:0;">
             <?php foreach ($allUsers as $user): ?>
               <?php
-                $profilePic = !empty($user['profile_picture']) ? $user['profile_picture'] : 'default.png';
+                $profilePic = !empty($user['profile_picture']) ? $user['profile_picture'] : 'rawr.png';
               ?>
               <li style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
                 <img class="avatar avatar--sm" src="./assets/profile/<?= htmlspecialchars($profilePic) ?>" alt="">
