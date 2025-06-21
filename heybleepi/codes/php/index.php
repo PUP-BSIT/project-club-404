@@ -121,14 +121,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <div class="social-connection">
-                  <button type="button" class="account-btn">
-                    <img src="../assets/connected_accounts/devhive.jpg" alt="Devhive logo">
+                  <a href="oauth_login.php?provider=devhive" class="account-btn">
+                    <img src="./assets/connected_accounts/devhive.jpg" alt="Devhive logo">
                     Devhive
-                  </button>
-                  <button type="button" class="account-btn">
-                    <img src="../assets/connected_accounts/hershell.png" alt="Hershell logo">
+                  </a>
+                  <a href="oauth_login.php?provider=hershive" class="account-btn">
+                    <img src="./assets/connected_accounts/hershell.png" alt="Hershell logo">
                     Hershell
-                  </button>
+                  </a>
                 </div>
               </form>
 
