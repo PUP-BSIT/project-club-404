@@ -109,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <span class="checkmark"></span>
                     <span>Remember me</span>
                   </label>
-                  <a href="#" class="link">Forgot password?</a>
+                  <a href="forgot_password.php" class="link">Forgot password?</a>
                 </div>
 
                 <button type="submit" name="login" class="auth-button">Login</button>
