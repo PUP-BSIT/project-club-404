@@ -1,5 +1,6 @@
 body {
-  background: url(../assets/dark_mode.jpg);
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(to right, #1e293b, #0f172a);
   background-size: cover;
   background-attachment: fixed;
   margin: 0;
@@ -21,7 +22,7 @@ body {
 
 .hide-overlay {
   display: none;
-} 
+}
 
 .show-delete-acc-prompt {
   position: fixed;
@@ -84,8 +85,8 @@ body {
 }
 
 #buttons_container button:hover,
-#buttons_container button:focus, 
-#buttons_container .back-to-dashboard:hover{
+#buttons_container button:focus,
+#buttons_container .back-to-dashboard:hover {
   background: rgba(255, 255, 255, 0.15);
   font-weight: bold;
 }
@@ -121,7 +122,7 @@ body {
 }
 
 /* Account Information Container */
-.show-account-info { 
+.show-account-info {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -156,12 +157,11 @@ body {
   gap: 1rem;
 }
 
-#account_information_container
-#save_btn {
+#account_information_container #save_btn {
   padding: 5px;
   border-radius: 5px;
   border: 1px solid #ccc;
-  width: 20em;  
+  width: 20em;
 }
 
 #account_information_container h2,
@@ -240,7 +240,7 @@ body {
   font-size: medium;
 }
 
-.acct-info-input::placeholder  {
+.acct-info-input::placeholder {
   color: rgba(255, 255, 255, .40);
 }
 
@@ -346,8 +346,7 @@ body {
   gap: 1em;
 }
 
-#privacy_settings_container
-#change_password_btn,
+#privacy_settings_container #change_password_btn,
 #delete_account_btn {
   padding: px;
   border-radius: 5px;
@@ -382,7 +381,9 @@ body {
   margin-left: 35px;
 }
 
-.old-pass, .new-pass, .confirm-pass {
+.old-pass,
+.new-pass,
+.confirm-pass {
   height: 8vh;
   width: 30vw;
   border-radius: 5px;
@@ -393,8 +394,8 @@ body {
   font-size: large;
 }
 
-.old-pass::placeholder, 
-.new-pass::placeholder, 
+.old-pass::placeholder,
+.new-pass::placeholder,
 .confirm-pass::placeholder {
   color: rgba(255, 255, 255, .40);
 }
@@ -529,12 +530,6 @@ body {
   text-decoration: none;
   padding: 10px 20px;
 }
-
-.back-to-dashboard:hover {
-    
-}
-
-/* Responsiveness */
 
 /* Mobile S */
 @media (max-width: 320px) {
@@ -876,7 +871,7 @@ body {
     gap: 1em;
     width: auto;
   }
-  
+
   .new-pass {
     display: flex;
     flex-direction: column;
@@ -1066,7 +1061,7 @@ body {
     gap: 1em;
     width: auto;
   }
-  
+
   .new-pass {
     display: flex;
     flex-direction: column;
