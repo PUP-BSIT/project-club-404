@@ -30,7 +30,7 @@ if ($result->num_rows > 0) {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
-    <link href="./stylesheet/settings.css" rel="stylesheet">
+    <link href="../stylesheet/settings.css" rel="stylesheet">
     <title>Settings</title>
   </head>
 
@@ -93,18 +93,20 @@ if ($result->num_rows > 0) {
         <button
           type="button"
           id="acct_info_btn"
-          onClick="switchToAccountInformation()">
+          onClick="switchToAccountInformation()"
+          title="Account Information">
             <span class="material-symbols-outlined">manage_accounts</span>
         </button>
 
         <button
           type="button"
           id="privacy_settings_btn"
-          onClick="switchToPrivacySettings()">
+          onClick="switchToPrivacySettings()"
+          title="Privacy and Security">
            <span class="material-symbols-outlined">security</span>
         </button>
 
-        <a href="dashboard.php" class="back-to-dashboard">
+        <a href="dashboard.php" class="back-to-dashboard" title="Back to dashboard">
           <span class="material-symbols-outlined">
             home
           </span>
@@ -113,7 +115,8 @@ if ($result->num_rows > 0) {
         <button 
           type="button" 
           id="logout_btn"
-          onClick="showLogoutPrompt()">
+          onClick="showLogoutPrompt()"
+          title="LOGOUT">
             <span class="material-symbols-outlined">logout</span></button>
       </div>
     </div>
@@ -125,7 +128,7 @@ if ($result->num_rows > 0) {
         class="show-account-info">
         <h2>Account Information</h2>
         <p>Here you can view and edit your account information.</p>
-        <form>
+        <form required>
           <div>
             <label for="first_name">First Name</label>
             <input
@@ -170,7 +173,8 @@ if ($result->num_rows > 0) {
               name="username_input"
               class="acct-info-input"
               value="<?php echo htmlspecialchars($user['user_name']); ?>"
-              required>
+              required
+              <?php if (isset($_SESSION['oauth_provider'])) echo 'readonly style="background-color: #8f9585; cursor: not-allowed;"'; ?>>
           </div>
 
           <div>
@@ -181,7 +185,8 @@ if ($result->num_rows > 0) {
               id="email"
               class="acct-info-input"
               value="<?php echo htmlspecialchars($user['email']); ?>"
-              required>
+              required
+              <?php if (isset($_SESSION['oauth_provider'])) echo 'readonly style="background-color: #8f9585; cursor: not-allowed;"'; ?>>
           </div>
 
           <div>
@@ -203,36 +208,22 @@ if ($result->num_rows > 0) {
               Save Changes
           </button>
         </form>
-
-        <div id="connected_accts_container">
-          <h4>Connected Accounts</h4>
-          <div class="account-buttons">
-
-            <button class="account-btn">
-              <img src="./assets/connected_accounts/devhive.jpg" alt="devhive">
-              Connect to Devhive
-            </button>
-
-            <button class="account-btn">
-              <img src="./assets/connected_accounts/hershell.png" alt="hershell">
-              Connect to Hershell
-            </button>
-          </div>
-        </div>
       </div>
 
       <div id="privacy_settings_container" 
         class="hide-privacy-settings">
         <h2>Privacy & Security</h2>
         <p>Here you can manage your password.</p>
-        <form>
+        <form required>
           <div class="old-pass-container">
             <label>Old Password</label>
             <input 
               type="password" 
               placeholder="Old Password"
               class="old-pass"
-              id="old_password">
+              id="old_password"
+              required
+              <?php if (isset($_SESSION['oauth_provider'])) echo 'readonly style="background-color: #8f9585; cursor: not-allowed;"'; ?>>
           </div>
 
           <div class="new-pass-container">
@@ -241,7 +232,9 @@ if ($result->num_rows > 0) {
               type="password" 
               placeholder="New Password"
               class="new-pass"
-              id="new_password">
+              id="new_password"
+              required
+              <?php if (isset($_SESSION['oauth_provider'])) echo 'readonly style="background-color: #8f9585; cursor: not-allowed;"'; ?>>
           </div>
 
           <div class="confirm-pass-container">
@@ -250,7 +243,9 @@ if ($result->num_rows > 0) {
               type="password" 
               placeholder="Confirm New Password"
               class="confirm-pass"
-              id="confirm_new_password">
+              id="confirm_new_password"
+              required
+              <?php if (isset($_SESSION['oauth_provider'])) echo 'readonly style="background-color: #8f9585; cursor: not-allowed;"'; ?>>
           </div>
 
           <div class="checkbox-container"> 
@@ -280,6 +275,6 @@ if ($result->num_rows > 0) {
     </div>
     <!-- End of Section -->
 
-    <script src="./script/settings.js"></script>
+    <script src="../script/settings.js"></script>
   </body>
 </html>

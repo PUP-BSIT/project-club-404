@@ -47,43 +47,50 @@ $lastSeenMessageId = $lastSeenMessageId ?? 0;
 $countNewMessages = $conn->query("SELECT COUNT(*) AS unread_messages FROM messages WHERE id > $lastSeenMessageId");
 $unreadMessages = $countNewMessages->fetch_assoc()['unread_messages'] ?? 0;
 
-// POST CREATION
+// POST CREATION - handles multiple image/video uploads
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['post_content'])) {
   $user_id = $_SESSION['id'];
   $post_content = trim($_POST['post_content']);
-  $image_path = null;
-  $video_path = null;
+  $upload_dir = "uploads/";
+  if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
 
-  // Handle image upload
-  if (isset($_FILES['post_image']) && $_FILES['post_image']['error'] === UPLOAD_ERR_OK) {
-    $imageName = basename($_FILES['post_image']['name']);
-    $targetDir = 'uploads/';
-    if (!is_dir($targetDir)) mkdir($targetDir); // create if not exists
-    $targetPath = $targetDir . uniqid() . "_" . $imageName;
+  // Insert post first to get post_id
+  $stmt = $conn->prepare("INSERT INTO posts (user_id, content) VALUES (?, ?)");
+  $stmt->bind_param("is", $user_id, $post_content);
+  $stmt->execute();
+  $post_id = $stmt->insert_id;
+  $stmt->close();
 
-    if (move_uploaded_file($_FILES['post_image']['tmp_name'], $targetPath)) {
-      $image_path = $targetPath;
+  // Handle multiple image uploads
+  if (!empty($_FILES['post_images']['name'][0])) {
+    foreach ($_FILES['post_images']['tmp_name'] as $key => $tmp_name) {
+      if ($_FILES['post_images']['error'][$key] === UPLOAD_ERR_OK) {
+        $filename = time() . '_img_' . $key . '_' . basename($_FILES['post_images']['name'][$key]);
+        $target = $upload_dir . $filename;
+        if (move_uploaded_file($tmp_name, $target)) {
+          $mediaStmt = $conn->prepare("INSERT INTO post_media (post_id, file_path, media_type) VALUES (?, ?, 'image')");
+          $mediaStmt->bind_param("is", $post_id, $target);
+          $mediaStmt->execute();
+          $mediaStmt->close();
+        }
+      }
     }
   }
 
-  // Handle video upload
-  if (isset($_FILES['post_video']) && $_FILES['post_video']['error'] === UPLOAD_ERR_OK) {
-    $tmp_name = $_FILES['post_video']['tmp_name'];
-    $filename = basename($_FILES['post_video']['name']);
-    $upload_dir = "uploads/";
-    if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
-    $target = $upload_dir . time() . '_' . $filename;
-
-    if (move_uploaded_file($tmp_name, $target)) {
-      $video_path = $target;
+  // Handle multiple video uploads
+  if (!empty($_FILES['post_videos']['name'][0])) {
+    foreach ($_FILES['post_videos']['tmp_name'] as $key => $tmp_name) {
+      if ($_FILES['post_videos']['error'][$key] === UPLOAD_ERR_OK) {
+        $filename = time() . '_vid_' . $key . '_' . basename($_FILES['post_videos']['name'][$key]);
+        $target = $upload_dir . $filename;
+        if (move_uploaded_file($tmp_name, $target)) {
+          $mediaStmt = $conn->prepare("INSERT INTO post_media (post_id, file_path, media_type) VALUES (?, ?, 'video')");
+          $mediaStmt->bind_param("is", $post_id, $target);
+          $mediaStmt->execute();
+          $mediaStmt->close();
+        }
+      }
     }
-  }
-
-  if (!empty($post_content) || $image_path || $video_path) {
-    $stmt = $conn->prepare("INSERT INTO posts (user_id, content, image_path, video_path) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("isss", $user_id, $post_content, $image_path, $video_path);
-    $stmt->execute();
-    $stmt->close();
   }
 
   header("Location: dashboard.php");
@@ -200,7 +207,7 @@ $unreadResult->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>HEYBLEEPI! – Social Media Dashboard</title>
 
-    <link rel="stylesheet" href="./stylesheet/dashboard.css" />
+    <link rel="stylesheet" href="../stylesheet/dashboard.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
@@ -214,17 +221,14 @@ $unreadResult->close();
 
       <div class="nav-actions">
         <!-- Search -->
-        <form class="search">
+        <div class="search" style="position: relative;">
           <input class="search-input"
+            id="searchInput"
             type="text"
             placeholder="Search in space…" />
           <i class="ri-search-line search-icon"></i>
-        </form>
-
-        <!-- Create Post -->
-        <button class="icon-btn icon-btn--primary" aria-label="Create post">
-          <i class="ri-add-line ri-lg"></i>
-        </button>
+          <div id="searchResults" class="search-results"></div>
+        </div>
 
         <!-- Notification Wrapper -->
         <div class="notification-wrapper" id="notification_wrapper">
@@ -256,8 +260,6 @@ $unreadResult->close();
           </div>
         </div>
 
-        <!-- Profile -->
-        <img class="avatar avatar--sm" src="./assets/profile/<?= htmlspecialchars($_SESSION['avatar'] ?? 'default.png') ?>" alt="">
       </div>
     </header>
 
@@ -270,9 +272,9 @@ $unreadResult->close();
         <!-- Profile Card -->
         <section class="glass card card--profile">
           <?php
-          $postAvatarPath = './assets/profile/' . ($_SESSION['avatar'] ?? 'default.png');
+          $postAvatarPath = '../assets/profile/' . ($_SESSION['avatar'] ?? 'rawr.png');
           if (!file_exists($postAvatarPath)) {
-            $postAvatarPath = './assets/profile/default.png';
+            $postAvatarPath = '../assets/profile/default.png';
           }
           ?>
           <img class="avatar avatar--sm" src="<?= $postAvatarPath ?>" alt="">
@@ -281,20 +283,41 @@ $unreadResult->close();
           <p class="card-subtitle">@<?= htmlspecialchars($_SESSION['username']) ?></p>
 
           <ul class="stats">
-            <li><strong>248</strong><span>Posts</span></li>
-            <li><strong>15.2 K</strong><span>Followers</span></li>
-            <li><strong>1.8 K</strong><span>Following</span></li>
+            <li><strong>
+              <?php
+                // Count all posts (original + shared) for the user
+                $userPostCount = $conn->query("SELECT COUNT(*) AS total FROM posts WHERE user_id = " . intval($_SESSION['id']));
+                $postCount = $userPostCount ? $userPostCount->fetch_assoc()['total'] : 0;
+                echo $postCount;
+              ?>
+            </strong><span>Posts</span></li>
+            <li><strong>
+              <?php
+                // Count all users except the current user (for followers)
+                $followersCountRes = $conn->query("SELECT COUNT(*) AS total FROM users WHERE id != " . intval($_SESSION['id']));
+                $followersCount = $followersCountRes ? $followersCountRes->fetch_assoc()['total'] : 0;
+                echo number_format($followersCount);
+              ?>
+            </strong><span>Followers</span></li>
+            <li><strong>
+              <?php
+                // Count all users except the current user (for following)
+                $followingCountRes = $conn->query("SELECT COUNT(*) AS total FROM users WHERE id != " . intval($_SESSION['id']));
+                $followingCount = $followingCountRes ? $followingCountRes->fetch_assoc()['total'] : 0;
+                echo number_format($followingCount);
+              ?>
+            </strong><span>Following</span></li>
           </ul>
         </section>
 
         <!-- Navigation -->
         <nav class="glass card nav-list">
-          <a class="nav-item" href="#">
+          <a class="nav-item <?= basename($_SERVER['PHP_SELF']) === 'dashboard.php' ? 'nav-item--active' : '' ?>" href="dashboard.php">
             <i class="ri-home-4-line"></i>
             Home
           </a>
 
-          <a class="nav-item" href="messages.php">
+          <a class="nav-item <?= basename($_SERVER['PHP_SELF']) === 'messages.php' ? 'nav-item--active' : '' ?>" href="messages.php">
             <i class="ri-message-3-line"></i>
             <span class="nav-label">
               Messages
@@ -304,13 +327,12 @@ $unreadResult->close();
             </span>
           </a>
 
-
-          <a class="nav-item" href="profile.php">
+          <a class="nav-item <?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'nav-item--active' : '' ?>" href="profile.php">
             <i class="ri-user-line"></i>
             Profile
           </a>
 
-          <a class="nav-item" href="settings.php"> <!-- Link to settings & privacy -->
+          <a class="nav-item" href="settings.php">
             <i class="ri-settings-4-line"></i>
             Settings & Privacy
           </a>
@@ -336,9 +358,9 @@ $unreadResult->close();
             <div class="create-post-header">
 
               <?php
-              $postAvatarPath = './assets/profile/' . ($_SESSION['avatar'] ?? 'default.png');
+              $postAvatarPath = '../assets/profile/' . ($_SESSION['avatar'] ?? 'rawr.png');
               if (!file_exists($postAvatarPath)) {
-                $postAvatarPath = './assets/profile/default.png';
+                $postAvatarPath = '../assets/profile/default.png';
               }
               ?>
               <img class="avatar avatar--sm" src="<?= $postAvatarPath ?>" alt="">
@@ -351,38 +373,20 @@ $unreadResult->close();
 
             <textarea class="create-post-input" name="post_content" placeholder="What's happening in your galaxy?"></textarea>
 
-            <!-- Image Preview -->
-            <div id="imagePreviewContainer" style="display: none; position: relative; margin-top: 10px;">
-              <img id="imagePreview" src="" style="max-width: 150px; max-height: 150px; border-radius: 8px;">
-              <button type="button" id="removeImageBtn" title="Remove Image"
-                style="position: absolute; top: -8px; right: -8px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer;">×</button>
-            </div>
-
-            <!-- Video Preview -->
-            <div id="videoPreviewContainer" style="display: none; position: relative; margin-top: 10px;">
-              <video id="videoPreview" controls style="max-width: 200px; border-radius: 10px;"></video>
-              <button type="button" id="removeVideoBtn"
-                style="position: absolute; top: -8px; right: -8px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer;">×</button>
-            </div>
+            <!-- Media Preview Grid -->
+            <div id="mediaPreviewGrid" class="media-preview-grid"></div>
 
             <div class="create-post-actions">
-              <div class="action-group">
-                <!-- Image -->
-                <label class="icon-btn">
-                  <i class="ri-image-line"></i>
-                  <input type="file" name="post_image" accept="image/*" id="postImageInput" style="display: none;">
-                </label>
+              <div class="media-actions">
+                <button type="button" class="media-upload-btn photo" onclick="document.getElementById('postImageInput').click()">+ Photo</button>
+                <button type="button" class="media-upload-btn video" onclick="document.getElementById('postVideoInput').click()">+ Video</button>
 
-                <!-- Video -->
-                <label class="icon-btn">
-                  <i class="ri-vidicon-line"></i>
-                  <input type="file" name="post_video" accept="video/*" id="postVideoInput" style="display: none;">
-                </label>
-
-                <!-- Emoji -->
-                <button class="icon-btn" type="button"><i class="ri-emotion-line"></i></button>
-
-                <!-- Location -->
+                <!-- Hidden File Inputs -->
+                <input type="file" name="post_images[]" accept="image/*" multiple id="postImageInput" hidden>
+                <input type="file" name="post_videos[]" accept="video/*" multiple id="postVideoInput" hidden>
+              </div>
+             
+              <div class="minor-actions">
                 <button class="icon-btn" type="button"><i class="ri-map-pin-line"></i></button>
               </div>
               <button class="btn btn--primary" type="submit">Post</button>
@@ -415,14 +419,21 @@ $unreadResult->close();
         <?php while ($post = $posts->fetch_assoc()): ?>
           <article class="glass post">
             <header class="post-header">
-              <img class="avatar avatar--sm" src="./assets/profile/<?= htmlspecialchars($post['profile_picture'] ?? 'default.png') ?>" alt="">
+              <a href="profile.php?user=<?= urlencode($post['user_name']) ?>">
+                <img class="avatar avatar--sm" src="../assets/profile/<?= htmlspecialchars($post['profile_picture'] ?? 'default.png') ?>" alt="">
+              </a>
               <div>
-                <h4><?= htmlspecialchars($post['first_name'] . ' ' . $post['last_name']) ?></h4>
+                <!-- Make user's name a link to their profile page -->
+                <a href="profile.php?user=<?= urlencode($post['user_name']) ?>" class="poster-name">
+                  <?= htmlspecialchars($post['first_name'] . ' ' . $post['last_name']) ?>
+                </a>
+                <div style="font-size:0.9em;color:#888;">
+                  @<?= htmlspecialchars($post['user_name']) ?>
+                </div>
                 <time><?= date("g:i A", strtotime($post['created_at'])) ?></time>
               </div>
-
               <?php if ($post['user_id'] == $_SESSION['id']): ?>
-                <div class="post-options">
+                <div class="post-options" style="margin-left: auto;">
                   <button class="icon-btn toggle-options"><i class="ri-more-fill"></i></button>
                   <ul class="dropdown hidden">
                     <li><button class="btn--sm btn-edit-post" data-id="<?= $post['id'] ?>">Edit Post</button></li>
@@ -435,32 +446,43 @@ $unreadResult->close();
                   </ul>
                 </div>
               <?php endif; ?>
-
             </header>
 
             <div class="post-content" data-post-id="<?= $post['id'] ?>">
               <p class="post-text"><?= htmlspecialchars($post['content']) ?></p>
+              <?php if (empty($post['shared_post_id'])): ?>
+                <?php
+                  $mediaStmt = $conn->prepare("SELECT file_path, media_type FROM post_media WHERE post_id = ?");
+                  $mediaStmt->bind_param("i", $post['id']);
+                  $mediaStmt->execute();
+                  $mediaResult = $mediaStmt->get_result();
+                  if ($mediaResult->num_rows > 0) {
+                    echo '<div class="post-media-grid">';
+                    while ($media = $mediaResult->fetch_assoc()) {
+                      if ($media['media_type'] === 'image') {
+                        echo '<img src="' . htmlspecialchars($media['file_path']) . '" class="post-image" alt="Post Image">';
+                      } elseif ($media['media_type'] === 'video') {
+                        echo '<video controls class="post-video"><source src="' . htmlspecialchars($media['file_path']) . '" type="video/mp4"></video>';
+                      }
+                    }
+                    echo '</div>';
+                  }
+                  $mediaStmt->close();
+                ?>
+              <?php endif; ?>
             </div>
 
             <?php
             $imageClass = !empty($post['image_path']) ? getMediaClass($post['image_path']) : '';
             ?>
 
-            <?php if (!empty($post['image_path'])): ?>
-              <div class="post-media-container">
-                <img src="<?= htmlspecialchars($post['image_path']) ?>"
-                  alt="Post Image"
-                  class="<?= $imageClass ?>"
-                  onclick="openLightbox(this.src)">
-              </div>
-            <?php endif; ?>
-
-            <?php if (!empty($post['video_path'])): ?>
-              <div class="post-media-container">
-                <video controls class="landscape"
-                    onclick="openLightboxVideo('<?= htmlspecialchars($post['video_path']) ?>')">
-              </div>
-            <?php endif; ?>
+            <?php
+              // Load multiple media for this post
+              $mediaStmt = $conn->prepare("SELECT file_path, media_type FROM post_media WHERE post_id = ?");
+              $mediaStmt->bind_param("i", $post['id']);
+              $mediaStmt->execute();
+              $mediaResult = $mediaStmt->get_result();
+            ?>
 
             <!-- SHARE COUNT AND USER SHARE STATUS -->
             <?php
@@ -477,21 +499,28 @@ $unreadResult->close();
                 <small>Shared from <strong><?= htmlspecialchars($post['shared_first_name'] . ' ' . $post['shared_last_name']) ?></strong></small>
                 <p><?= htmlspecialchars($post['shared_content']) ?></p>
 
-                <!-- Image shared post -->
-                <?php if (!empty($post['shared_image_path'])): ?>
-                  <img src="<?= htmlspecialchars($post['shared_image_path']) ?>" alt="Shared Post Image" style="max-width: 150px; max-height: 150px; margin-top: 10px; border-radius: 10px;">
-                <?php endif; ?>
-
-                <!-- Video shared post -->
-                <?php if (!empty($post['shared_video_path'])): ?>
-                  <video controls style="max-width: 100%; margin-top: 10px; border-radius: 10px;">
-                    <source src="<?= htmlspecialchars($post['shared_video_path']) ?>" type="video/mp4">
-                    Your browser does not support the video tag.
-                  </video>
-                <?php endif; ?>
-
+                <?php
+                // Load multiple media for the shared post
+                if (!empty($post['shared_post_id'])) {
+                  $sharedMediaStmt = $conn->prepare("SELECT file_path, media_type FROM post_media WHERE post_id = ?");
+                  $sharedMediaStmt->bind_param("i", $post['shared_post_id']);
+                  $sharedMediaStmt->execute();
+                  $sharedMediaResult = $sharedMediaStmt->get_result();
+                  if ($sharedMediaResult->num_rows > 0) {
+                    echo '<div class="post-media-grid">';
+                    while ($media = $sharedMediaResult->fetch_assoc()) {
+                      if ($media['media_type'] === 'image') {
+                        echo '<img src="' . htmlspecialchars($media['file_path']) . '" class="post-image" alt="Shared Post Image">';
+                      } elseif ($media['media_type'] === 'video') {
+                        echo '<video controls class="post-video"><source src="' . htmlspecialchars($media['file_path']) . '" type="video/mp4"></video>';
+                      }
+                    }
+                    echo '</div>';
+                  }
+                  $sharedMediaStmt->close();
+                }
+                ?>
               </div>
-
             <?php endif; ?>
 
             <footer class="post-footer">
@@ -501,9 +530,9 @@ $unreadResult->close();
                 $likes = $conn->query("SELECT COUNT(*) AS total FROM likes WHERE post_id = {$post['id']}")->fetch_assoc();
                 $liked = $conn->query("SELECT 1 FROM likes WHERE user_id = {$_SESSION['id']} AND post_id = {$post['id']}")->num_rows > 0;
                 ?>
-                <form method="POST" style="display:inline;">
+                <form method="POST" style="display:inline;" onsubmit="event.preventDefault(); return false;">
                   <input type="hidden" name="like_post_id" value="<?= $post['id'] ?>">
-                  <button type="submit" class="icon-btn <?= $liked ? 'liked' : '' ?>">
+                  <button type="button" class="icon-btn like-button <?= $liked ? 'liked' : '' ?>" data-post-id="<?= $post['id'] ?>">
                     <i class="<?= $liked ? 'ri-heart-fill' : 'ri-heart-line' ?>"></i>
                     <span><?= $likes['total'] ?></span>
                   </button>
@@ -518,12 +547,17 @@ $unreadResult->close();
                   <span><?= $comments['total'] ?></span>
                 </button>
 
-                <!-- SHARE FORM -->
+                <!-- SHARE COUNT -->
+                <?php
+                  // Count shares for this post
+                  $shareCountRes = $conn->query("SELECT COUNT(*) AS total FROM posts WHERE shared_post_id = " . intval($post['id']));
+                  $shareCount = $shareCountRes ? $shareCountRes->fetch_assoc()['total'] : 0;
+                ?>
                 <form method="POST" action="share_post.php" style="display:inline;">
                   <input type="hidden" name="share_post_id" value="<?= $post['id'] ?>">
                   <button type="submit" class="icon-btn">
                     <i class="ri-share-forward-line"></i>
-                    <span><?= $countShares['total'] ?></span>
+                    <span><?= $shareCount ?></span>
                   </button>
                 </form>
               </div>
@@ -550,8 +584,15 @@ $unreadResult->close();
                     <small style="color:gray;"> – <?= date("M d, g:i A", strtotime($comment['commented_at'])) ?></small>
 
                     <?php if ($comment['user_id'] == $_SESSION['id']): ?>
-                      <button class="btn--sm btn-edit-comment-dashboard" data-id="<?= $comment['id'] ?>">Edit</button>
-                      <button class="btn--sm btn-delete-comment-dashboard" data-id="<?= $comment['id'] ?>">Delete</button>
+                      <div class="comment-options">
+                        <button class="icon-btn toggle-comment-options" aria-label="Options">
+                          <i class="ri-more-fill"></i>
+                        </button>
+                        <ul class="comment-dropdown hidden">
+                          <li><button class="btn-edit-comment-dashboard" data-id="<?= $comment['id'] ?>">Edit</button></li>
+                          <li><button class="btn-delete-comment-dashboard" data-id="<?= $comment['id'] ?>">Delete</button></li>
+                        </ul>
+                      </div>
                     <?php endif; ?>
                   </div>
                 <?php endwhile; ?>
@@ -560,58 +601,6 @@ $unreadResult->close();
           </article>
         <?php endwhile; ?>
       </section>
-
-      <!-- RIGHT SIDEBAR -->
-      <aside class="sidebar sidebar--right">
-
-        <!-- Suggested Friends -->
-        <section class="glass card">
-          <h3 class="card-title">Suggested Connections</h3>
-          <ul class="suggestions" id="suggestion_list">
-
-
-            <!-- Initial Visible Users -->
-            <li class="suggestion">
-              <img class="avatar avatar--sm" src="./assets/profile/chick.jpg" alt="">
-              <div class="user-meta">
-                <h4>Mingyu</h4>
-                <p>Rapper</p>
-              </div>
-              <button class="btn btn--primary btn--sm">Connect</button>
-            </li>
-
-            <li class="suggestion">
-              <img class="avatar avatar--sm" src="assets/profile/cat.jpg" alt="">
-              <div class="user-meta">
-                <h4>Hoshi</h4>
-                <p>RAWRRRRRR</p>
-              </div>
-              <button class="btn btn--primary btn--sm">Connect</button>
-            </li>
-
-            <!-- Hidden Initially -->
-            <li class="suggestion hidden">
-              <img class="avatar avatar--sm" src="./assets/profile/penguin.jpg" alt="">
-              <div class="user-meta">
-                <h4>Yasmin</h4>
-                <p>Developer</p>
-              </div>
-              <button class="btn btn--primary btn--sm">Connect</button>
-            </li>
-
-            <li class="suggestion hidden">
-              <img class="avatar avatar--sm" src="./assets/profile/frog.jpg" alt="">
-              <div class="user-meta">
-                <h4>Ken</h4>
-                <p>Artist</p>
-              </div>
-              <button class="btn btn--primary btn--sm">Connect</button>
-            </li>
-          </ul>
-
-          <button class="see-more" id="seeMoreBtn">See More</button>
-        </section>
-      </aside>
     </main>
 
     <!-- ☰ MOBILE NAV -->
@@ -629,6 +618,6 @@ $unreadResult->close();
       <div class="lightbox-content" id="lightboxContent"></div>
     </div>
 
-    <script src="./script/dashboard.js"></script>
+    <script src="../script/dashboard.js"></script>
   </body>
 </html>

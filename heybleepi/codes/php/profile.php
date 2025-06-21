@@ -48,12 +48,14 @@ $unreadResult->bind_result($unread_count);
 $unreadResult->fetch();
 $unreadResult->close();
 
+// Use the username from the URL if present, otherwise use the logged-in user
+$username = isset($_GET['user']) ? $_GET['user'] : $_SESSION['username'];
+
 // Fetch user data by username
 $sql = "SELECT users.*, user_details.bio, user_details.work, user_details.school, user_details.home, user_details.religion, user_details.relationship_status, user_details.profile_picture, user_details.profile_cover
         FROM users
         LEFT JOIN user_details ON users.id = user_details.id_fk
         WHERE users.user_name = ?";
-
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $username);
 $stmt->execute();
@@ -64,96 +66,116 @@ if ($result->num_rows === 0) {
   exit();
 }
 
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['comment_post_id'], $_POST['comment_text'])) {
-    $user_id = $_SESSION['id'];
-    $post_id = intval($_POST['comment_post_id']);
-    $comment_text = trim($_POST['comment_text']);
-
-    if (!empty($comment_text)) {
-        $stmt = $conn->prepare("INSERT INTO comments (post_id, user_id, comment_text) VALUES (?, ?, ?)");
-        $stmt->bind_param("iis", $post_id, $user_id, $comment_text);
-        $stmt->execute();
-        $stmt->close();
-    }
-
-    header("Location: profile.php");
-    exit();
-}
-
-// POST CREATION
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['post_content'])) {
-  $user_id = $_SESSION['id'];
-  $post_content = trim($_POST['post_content']);
-  $image_path = null;
-  $video_path = null;
-
-  // Handle uploaded image
-  if (isset($_FILES['post_image']) && $_FILES['post_image']['error'] === UPLOAD_ERR_OK) {
-    $tmp_name = $_FILES['post_image']['tmp_name'];
-    $filename = basename($_FILES['post_image']['name']);
-    $upload_dir = "uploads/";
-    if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
-    $target = $upload_dir . time() . '_' . $filename;
-
-    if (move_uploaded_file($tmp_name, $target)) {
-      $image_path = $target;
-    }
-  }
-
-  // Handle uploaded video
-  if (isset($_FILES['post_video']) && $_FILES['post_video']['error'] === UPLOAD_ERR_OK) {
-    $tmp_name = $_FILES['post_video']['tmp_name'];
-    $filename = basename($_FILES['post_video']['name']);
-    $upload_dir = "uploads/";
-    if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
-    $target = $upload_dir . time() . '_' . $filename;
-
-    if (move_uploaded_file($tmp_name, $target)) {
-      $video_path = $target;
-    }
-  }
-
-  if (!empty($post_content) || $image_path || $video_path) {
-    $stmt = $conn->prepare("INSERT INTO posts (user_id, content, image_path, video_path) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("isss", $user_id, $post_content, $image_path, $video_path);
-    $stmt->execute();
-    $stmt->close();
-  }
-
-  header("Location: profile.php");
-  exit();
-}
-
-function getMediaClass($path) {
-    $size = @getimagesize($path);
-    if (!$size) return 'landscape'; // fallback
-
-    $width = $size[0];
-    $height = $size[1];
-
-    $ratio = $width / $height;
-
-    if ($ratio > 1.2) return 'landscape';
-    elseif ($ratio < 0.8) return 'portrait';
-    else return 'square';
-}
-
 $user = $result->fetch_assoc();
+$userId = $user['id'];
 
-$userId = $_SESSION['id'];
+// --- MOVE POST/COMMENT HANDLERS HERE, BEFORE ANY HTML OUTPUT ---
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+  // Handle creating a post (only allow if viewing own profile)
+  if (isset($_POST['post_content']) && $userId == $_SESSION['id']) {
+    $post_content = trim($_POST['post_content']);
+    $upload_dir = "uploads/";
+    if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
 
+    // Insert post first to get post_id
+    $stmt = $conn->prepare("INSERT INTO posts (user_id, content) VALUES (?, ?)");
+    $stmt->bind_param("is", $userId, $post_content);
+    $stmt->execute();
+    $post_id = $stmt->insert_id;
+    $stmt->close();
+
+    // Handle multiple image uploads
+    if (!empty($_FILES['post_images']['name'][0])) {
+      foreach ($_FILES['post_images']['tmp_name'] as $key => $tmp_name) {
+        if ($_FILES['post_images']['error'][$key] === UPLOAD_ERR_OK) {
+          $filename = time() . '_img_' . $key . '_' . basename($_FILES['post_images']['name'][$key]);
+          $target = $upload_dir . $filename;
+          if (move_uploaded_file($tmp_name, $target)) {
+            $mediaStmt = $conn->prepare("INSERT INTO post_media (post_id, file_path, media_type) VALUES (?, ?, 'image')");
+            $mediaStmt->bind_param("is", $post_id, $target);
+            $mediaStmt->execute();
+            $mediaStmt->close();
+          }
+        }
+      }
+    }
+
+    // Handle multiple video uploads
+    if (!empty($_FILES['post_videos']['name'][0])) {
+      foreach ($_FILES['post_videos']['tmp_name'] as $key => $tmp_name) {
+        if ($_FILES['post_videos']['error'][$key] === UPLOAD_ERR_OK) {
+          $filename = time() . '_vid_' . $key . '_' . basename($_FILES['post_videos']['name'][$key]);
+          $target = $upload_dir . $filename;
+          if (move_uploaded_file($tmp_name, $target)) {
+            $mediaStmt = $conn->prepare("INSERT INTO post_media (post_id, file_path, media_type) VALUES (?, ?, 'video')");
+            $mediaStmt->bind_param("is", $post_id, $target);
+            $mediaStmt->execute();
+            $mediaStmt->close();
+          }
+        }
+      }
+    }
+
+    // Redirect to correct profile
+    if ($userId == $_SESSION['id']) {
+      header("Location: profile.php");
+    } else {
+      header("Location: profile.php?user=" . urlencode($user['user_name']));
+    }
+    exit();
+  }
+
+  // Handle commenting on a post (allow for logged-in user)
+  if (isset($_POST['comment_post_id'], $_POST['comment_text'])) {
+    $post_id = intval($_POST['comment_post_id']);
+    $comment = trim($_POST['comment_text']);
+
+    if (!empty($comment)) {
+      $stmt = $conn->prepare("INSERT INTO comments (user_id, post_id, comment_text) VALUES (?, ?, ?)");
+      $stmt->bind_param("iis", $_SESSION['id'], $post_id, $comment);
+      $stmt->execute();
+      $stmt->close();
+
+      // Add notification to post owner
+      $ownerStmt = $conn->prepare("SELECT user_id FROM posts WHERE id = ?");
+      $ownerStmt->bind_param("i", $post_id);
+      $ownerStmt->execute();
+      $ownerStmt->bind_result($owner_id);
+      $ownerStmt->fetch();
+      $ownerStmt->close();
+
+      if ($owner_id != $_SESSION['id']) {
+        $notifStmt = $conn->prepare("INSERT INTO notifications (user_id, actor_id, post_id, type) VALUES (?, ?, ?, 'comment')");
+        $notifStmt->bind_param("iii", $owner_id, $_SESSION['id'], $post_id);
+        $notifStmt->execute();
+        $notifStmt->close();
+      }
+    }
+
+    // Redirect to correct profile
+    if ($userId == $_SESSION['id']) {
+      header("Location: profile.php");
+    } else {
+      header("Location: profile.php?user=" . urlencode($user['user_name']));
+    }
+    exit();
+  }
+}
+
+// Fetch all media for the user's posts from post_media table
 $mediaStmt = $conn->prepare("
-  SELECT image_path, video_path
-  FROM posts
-  WHERE user_id = ?
-    AND (image_path IS NOT NULL OR video_path IS NOT NULL)
-  ORDER BY created_at DESC
+  SELECT pm.file_path, pm.media_type
+  FROM post_media pm
+  JOIN posts p ON pm.post_id = p.id
+  WHERE p.user_id = ?
+  ORDER BY pm.id DESC
 ");
 $mediaStmt->bind_param("i", $userId);
 $mediaStmt->execute();
 $mediaResult = $mediaStmt->get_result();
 $mediaPosts = $mediaResult->fetch_all(MYSQLI_ASSOC);
 
+// Fetch albums for the profile owner
 $albumStmt = $conn->prepare("
   SELECT a.*, COUNT(ap.id) AS media_count
   FROM albums a
@@ -162,7 +184,7 @@ $albumStmt = $conn->prepare("
   GROUP BY a.id
   ORDER BY a.created_at DESC
 ");
-$albumStmt->bind_param("i", $_SESSION['id']);
+$albumStmt->bind_param("i", $userId);
 $albumStmt->execute();
 $albumResult = $albumStmt->get_result();
 $albums = $albumResult->fetch_all(MYSQLI_ASSOC);
@@ -174,7 +196,27 @@ function getAlbumCover($albumId, $conn) {
   $stmt->bind_result($path);
   $stmt->fetch();
   $stmt->close();
-  return $path ? $path : './assets/profile/default.png';
+  return $path ? $path : '../assets/profile/default.png';
+}
+
+// Fetch all user images and videos for tabs
+$userImages = array_filter($mediaPosts, function($m) { return $m['media_type'] === 'image'; });
+$userVideos = array_filter($mediaPosts, function($m) { return $m['media_type'] === 'video'; });
+// For gallery, get only the 9 latest images
+$galleryImages = array_slice($userImages, 0, 9);
+
+// Fetch all users except the current user for the friends tab
+$allUsers = [];
+$usersResult = $conn->query("
+  SELECT u.id, u.first_name, u.last_name, u.user_name, ud.profile_picture
+  FROM users u
+  LEFT JOIN user_details ud ON u.id = ud.id_fk
+  WHERE u.id != " . intval($_SESSION['id'])
+);
+if ($usersResult) {
+  while ($row = $usersResult->fetch_assoc()) {
+    $allUsers[] = $row;
+  }
 }
 ?>
 
@@ -185,19 +227,21 @@ function getAlbumCover($albumId, $conn) {
     <title>HEYBLEEPI | <?php echo htmlspecialchars($user['user_name']); ?>'s Profile</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="./stylesheet/dashboard.css" />
+    <link rel="stylesheet" href="../stylesheet/dashboard.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
     <script>
       const CURRENT_USER_NAME = <?= json_encode($user['first_name'] . ' ' . $user['last_name']) ?>;
       const CURRENT_USER_USERNAME = <?= json_encode($user['user_name']) ?>;
-      const CURRENT_USER_AVATAR = <?= json_encode("./assets/profile/" . ($user['avatar'] ?? "rawr.png")) ?>;
+      const CURRENT_USER_AVATAR = <?= json_encode("../assets/profile/" . ($user['avatar'] ?? "rawr.png")) ?>;
     </script>
   </head>
 
-  <body class="page">
+  <body class="page profile-page">
     <!-- Top Navbar -->
     <header class="top-nav glass">
-      <h1 class="brand">HEYBLEEPI</h1>
+      <a href="dashboard.php" style="text-decoration: none; color: inherit;">
+        <h1 class="brand">HEYBLEEPI</h1>
+      </a>
       <nav class="nav-actions">
         <a class="icon-btn" href="dashboard.php" title="Home"><i class="ri-home-4-line"></i></a>
 
@@ -244,12 +288,12 @@ function getAlbumCover($albumId, $conn) {
     <main class="profile-container">
       <!-- Banner + Profile info -->
       <div class="profile-top glass">
-        <img class="banner-img" src="./assets/profile/<?= htmlspecialchars($user['profile_cover'] ?? 'banner.jpg') ?>" alt="Banner" />
+        <img class="banner-img" src="../assets/profile/<?= htmlspecialchars($user['profile_cover'] ?? 'banner.jpg') ?>" alt="Banner" />
         <div class="profile-info-bar">
-          <img class="avatar avatar--sm2" src="./assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>" alt="">
+          <img class="avatar avatar--sm2" src="../assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>" alt="">
           <div class="user-basic-info">
             <h2><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></h2>
-            <p>@<?= htmlspecialchars($user['user_name']) ?> · 81</p>
+            <p>@<?= htmlspecialchars($user['user_name']) ?></p>
           </div>
           <div class="profile-buttons">
             <button class="btn btn--primary">Add to Story</button>
@@ -258,12 +302,12 @@ function getAlbumCover($albumId, $conn) {
         </div>
       </div>
 
-      <nav class="profile-tabs glass">
-        <a class="tab active" href="#">Posts</a>
-        <a class="tab" href="#">About</a>
-        <a class="tab" href="#">Friends</a>
-        <a class="tab" href="#">Photos</a>
-        <a class="tab" href="#">More</a>
+      <nav class="profile-tabs glass" id="profileTabs">
+        <a class="tab active" href="#" data-tab="posts">Posts</a>
+        <a class="tab" href="#" data-tab="friends">Friends</a>
+        <a class="tab" href="#" data-tab="photos">Photos</a>
+        <a class="tab" href="#" data-tab="videos">Videos</a>
+        <a class="tab" href="#" data-tab="more">More</a>
       </nav>
 
       <!-- Main 2-column grid -->
@@ -302,36 +346,24 @@ function getAlbumCover($albumId, $conn) {
           <section class="glass card">
             <h4 class="card-title">Gallery</h4>
             <div class="photo-grid">
-              <?php foreach ($mediaPosts as $media): ?>
-                <?php if (!empty($media['image_path'])): ?>
-                  <img
-                    src="<?= htmlspecialchars($media['image_path']) ?>"
-                    class="gallery-item"
-                    data-type="image"
-                    data-src="<?= htmlspecialchars($media['image_path']) ?>"
-                    alt="User Image"
-                  />
-                <?php elseif (!empty($media['video_path'])): ?>
-                  <video
-                    class="gallery-item"
-                    muted
-                    data-type="video"
-                    data-src="<?= htmlspecialchars($media['video_path']) ?>"
-                  >
-                    <source src="<?= htmlspecialchars($media['video_path']) ?>" type="video/mp4" />
-                  </video>
-                <?php endif; ?>
+              <?php foreach ($galleryImages as $media): ?>
+                <img
+                  src="<?= htmlspecialchars($media['file_path']) ?>"
+                  class="gallery-item"
+                  data-type="image"
+                  data-src="<?= htmlspecialchars($media['file_path']) ?>"
+                  alt="User Image"
+                />
               <?php endforeach; ?>
             </div>
           </section>
 
           <!-- Albums Section -->
           <section class="glass card">
-            <div style="text-align: right; margin-bottom: 10px;">
-              <a href="create_album.php" class="btn btn--primary">+ Create Album</a>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <h4 class="card-title" style="margin: 0;">Albums</h4>
+              <a href="create_album.php" class="btn btn--primary" style="font-size: 0.95em; padding: 6px 16px;">+ Create Album</a>
             </div>
-
-            <h4 class="card-title">Albums</h4>
             <div class="photo-grid">
               <?php if (empty($albums)): ?>
                 <p style="padding: 1rem;">No albums created yet.</p>
@@ -353,61 +385,38 @@ function getAlbumCover($albumId, $conn) {
 
         <!-- Create Post -->
         <section class="right-column">
+          <?php if ($userId == $_SESSION['id']): ?>
           <div class="glass create-post">
-            <form method="POST" action="profile.php"  enctype="multipart/form-data">
+            <form method="POST" action="profile.php" enctype="multipart/form-data">
               <div class="create-post-header">
-                <img class="avatar avatar--sm" src="./assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>" alt="">
+                <img class="avatar avatar--sm" src="../assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>" alt="">
                 <div class="poster-info">
-                  <a href="profile.php" class="poster-name"><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></a>
-                  <p>@<?php echo htmlspecialchars($user['user_name']); ?></p>
+                  <a href="profile.php" class="poster-name"><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></a>
+                  <p>@<?= htmlspecialchars($user['user_name']); ?></p>
                 </div>
               </div>
-
               <textarea class="create-post-input" name="post_content" placeholder="What's happening in your galaxy?" required></textarea>
-
-              <!-- Image Preview -->
-              <div id="imagePreviewContainer" style="display: none; position: relative; margin-top: 10px;">
-                <img id="imagePreview" src="" style="max-width: 150px; max-height: 150px; border-radius: 8px;">
-                <button type="button" id="removeImageBtn"
-                  style="position: absolute; top: -8px; right: -8px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer;">×</button>
-              </div>
-
-              <!-- Video Preview -->
-              <div id="videoPreviewContainer" style="display: none; position: relative; margin-top: 10px;">
-                <video id="videoPreview" controls style="max-width: 200px; border-radius: 10px;"></video>
-                <button type="button" id="removeVideoBtn"
-                  style="position: absolute; top: -8px; right: -8px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer;">×</button>
-              </div>
-
+              <!-- Media Preview Grid -->
+              <div id="mediaPreviewGrid" class="media-preview-grid"></div>
               <div class="create-post-actions">
-                <div class="action-group">
-                  <!-- Image -->
-                  <label class="icon-btn">
-                    <i class="ri-image-line"></i>
-                    <input type="file" name="post_image" accept="image/*" id="postImageInput" style="display: none;">
-                  </label>
-
-                  <!-- Video -->
-                  <label class="icon-btn">
-                    <i class="ri-vidicon-line"></i>
-                    <input type="file" name="post_video" accept="video/*" id="postVideoInput" style="display: none;">
-                  </label>
-
-                  <!-- Emoji -->
+                <div class="media-actions">
+                  <button type="button" class="media-upload-btn photo" onclick="document.getElementById('postImageInput').click()">+ Photo</button>
+                  <button type="button" class="media-upload-btn video" onclick="document.getElementById('postVideoInput').click()">+ Video</button>
+                  <input type="file" name="post_images[]" accept="image/*" multiple id="postImageInput" hidden>
+                  <input type="file" name="post_videos[]" accept="video/*" multiple id="postVideoInput" hidden>
+                </div>
+                <div class="minor-actions">
                   <button class="icon-btn" type="button"><i class="ri-emotion-line"></i></button>
-
-                  <!-- Location -->
                   <button class="icon-btn" type="button"><i class="ri-map-pin-line"></i></button>
                 </div>
                 <button class="btn btn--primary" type="submit">Post</button>
               </div>
             </form>
           </div>
+          <?php endif; ?>
 
           <!-- Posts will appear here -->
           <?php
-          $userId = $_SESSION['id'];
-
           $query = "
             SELECT
               p.id AS post_id,
@@ -434,10 +443,9 @@ function getAlbumCover($albumId, $conn) {
           ";
 
           $stmt = $conn->prepare($query);
-          $stmt->bind_param("i", $_SESSION['id']);
+          $stmt->bind_param("i", $userId);
           $stmt->execute();
           $result = $stmt->get_result();
-
           ?>
 
           <?php while ($post = $result->fetch_assoc()): ?>
@@ -458,12 +466,12 @@ function getAlbumCover($albumId, $conn) {
 
             <article class="glass post">
               <header class="post-header">
-                <img class="avatar avatar--sm" src="./assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>" alt="User Avatar">
+                <img class="avatar avatar--sm" src="../assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>" alt="User Avatar">
                 <div>
                   <h4><?= htmlspecialchars($post['first_name'] . ' ' . $post['last_name']) ?></h4>
                   <time><?= date("M d, g:i A", strtotime($post['created_at'])) ?></time>
                 </div>
-                <div class="post-options">
+                <div class="post-options" style="margin-left: auto;">
                   <button class="icon-btn toggle-options"><i class="ri-more-fill"></i></button>
                   <ul class="dropdown hidden">
                     <li><button class="btn--sm btn-edit-post" data-id="<?= $post['post_id'] ?>">Edit Post</button></li>
@@ -477,55 +485,66 @@ function getAlbumCover($albumId, $conn) {
                 </div>
               </header>
 
-              <!-- SHARED POST BLOCK -->
+              <!-- POST CONTENT -->
+              <div class="post-content" data-post-id="<?= $post['post_id'] ?>">
+                <p class="post-text"><?= htmlspecialchars($post['content']) ?></p>
+                <?php if (empty($post['shared_post_id'])): ?>
+                  <?php
+                    // Load multiple media for this post (only if not a shared post)
+                    $mediaStmt = $conn->prepare("SELECT file_path, media_type FROM post_media WHERE post_id = ?");
+                    $mediaStmt->bind_param("i", $post['post_id']);
+                    $mediaStmt->execute();
+                    $mediaResult = $mediaStmt->get_result();
+                    if ($mediaResult->num_rows > 0) {
+                      echo '<div class="post-media-grid">';
+                      while ($media = $mediaResult->fetch_assoc()) {
+                        if ($media['media_type'] === 'image') {
+                          echo '<img src="' . htmlspecialchars($media['file_path']) . '" class="post-image" alt="Post Image" onclick="openLightbox(\'' . htmlspecialchars($media['file_path']) . '\')">';
+                        } elseif ($media['media_type'] === 'video') {
+                          echo '<video controls class="post-video" onclick="openLightboxVideo(\'' . htmlspecialchars($media['file_path']) . '\')"><source src="' . htmlspecialchars($media['file_path']) . '" type="video/mp4"></video>';
+                        }
+                      }
+                      echo '</div>';
+                    }
+                    $mediaStmt->close();
+                  ?>
+                <?php endif; ?>
+              </div>
+
+              <!-- SHARED POST (if any) -->
               <?php if ($post['shared_post_id']): ?>
                 <div class="shared-post glass" style="padding: 10px; background-color: rgba(255, 255, 255, 0.05); border-left: 3px solid var(--primary); border-radius: 10px; margin-bottom: 10px;">
                   <small>Shared from <strong><?= htmlspecialchars($post['shared_first_name'] . ' ' . $post['shared_last_name']) ?></strong></small>
-                  <p><?= htmlspecialchars($post['shared_content']) ?></p>
-
-                  <!-- Image shared post -->
-                  <?php if (!empty($post['shared_image_path'])): ?>
-                    <img src="<?= htmlspecialchars($post['shared_image_path']) ?>" alt="Shared Post Image" style="max-width: 150px; max-height: 150px; margin-top: 10px; border-radius: 10px;">
-                  <?php endif; ?>
-
-                  <!-- Video shared post -->
-                  <?php if (!empty($post['shared_video_path'])): ?>
-                    <video controls style="max-width: 100%; margin-top: 10px; border-radius: 10px;">
-                      <source src="<?= htmlspecialchars($post['shared_video_path']) ?>" type="video/mp4">
-                      Your browser does not support the video tag.
-                    </video>
-                  <?php endif; ?>
-
+                  <?php
+                    // Show shared post caption above media grid
+                    if (!empty($post['shared_content'])) {
+                      echo '<p>' . htmlspecialchars($post['shared_content']) . '</p>';
+                    }
+                    // Load multiple media for the shared post
+                    $sharedMediaStmt = $conn->prepare("SELECT file_path, media_type FROM post_media WHERE post_id = ?");
+                    $sharedMediaStmt->bind_param("i", $post['shared_post_id']);
+                    $sharedMediaStmt->execute();
+                    $sharedMediaResult = $sharedMediaStmt->get_result();
+                    if ($sharedMediaResult->num_rows > 0) {
+                      echo '<div class="post-media-grid">';
+                      while ($media = $sharedMediaResult->fetch_assoc()) {
+                        if ($media['media_type'] === 'image') {
+                          echo '<img src="' . htmlspecialchars($media['file_path']) . '" class="post-image" alt="Shared Post Image" onclick="openLightbox(\'' . htmlspecialchars($media['file_path']) . '\')">';
+                        } elseif ($media['media_type'] === 'video') {
+                          echo '<video controls class="post-video" onclick="openLightboxVideo(\'' . htmlspecialchars($media['file_path']) . '\')"><source src="' . htmlspecialchars($media['file_path']) . '" type="video/mp4"></video>';
+                        }
+                      }
+                      echo '</div>';
+                    }
+                    $sharedMediaStmt->close();
+                  ?>
                 </div>
-
               <?php endif; ?>
 
-              <!-- MAIN POST CONTENT -->
-              <div class="post-content" data-post-id="<?= $post['post_id'] ?>">
-                <p class="post-text"><?= htmlspecialchars($post['content']) ?></p>
-              </div>
-
-              <!-- Display uploaded image/video -->
-              <?php
-              $imageClass = !empty($post['image_path']) ? getMediaClass($post['image_path']) : '';
-              ?>
-
-              <?php if (!empty($post['image_path'])): ?>
-                <img src="<?= htmlspecialchars($post['image_path']) ?>"
-                    onclick="openLightbox('image', '<?= htmlspecialchars($post['image_path']) ?>')"
-                    style="max-width: 100%; max-height: 500px; cursor: zoom-in; border-radius: 10px;" />
-              <?php endif; ?>
-
-              <?php if (!empty($post['video_path'])): ?>
-                <video src="<?= htmlspecialchars($post['video_path']) ?>"
-                      onclick="openLightbox('video', '<?= htmlspecialchars($post['video_path']) ?>')"
-                      style="max-width: 100%; max-height: 500px; cursor: zoom-in; border-radius: 10px;"
-                      muted></video>
-              <?php endif; ?>
-
+              <!-- FOOTER -->
               <footer class="post-footer">
                 <div class="post-actions">
-                  <!-- LIKE -->
+                  <!-- Like -->
                   <form method="POST" class="like-form" style="display:inline;">
                     <input type="hidden" name="like_post_id" value="<?= $post['post_id'] ?>">
                     <button type="button" class="icon-btn like-button <?= $userLiked ? 'liked' : '' ?>" data-post-id="<?= $post['post_id'] ?>">
@@ -534,13 +553,13 @@ function getAlbumCover($albumId, $conn) {
                     </button>
                   </form>
 
-                  <!-- COMMENT TOGGLE -->
+                  <!-- Comment toggle -->
                   <button class="icon-btn" onclick="document.getElementById('comment-form-<?= $post['post_id'] ?>').classList.toggle('hidden')">
                     <i class="ri-chat-1-line"></i>
                     <span><?= $countComments['total'] ?></span>
                   </button>
 
-                  <!-- SHARE -->
+                  <!-- Share -->
                   <form method="POST" action="share_post.php" style="display:inline;">
                     <input type="hidden" name="share_post_id" value="<?= $post['post_id'] ?>">
                     <button type="submit" class="icon-btn">
@@ -552,7 +571,7 @@ function getAlbumCover($albumId, $conn) {
                 <button class="icon-btn"><i class="ri-bookmark-line"></i></button>
               </footer>
 
-              <!-- COMMENTS SECTION -->
+               <!-- COMMENTS SECTION -->
               <div id="comment-form-<?= $post['post_id'] ?>" class="hidden" style="margin-top:10px;">
                 <form method="POST" action="profile.php">
                   <input type="hidden" name="comment_post_id" value="<?= $post['post_id'] ?>">
@@ -580,19 +599,98 @@ function getAlbumCover($albumId, $conn) {
                 </div>
               </div>
             </article>
-
           <?php endwhile; ?>
+        </section>
+      </div>
 
+      <!-- Add tab content containers below main grid -->
+      <div id="tab-photos" class="profile-tab-content" style="display:none;">
+        <section class="glass card">
+          <h4 class="card-title">All Photos</h4>
+          <div class="photo-grid">
+            <?php foreach ($userImages as $media): ?>
+              <img
+                src="<?= htmlspecialchars($media['file_path']) ?>"
+                class="gallery-item"
+                data-type="image"
+                data-src="<?= htmlspecialchars($media['file_path']) ?>"
+                alt="User Image"
+              />
+            <?php endforeach; ?>
+          </div>
+        </section>
+      </div>
+      <div id="tab-videos" class="profile-tab-content" style="display:none;">
+        <section class="glass card">
+          <h4 class="card-title">All Videos</h4>
+          <div class="photo-grid">
+            <?php foreach ($userVideos as $media): ?>
+              <video
+                class="gallery-item"
+                muted
+                data-type="video"
+                data-src="<?= htmlspecialchars($media['file_path']) ?>"
+              >
+                <source src="<?= htmlspecialchars($media['file_path']) ?>" type="video/mp4" />
+              </video>
+            <?php endforeach; ?>
+          </div>
+        </section>
+      </div>
+
+      <!-- Friends Tab Content -->
+      <div id="tab-friends" class="profile-tab-content" style="display:none;">
+        <section class="glass card">
+          <h4 class="card-title">All Users</h4>
+          <ul style="list-style:none; padding:0; margin:0;">
+            <?php foreach ($allUsers as $user): ?>
+              <?php
+                $profilePic = !empty($user['profile_picture']) ? $user['profile_picture'] : 'rawr.png';
+              ?>
+              <li style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                <img class="avatar avatar--sm" src="../assets/profile/<?= htmlspecialchars($profilePic) ?>" alt="">
+                <div>
+                  <strong><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></strong>
+                  <div style="font-size:0.85em;color:#aaa;">@<?= htmlspecialchars($user['user_name']) ?></div>
+                </div>
+              </li>
+            <?php endforeach; ?>
+          </ul>
         </section>
       </div>
     </main>
 
     <!-- Lightbox Modal -->
     <div id="lightbox" class="lightbox" style="display:none;">
-      <span class="close" onclick="closeLightbox()">×</span>
+      <span class="lightbox-close" onclick="closeLightbox()">×</span>
       <div class="lightbox-content" id="lightboxContent"></div>
     </div>
 
-    <script src="./script/dashboard.js"></script>
+    <script>
+      // Tab switching logic
+      const tabs = document.querySelectorAll('#profileTabs .tab');
+      const tabContents = {
+        posts: document.querySelector('.profile-main-grid'),
+        friends: document.getElementById('tab-friends'),
+        photos: document.getElementById('tab-photos'),
+        videos: document.getElementById('tab-videos'),
+        more: null // implement if needed
+      };
+      tabs.forEach(tab => {
+        tab.addEventListener('click', function(e) {
+          e.preventDefault();
+          tabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          Object.values(tabContents).forEach(c => { if (c) c.style.display = 'none'; });
+          const tabKey = tab.getAttribute('data-tab');
+          if (tabKey === 'posts') {
+            tabContents.posts.style.display = '';
+          } else if (tabContents[tabKey]) {
+            tabContents[tabKey].style.display = '';
+          }
+        });
+      });
+    </script>
+    <script src="../script/dashboard.js"></script>
   </body>
 </html>

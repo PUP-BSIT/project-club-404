@@ -27,6 +27,22 @@ if (!$user_row) {
 
 $user_id = $user_row['id'];
 
+// Get the latest message ID and update user's last_seen_message_id
+$latest_msg_query = $conn->query("SELECT MAX(id) as max_id FROM messages");
+$latest_msg = $latest_msg_query->fetch_assoc();
+$latest_msg_id = $latest_msg['max_id'] ?? 0;
+
+$update_last_seen = $conn->prepare("UPDATE users SET last_seen_message_id = ? WHERE id = ?");
+$update_last_seen->bind_param("ii", $latest_msg_id, $user_id);
+$update_last_seen->execute();
+$update_last_seen->close();
+
+// Mark all messages as read for the current user
+$update = $conn->prepare("UPDATE messages SET is_read = 1 WHERE user_id = ? AND is_read = 0");
+$update->bind_param("i", $user_id);
+$update->execute();
+$update->close();
+
 // Handle adding or updating a message
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (isset($_POST["comment"]) && trim($_POST["comment"]) !== "") {
@@ -100,7 +116,7 @@ $conn->close();
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@4.6.4/dist/index.min.js"></script>
-  <link rel="stylesheet" href="./stylesheet/messages.css" />
+  <link rel="stylesheet" href="../stylesheet/messages.css" />
 </head>
 <body class="page">
   <header class="top-nav glass">
@@ -143,7 +159,7 @@ $conn->close();
         <div class="message-preview">
           <div class="comment-box">
             <div class="comment-header">
-            <img src="./assets/profile/<?= htmlspecialchars($row['profile_picture'] ?? 'rawr.png') ?>" alt="Avatar" class="avatar avatar--sm" />
+            <img src="../assets/profile/<?= htmlspecialchars($row['profile_picture'] ?? 'rawr.png') ?>" alt="Avatar" class="avatar avatar--sm" />
               <div class="preview-text">
                 <h4><?= htmlspecialchars($row['user_name']) ?></h4>
                 <p><?= htmlspecialchars($row['message']) ?></p>
@@ -166,10 +182,10 @@ $conn->close();
         </div>
       <?php endforeach; ?>
     <?php else: ?>
-      <p>No messages found.</p>
+      <p class="no-messages">No messages found.</p>
     <?php endif; ?>
   </div>
 
-  <script src="./script/messages.js"></script>
+  <script src="../script/messages.js"></script>
 </body>
 </html>

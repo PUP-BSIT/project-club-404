@@ -4,6 +4,10 @@ require_once 'users.php';
 
 $message = '';
 $activeTab = 'login'; // Default tab
+if(isset($_SESSION['isloginok']) && $_SESSION['isloginok'] === true) {
+    header('Location: dashboard.php');
+    exit();
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['login'])) {
@@ -51,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./stylesheet/form_style.css" />
+    <link rel="stylesheet" href="../stylesheet/form_style.css" />
   </head>
 
   <body>
@@ -65,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               <h1 class="heading">HeyBleepi</h1>
               <p class="subheading">Connect with friends across the galaxy</p>
               <div class="image-container">
-                <img src="./assets/heybleepi-mascot.jpg" alt="HeyBleepi Cat Mascot" class="mascot" />
+                <img src="../assets/heybleepi-mascot.jpg" alt="HeyBleepi Cat Mascot" class="mascot" />
               </div>
               <p class="description">
                 Join thousands of space explorers connecting across the universe
@@ -105,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <span class="checkmark"></span>
                     <span>Remember me</span>
                   </label>
-                  <a href="#" class="link">Forgot password?</a>
+                  <a href="forgot_password.php" class="link">Forgot password?</a>
                 </div>
 
                 <button type="submit" name="login" class="auth-button">Login</button>
@@ -188,6 +192,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </div>
     </div>
 
-    <script src="./script/form_script.js"></script>
+    <script src="../script/form_script.js"></script>
   </body>
 </html>

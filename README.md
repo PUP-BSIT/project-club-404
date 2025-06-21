@@ -30,7 +30,7 @@
 ## 🌐 Web Hosting
 
 - **Hosted on:** Hostinger
-- **Live URL:** [HeyBleepi.com](https://dimgrey-parrot-643194.hostingersite.com/)
+- **Live URL:** [heybleepi.site](https://heybleepi.site/)
 
 ---
 
@@ -38,7 +38,7 @@
 
 To explore without registering:
 
-- **Email:** `joe123@example`
+- **Email:** `joe123@example.com`
 - **Password:** `joe123`
 
 ---

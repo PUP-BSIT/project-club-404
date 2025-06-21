@@ -22,37 +22,6 @@ $stmt->execute();
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 
-$defaultProfilePic = 'rawr.png';
-$oldProfilePath = __DIR__ . "/assets/profile/" . $user['profile_picture'];
-if (empty($user['profile_picture']) || $user['profile_picture'] !== $defaultProfilePic && !file_exists($oldProfilePath)) {
-  $stmt = $conn->prepare(
-    "UPDATE user_details
-      SET profile_picture = ?
-      WHERE id_fk = ?"
-  );
-
-
-  $stmt-> bind_param("si", $defaultProfilePic, $user['id']);
-  $stmt-> execute();
-  $user['profile_picture'] = $defaultProfilePic;
-  
-}
-
-$defaultCoverPic = 'dark_mode.jpg';
-$oldCoverPath = __DIR__ . "/assets/profile/" . $user['profile_cover'];
-if (empty($user['profile_cover']) || $user['profile_picture'] !== $defaultCoverPic && !file_exists($oldCoverPath)) {
-    $stmt = $conn->prepare(
-      "UPDATE user_details
-       SET profile_cover = ?
-       WHERE id_fk = ?"
-    );
-    
-    $stmt-> bind_param("si", $defaultCoverPic, $user['id']);
-    $stmt-> execute();
-    $user['profile_cover'] = $defaultCoverPic;
-  
-}
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $newUsername = $_POST['username'];
   $firstName = $_POST['first_name'];
@@ -104,25 +73,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if (isset($_FILES['file_input']) && $_FILES['file_input']['error'] === UPLOAD_ERR_OK) {
     $avatarName = basename($_FILES['file_input']['name']);
     $avatarTmp = $_FILES['file_input']['tmp_name'];
-    $avatarPath = __DIR__ . "/assets/profile/" . $avatarName;
+    $uploadPath = __DIR__ . "/assets/profile/" . $avatarName;
 
-    if (!empty($user['profile_picture']) && $user['profile_picture'] !== 'rawr.png') {
-        $oldProfilePath = __DIR__ . "/assets/profile/" . $user['profile_picture'];
-        if (file_exists($oldProfilePath)) {
-            unlink($oldProfilePath);
-        }
+    if (move_uploaded_file($avatarTmp, $uploadPath)) {
+      $stmt = $conn->prepare("UPDATE user_details SET profile_picture = ? WHERE id_fk = ?");
+      $stmt->bind_param("si", $avatarName, $userId);
+      $stmt->execute();
     }
-
-    move_uploaded_file($avatarTmp, $avatarPath);
-
-    $stmt = $conn->prepare(
-      "UPDATE user_details 
-      SET profile_picture = ? 
-      WHERE id_fk = ?"
-    );
-
-    $stmt->bind_param("si", $avatarName, $userId);
-    $stmt->execute();
   }
 
   // Handle cover photo upload
@@ -130,31 +87,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $coverName = basename($_FILES['cover_input']['name']);
     $coverTmp = $_FILES['cover_input']['tmp_name'];
     $coverPath = __DIR__ . "/assets/profile/" . $coverName;
-    
-    if (!empty($user['profile_cover']) && $user['profile_cover'] !== 'dark_mode.jpg') {
-      $oldCoverPath = __DIR__ . "/assets/profile/" . $user['profile_cover'];
-      if (file_exists($oldCoverPath)) {
-        unlink($oldCoverPath);
-      }
+
+    if (move_uploaded_file($coverTmp, $coverPath)) {
+      $stmt = $conn->prepare("UPDATE user_details SET profile_cover = ? WHERE id_fk = ?");
+      $stmt->bind_param("si", $coverName, $userId);
+      $stmt->execute();
     }
-
-    move_uploaded_file($coverTmp, $coverPath);
-
-    $stmt = $conn->prepare(
-      "UPDATE user_details 
-      SET profile_cover = ? 
-      WHERE id_fk = ?"
-    );
-
-    $stmt->bind_param("si", $coverName, $userId);
-    $stmt->execute();
   }
 
   // Update session variables to reflect new profile
   $_SESSION['username'] = $newUsername;
   $_SESSION['first_name'] = $firstName;
   $_SESSION['last_name'] = $lastName;
-
+  
   if (!empty($avatarName)) {
     $_SESSION['avatar'] = $avatarName;
   }
@@ -171,7 +116,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Edit Your Profile!</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="stylesheet/profile_edit.css" />
+    <link rel="stylesheet" href="../stylesheet/profile_edit.css" />
   </head>
 
   <body>
@@ -181,7 +126,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <!-- Cover Upload -->
         <div class="cover-preview-div"
-          style="background-image: url('../assets/profile/<?php echo htmlspecialchars($user['profile_cover'] ?? 'dark_mode.jpg') ?>');"
+          style="background-image: url('../assets/profile/<?= htmlspecialchars($user['profile_cover'] ?? 'dark_mode.jpg') ?>');"
           id="cover_preview_div">
         </div>
         <button class="change-profile-pic" type="button" onclick="changeCover()">Change Cover Photo</button>
@@ -190,7 +135,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <!-- Edit Profile Title -->
         <div class="profile-picture">
           <img id="profile_image"
-            src="../assets/profile/<?php echo htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>"
+            src="../assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>"
             alt="Profile Picture" />
           <label for="file_input" class="change-profile-image">+</label>
           <input type="file" name="file_input" id="file_input" accept="image/*" hidden />
@@ -209,11 +154,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           </div>
           <div class="input-group">
             <label for="username">Username</label>
-            <input type="text" id="username" name="username" value="<?= htmlspecialchars($user['user_name']) ?>" />
-          </div>
-          <div class="input-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" />
+            <input type="text" id="username" name="username" value="<?= htmlspecialchars($user['user_name']) ?>" 
+            <?= isset($_SESSION['oauth_provider']) ? 'readonly style="background-color:#8f9585;cursor:not-allowed;"' : '' ?> />
           </div>
         </div>
 
@@ -263,6 +205,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       </form>
 
     </div>
-    <script src="script/profile_edit.js"></script>
+    <script src="../script/profile_edit.js"></script>
   </body>
 </html>

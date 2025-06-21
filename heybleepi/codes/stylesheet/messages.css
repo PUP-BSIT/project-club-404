@@ -393,6 +393,12 @@ form button:hover,
   white-space: pre-wrap;
 }
 
+.no-messages {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
+
 .button-row button,
 .button-row .cancel {
   width: 100%;
