@@ -20,7 +20,8 @@
 }
 
 body {
-  background: url(../assets/dark_mode.jpg) center/cover fixed no-repeat;
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(to right, #1e293b, #0f172a);
   color: white;
 }
 
