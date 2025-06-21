@@ -10,16 +10,33 @@ $error = '';
 // Approve/Deny 
 if (isset($_POST['approve'])) {
     $user_id = $_SESSION['user_id'];
-    $token = bin2hex(random_bytes(32));
-    $expires_at = date('Y-m-d H:i:s', strtotime('+1 hour'));
-    $stmt = $conn->prepare("INSERT INTO oauth_tokens (user_id, client_id, token, expires_at) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("isss", $user_id, $client_id, $token, $expires_at);
+    
+    // Check for existing valid token for this user and client
+    $stmt = $conn->prepare("
+        SELECT token 
+        FROM oauth_tokens 
+        WHERE user_id = ? AND client_id = ? AND expires_at > NOW()
+        ORDER BY created_at DESC 
+        LIMIT 1
+    ");
+    $stmt->bind_param("is", $user_id, $client_id);
     $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($row = $result->fetch_assoc()) {
+        // Reuse existing token
+        $token = $row['token'];
+    } else {
+        // No valid token found — generate a new one
+        $token = bin2hex(random_bytes(32));
+        $expires_at = date('Y-m-d H:i:s', strtotime('+1 hour'));
+        $stmt = $conn->prepare("INSERT INTO oauth_tokens (user_id, client_id, token, expires_at) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("isss", $user_id, $client_id, $token, $expires_at);
+        $stmt->execute();
+    }
+    
+    // Redirect back to client with token
     header("Location: $redirect_uri&token=$token");
-    exit;
-}
-if (isset($_POST['deny'])) {
-    header("Location: $redirect_uri?error=access_denied");
     exit;
 }
 
