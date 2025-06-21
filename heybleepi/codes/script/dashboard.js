@@ -578,3 +578,421 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.comment-dropdown').forEach(d => d.classList.add('hidden'));
   });
 });
+
+// Get user's location and store it in the hidden input
+const openCageApiKey = "8653b83ddf764a60b2fd8df561100fdd"; // Get this from opencagedata.com
+
+let map;
+let mapInitialized = false;
+let selectedPlaceName = null;
+let currentMarker = null;
+
+// DOM elements
+const openMapBtn = document.getElementById("openMapModal");
+const modal = document.getElementById("mapModal");
+const cancelMapBtn = document.getElementById("cancelMapModal");
+const confirmBtn = document.getElementById("confirmLocationBtn");
+const locationInput = document.getElementById("postLocation");
+
+// Modal logic
+openMapBtn.addEventListener("click", function (e) {
+  e.preventDefault();
+  e.stopPropagation();
+
+  console.log("Opening map modal...");
+  modal.style.display = "block";
+
+  setTimeout(() => {
+    if (!mapInitialized) {
+      initMap();
+    } else {
+      map.invalidateSize(); // Leaflet equivalent of resize
+    }
+  }, 300);
+});
+
+document.querySelector("form").addEventListener("submit", function (e) {
+  // Prevent accidental submission if modal is open
+  const modal = document.getElementById("mapModal");
+  if (modal.style.display === "block") {
+    console.log("Blocking form submit while map modal is open");
+    e.preventDefault();
+  }
+});
+
+// OpenCage geocoding functions
+async function geocodeAddress(address) {
+  try {
+    const response = await fetch(
+      `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(address)}&key=${openCageApiKey}&limit=5`
+    );
+    const data = await response.json();
+
+    if (data.results && data.results.length > 0) {
+      return data.results;
+    }
+    return [];
+  } catch (error) {
+    console.error("Geocoding error:", error);
+    return [];
+  }
+}
+
+async function reverseGeocode(lat, lng) {
+  try {
+    const response = await fetch(
+      `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lng}&key=${openCageApiKey}`
+    );
+    const data = await response.json();
+
+    if (data.results && data.results.length > 0) {
+      return data.results[0];
+    }
+    return null;
+  } catch (error) {
+    console.error("Reverse geocoding error:", error);
+    return null;
+  }
+}
+
+// Create custom search control that uses existing geocoder div
+function createSearchControl() {
+  const geocoderDiv = document.getElementById('geocoder');
+
+  const searchInput = document.createElement('input');
+  searchInput.type = 'text';
+  searchInput.placeholder = 'Search for a place...';
+  searchInput.style.cssText = `
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+    outline: none;
+    font-family: inherit;
+  `;
+
+  const searchResults = document.createElement('div');
+  searchResults.className = 'search-results';
+  searchResults.style.cssText = `
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  `;
+
+  // Make geocoder div relative for positioning
+  geocoderDiv.style.position = 'relative';
+  geocoderDiv.innerHTML = '';
+  geocoderDiv.appendChild(searchInput);
+  geocoderDiv.appendChild(searchResults);
+
+  // Search functionality with debouncing
+  let searchTimeout;
+  searchInput.addEventListener('input', (e) => {
+    clearTimeout(searchTimeout);
+    const query = e.target.value.trim();
+
+    if (query.length < 3) {
+      searchResults.style.display = 'none';
+      return;
+    }
+
+    searchTimeout = setTimeout(async () => {
+      const results = await geocodeAddress(query);
+      displaySearchResults(results, searchResults, searchInput);
+    }, 300);
+  });
+
+  // Hide results when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!geocoderDiv.contains(e.target)) {
+      searchResults.style.display = 'none';
+    }
+  });
+
+  return geocoderDiv;
+}
+
+function displaySearchResults(results, container, searchInput) {
+  container.innerHTML = '';
+
+  if (results.length === 0) {
+    const noResults = document.createElement('div');
+    noResults.style.cssText = `
+      padding: 12px;
+      color: #666;
+      font-style: italic;
+      font-size: 14px;
+    `;
+    noResults.textContent = 'No locations found';
+    container.appendChild(noResults);
+    container.style.display = 'block';
+    return;
+  }
+
+  results.forEach(result => {
+    const resultItem = document.createElement('div');
+    resultItem.style.cssText = `
+      padding: 12px;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+      font-size: 14px;
+      transition: background-color 0.2s ease;
+    `;
+    resultItem.textContent = result.formatted;
+
+    resultItem.addEventListener('mouseenter', () => {
+      resultItem.style.backgroundColor = '#f8f9fa';
+    });
+
+    resultItem.addEventListener('mouseleave', () => {
+      resultItem.style.backgroundColor = 'white';
+    });
+
+    resultItem.addEventListener('click', () => {
+      selectLocation(result);
+      container.style.display = 'none';
+      searchInput.value = result.formatted;
+    });
+
+    container.appendChild(resultItem);
+  });
+
+  container.style.display = 'block';
+}
+
+function selectLocation(location) {
+  const { lat, lng } = location.geometry;
+  selectedPlaceName = location.formatted;
+
+  // Update map view
+  map.setView([lat, lng], 15);
+
+  // Remove existing marker
+  if (currentMarker) {
+    map.removeLayer(currentMarker);
+  }
+
+  // Add new marker
+  currentMarker = L.marker([lat, lng]).addTo(map);
+
+  // Update confirm button state
+  if (confirmBtn) {
+    confirmBtn.disabled = false;
+    confirmBtn.textContent = `Use This Location`;
+    confirmBtn.style.opacity = '1';
+  }
+}
+
+function initMap() {
+  if (mapInitialized) return;
+  mapInitialized = true;
+
+  // Initialize Leaflet map
+  map = L.map('map').setView([14.5995, 120.9842], 10); // Philippines center
+
+  // Add OpenStreetMap tiles
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+
+  // Initialize the search control in your existing geocoder div
+  createSearchControl();
+
+  // Add click handler for map
+  map.on('click', async (e) => {
+    const { lat, lng } = e.latlng;
+
+    // Show loading state
+    if (confirmBtn) {
+      confirmBtn.textContent = 'Loading location...';
+      confirmBtn.disabled = true;
+      confirmBtn.style.opacity = '0.6';
+    }
+
+    // Reverse geocode the clicked location
+    const result = await reverseGeocode(lat, lng);
+
+    if (result) {
+      selectLocation(result);
+      // Update search input with selected location
+      const searchInput = document.querySelector('#geocoder input');
+      if (searchInput) {
+        searchInput.value = result.formatted;
+      }
+    } else {
+      // Even if reverse geocoding fails, allow user to use the coordinates
+      selectedPlaceName = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+
+      // Remove existing marker
+      if (currentMarker) {
+        map.removeLayer(currentMarker);
+      }
+
+      // Add new marker
+      currentMarker = L.marker([lat, lng]).addTo(map);
+
+      if (confirmBtn) {
+        confirmBtn.textContent = 'Use This Location';
+        confirmBtn.disabled = false;
+        confirmBtn.style.opacity = '1';
+      }
+    }
+  });
+
+  setTimeout(() => map.invalidateSize(), 200);
+}
+
+// Confirm location selection
+if (confirmBtn) {
+  confirmBtn.addEventListener('click', () => {
+    if (selectedPlaceName && locationInput) {
+      locationInput.value = selectedPlaceName;
+      modal.style.display = 'none';
+
+      // Trigger change event for other listeners
+      locationInput.dispatchEvent(new Event('change'));
+
+      console.log('Location selected:', selectedPlaceName);
+    }
+  });
+}
+
+// Cancel modal for exiting without selection
+if (cancelMapBtn) {
+  cancelMapBtn.addEventListener('click', () => {
+    modal.style.display = 'none';
+    selectedPlaceName = null;
+
+    // Clear search input
+    const searchInput = document.querySelector('#geocoder input');
+    if (searchInput) {
+      searchInput.value = '';
+    }
+
+    // Reset results
+    const searchResults = document.querySelector('#geocoder .search-results');
+    if (searchResults) {
+      searchResults.style.display = 'none';
+    }
+
+    if (currentMarker) {
+      map.removeLayer(currentMarker);
+      currentMarker = null;
+    }
+
+    // Reset confirm button
+    if (confirmBtn) {
+      confirmBtn.textContent = 'Use This Location';
+      confirmBtn.disabled = true;
+      confirmBtn.style.opacity = '0.6';
+    }
+  });
+}
+
+// Close modal when clicking outside
+modal?.addEventListener('click', (e) => {
+  if (e.target === modal) {
+    modal.style.display = 'none';
+    selectedPlaceName = null;
+
+    // Clear search input
+    const searchInput = document.querySelector('#geocoder input');
+    if (searchInput) {
+      searchInput.value = '';
+    }
+
+    if (currentMarker) {
+      map.removeLayer(currentMarker);
+      currentMarker = null;
+    }
+
+    // Reset confirm button
+    if (confirmBtn) {
+      confirmBtn.textContent = 'Use This Location';
+      confirmBtn.disabled = true;
+      confirmBtn.style.opacity = '0.6';
+    }
+  }
+});
+
+// Get user's current location
+function getCurrentLocation() {
+  if (navigator.geolocation) {
+    // Show loading state
+    if (confirmBtn) {
+      confirmBtn.textContent = 'Getting your location...';
+      confirmBtn.disabled = true;
+      confirmBtn.style.opacity = '0.6';
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+
+        // Reverse geocode current location
+        const result = await reverseGeocode(latitude, longitude);
+
+        if (result && map) {
+          map.setView([latitude, longitude], 15);
+
+          // Add marker for current location
+          if (currentMarker) {
+            map.removeLayer(currentMarker);
+          }
+
+          currentMarker = L.marker([latitude, longitude])
+            .addTo(map)
+            .bindPopup('Your current location')
+            .openPopup();
+
+          selectedPlaceName = result.formatted;
+
+          // Update search input
+          const searchInput = document.querySelector('#geocoder input');
+          if (searchInput) {
+            searchInput.value = result.formatted;
+          }
+
+          // Enable confirm button
+          if (confirmBtn) {
+            confirmBtn.textContent = 'Use This Location';
+            confirmBtn.disabled = false;
+            confirmBtn.style.opacity = '1';
+          }
+        }
+      },
+      (error) => {
+        console.error("Geolocation error:", error);
+        alert("Unable to get your location. Please search for a place or click on the map.");
+
+        // Reset confirm button
+        if (confirmBtn) {
+          confirmBtn.textContent = 'Use This Location';
+          confirmBtn.disabled = true;
+          confirmBtn.style.opacity = '0.6';
+        }
+      }
+    );
+  } else {
+    alert("Geolocation is not supported by this browser.");
+  }
+}
+
+// Export functions for external use if needed
+window.mapFunctions = {
+  getCurrentLocation,
+  geocodeAddress,
+  reverseGeocode
+};
