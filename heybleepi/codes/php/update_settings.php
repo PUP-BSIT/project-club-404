@@ -7,7 +7,7 @@ if (!isset($_SESSION['username'])) {
   exit();
 }
 
-// Get the current username using the session.
+// Get the current user id using the session.
 $currentId= $_SESSION['id'];
 
 // Get form values
@@ -18,21 +18,37 @@ $updatedUsername = $_POST['user_name'] ?? "";
 $updatedEmail = $_POST['email'] ?? "";
 $updatedBirthdate = $_POST['birthdate'] ?? "";
 
-// Update query
+// Check if the username exists.
+$checkQuery = "SELECT id FROM users WHERE user_name = ? AND id != ?";
+$stmt = $conn->prepare($checkQuery);
+$stmt->bind_param("si", $updatedUsername, $currentId);
+$stmt->execute();
+$stmt->store_result();
+
+if ($stmt->num_rows > 0) {
+    echo "Username already taken!";
+    $stmt->close();
+    $conn->close();
+    exit();
+}
+$stmt->close();
+
+// Update information query
 $sql = "UPDATE users 
-        SET user_name = '${updatedUsername}', 
-        first_name = '${updatedFirstName}', 
-        middle_name = '${updatedMiddleName}', 
-        last_name = '${updatedLastName}',
-        email = '${updatedEmail}', 
-        birthdate = '${updatedBirthdate}' 
-        WHERE id = '${currentId}';
+        SET user_name = '{$updatedUsername}', 
+        first_name = '{$updatedFirstName}', 
+        middle_name = '{$updatedMiddleName}', 
+        last_name = '{$updatedLastName}',
+        email = '{$updatedEmail}', 
+        birthdate = '{$updatedBirthdate}' 
+        WHERE id = '{$currentId}';
         
         UPDATE messages 
-        SET user_name = '${updatedUsername}'
-        WHERE user_id = '${currentId}';
+        SET user_name = '{$updatedUsername}'
+        WHERE user_id = '{$currentId}';
     ";
       
+// Handle error.
 if(!mysqli_multi_query($conn, $sql)) {
   echo "Failed to update account information";
 }
