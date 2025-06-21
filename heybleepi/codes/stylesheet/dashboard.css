@@ -35,12 +35,14 @@ body.page {
 
 /* Remove or override these for profile.php scrolling */
 body.page.profile-page {
-  height: auto !important;
-  min-height: 100vh !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  display: block !important;
-  position: static !important;
+  background: linear-gradient(to right, #1e293b, #0f172a);
+  font-family: 'Inter', sans-serif;
+  color: white;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 html {
@@ -188,6 +190,7 @@ body {
   position: sticky;
   top: 0;
   border-radius: 0;
+  margin-bottom: 1rem;
 }
 
 .brand {
@@ -1433,40 +1436,54 @@ textarea:focus {
   box-sizing: border-box;
 }
 
-.profile-info-bar {
+.profile-container {
+  max-width: 100vw;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
   display: flex;
-  align-items: center;
-  margin-top: -40px;
-  padding: 1.5rem 1rem;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(10px);
-  border-radius: 0 0 10px 10px;
-  gap: 1.5rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1 1 auto;
 }
 
 .profile-main-grid {
   display: grid;
-  grid-template-columns: 25% 75%;
-  gap: 2rem;
-  margin-top: 1rem;
+  grid-template-columns: 320px 1fr;
+  gap: 1.5rem;
+  margin: 0;
   width: 100%;
   box-sizing: border-box;
+  flex: 1 1 auto;
 }
 
-.profile-tabs {
-  display: flex;
-  gap: 1rem;
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+.left-column {
+  padding: 0;
+  margin: 0;
 }
 
-.profile-avatar {
-  width: 150px;
-  height: 150px;
-  border-radius: 9999px;
-  object-fit: cover;
-  border: 3px solid rgba(255, 255, 255, 0.3);
+.right-column {
+  padding: 0;
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .profile-main-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .profile-info-bar {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2rem 0 0 0;
+  }
+
+  .right-column {
+    max-height: none;
+    overflow-y: visible;
+  }
 }
 
 /* ==== USER ==== */
@@ -2023,4 +2040,114 @@ body.page {
   font-size: 28px;
   color: white;
   cursor: pointer;
+}
+
+/*  ====  PROFILE PAGE SPECIFIC STYLES  ==== */
+.profile-top.glass {
+  background: var(--card-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  padding: 0 0 2rem 0;
+  position: relative;
+  overflow: visible;
+}
+
+.profile-info-bar {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem 2rem 0 2rem;
+  background: none;
+}
+
+.profile-info-bar .avatar--sm2 {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid var(--glass-border);
+  background: #181f2f;
+}
+
+.user-basic-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: white;
+  gap: 0.25rem;
+}
+
+.profile-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+
+.profile-tabs.glass {
+  background: var(--card-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 0.5rem 1.5rem;
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.profile-tabs .tab {
+  color: white;
+  text-decoration: none;
+  font-size: 1rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 12px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.profile-tabs .tab.active {
+  font-weight: bold;
+  border-bottom: 2px solid #FF6BC4;
+  color: #FF6BC4;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.profile-main-grid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 1.5rem;
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  box-sizing: border-box;
+  flex: 1 1 auto;
+}
+
+.left-column {
+  padding: 0;
+  margin: 0;
+}
+
+.right-column {
+  padding: 0;
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .profile-main-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .profile-info-bar {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2rem 0 0 0;
+  }
+
+  .right-column {
+    max-height: none;
+    overflow-y: visible;
+  }
 }
