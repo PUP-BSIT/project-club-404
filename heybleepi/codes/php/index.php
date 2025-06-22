@@ -120,11 +120,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="social-connection">
                   <a href="oauth_login.php?provider=devhive" class="account-btn">
-                    <img src="./assets/connected_accounts/devhive.jpg" alt="Devhive logo">
+                    <img src="../assets/connected_accounts/devhive.jpg" alt="Devhive logo">
                     Devhive
                   </a>
                   <a href="oauth_login.php?provider=hershive" class="account-btn">
-                    <img src="./assets/connected_accounts/hershell.png" alt="Hershell logo">
+                    <img src="../assets/connected_accounts/hershell.png" alt="Hershell logo">
                     Hershell
                   </a>
                 </div>
