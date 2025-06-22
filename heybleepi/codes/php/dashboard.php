@@ -428,13 +428,10 @@ $unreadResult->close();
                   <img class="avatar avatar--sm" src="../assets/profile/<?= htmlspecialchars($post['profile_picture'] ?? 'default.png') ?>" alt="">
                 </a>
                 <div>
-                  <!-- Make user's name a link to their profile page -->
-                  <a href="profile.php?user=<?= urlencode($post['user_name']) ?>" class="poster-name">
+                  <!-- Show only user's name as a link to their profile page -->
+                  <a href="profile.php?user=<?= urlencode($post['user_name']) ?>" class="poster-name" style="display:block;">
                     <?= htmlspecialchars($post['first_name'] . ' ' . $post['last_name']) ?>
                   </a>
-                  <div style="font-size:0.9em;color:#888;">
-                    @<?= htmlspecialchars($post['user_name']) ?>
-                  </div>
                   <time><?= date("g:i A", strtotime($post['created_at'])) ?></time>
                 </div>
                 <?php if ($post['user_id'] == $_SESSION['id']): ?>
