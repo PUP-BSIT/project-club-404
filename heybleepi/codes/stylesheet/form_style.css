@@ -5,12 +5,20 @@ body {
   overflow-x: hidden;
 }
 
+/*Hides the another form, for toggle.*/
+.hidden {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: -1;
+}
+
 .main-container {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
+  /*padding: 1rem;*/
   position: relative;
   z-index: 10;
   background-image: url('./assets/login-register-bg.jpg')
@@ -80,25 +88,6 @@ body {
   backdrop-filter: blur(12px);
   border-radius: 1rem;
   color: white;
-}
-
-.star {
-  position: absolute;
-  background-color: white;
-  border-radius: 50%;
-  animation: twinkle 4s infinite;
-}
-
-@keyframes twinkle {
-
-  0%,
-  100% {
-    opacity: 0.2;
-  }
-
-  50% {
-    opacity: 1;
-  }
 }
 
 /* Flex container for "Remember me" and link */
@@ -230,7 +219,7 @@ body {
 
 /* Link styling */
 .agreement-text .link {
-  color: #311f79;
+  color: #dbd2ff;
   text-decoration: none;
 }
 
@@ -341,7 +330,7 @@ input:checked+.toggle-slider:before {
 /* Forms */
 
 .form-section {
-  margin-top: 1rem;
+  /*margin-top: 1rem;*/
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -357,12 +346,8 @@ input:checked+.toggle-slider:before {
   font-size: 0.85rem;
 }
 
-.form-input::placeholder {
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.form-input {
-  width: 100%;
+.name-group {
+  width: 68%;
   padding: 0.75rem 1rem 0.75rem 2.5rem;
   background-color: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -371,8 +356,33 @@ input:checked+.toggle-slider:before {
   outline: none;
 }
 
+.name-group::placeholder {
+    color: white;
+}
+
+.form-input::placeholder {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.form-input {
+  width: 90%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: white;
+  outline: none;
+}
+
 .form-input:focus {
   box-shadow: 0 0 0 2px rgba(138, 111, 223, 0.5);
+}
+
+.form-input:-webkit-autofill {
+  background-color: rgba(255, 255, 255, 0.05) !important;  
+  -webkit-box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important;
+  -webkit-text-fill-color: #fff !important;
+  transition: background-color 5000s ease-in-out 0s; /* Prevent flicker */
 }
 
 .input-icon {
@@ -392,9 +402,16 @@ input:checked+.toggle-slider:before {
   color: black
 }
 
+.form-section-2 {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 .input-toggle {
   position: absolute;
-  right: 0.75rem;
+  right: 0.25rem;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
@@ -402,6 +419,12 @@ input:checked+.toggle-slider:before {
   width: 2.5rem;
   height: 2.5rem;
   color: rgba(255, 255, 255, 0.7);
+  background-color: transparent;
+  border: none;
+}
+
+.input-toggle:hover {
+    cursor: pointer;
 }
 
 .auth-button {
@@ -413,10 +436,11 @@ input:checked+.toggle-slider:before {
   border-radius: 8px;
   cursor: pointer;
   transition: opacity 0.3s ease;
+  border: none;
 }
 
 .auth-button:hover {
-  opacity: 0.9;
+  opacity: 0.8;
 }
 
 /* Social Buttons */
