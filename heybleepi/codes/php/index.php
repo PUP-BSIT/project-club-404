@@ -141,15 +141,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="name-grid">
                   <div class="input-group">
                     <i class="ri-user-line input-icon"></i>
-                    <input type="text" name="first_name" placeholder="First Name" class="form-input" required />
+                    <input type="text" name="first_name" placeholder="First Name" class="name-group" required />
                   </div>
                   <div class="input-group">
                     <i class="ri-user-line input-icon"></i>
-                    <input type="text" name="middle_name" placeholder="Middle Name" class="form-input" />
+                    <input type="text" name="middle_name" placeholder="Middle Name" class="name-group" />
                   </div>
                   <div class="input-group">
                     <i class="ri-user-line input-icon"></i>
-                    <input type="text" name="last_name" placeholder="Last Name" class="form-input" required />
+                    <input type="text" name="last_name" placeholder="Last Name" class="name-group" required />
                   </div>
                 </div>
 
