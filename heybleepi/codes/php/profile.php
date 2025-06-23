@@ -196,7 +196,7 @@ function getAlbumCover($albumId, $conn) {
   $stmt->bind_result($path);
   $stmt->fetch();
   $stmt->close();
-  return $path ? $path : './assets/profile/default.png';
+  return $path ? $path : '../assets/profile/default.png';
 }
 
 // Fetch all user images and videos for tabs
@@ -229,11 +229,170 @@ if ($usersResult) {
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="../stylesheet/dashboard.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
-    <script>
-      const CURRENT_USER_NAME = <?= json_encode($user['first_name'] . ' ' . $user['last_name']) ?>;
-      const CURRENT_USER_USERNAME = <?= json_encode($user['user_name']) ?>;
-      const CURRENT_USER_AVATAR = <?= json_encode("../assets/profile/" . ($user['avatar'] ?? "rawr.png")) ?>;
-    </script>
+    <style>
+      /* --- Profile Banner & Info Bar Fixes --- */
+      .profile-top {
+        position: relative;
+        padding: 0;
+        overflow: visible;
+        min-height: 220px;
+        margin-bottom: 2.5rem;
+      }
+      .profile-top .banner-img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        border-radius: 12px 12px 0 0;
+        display: block;
+      }
+      .profile-info-bar {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -56px;
+        display: flex;
+        align-items: center;
+        background: var(--glass-bg, rgba(30,34,44,0.95));
+        border-radius: 0 0 12px 12px;
+        padding: 1.2rem 2rem 1.2rem 1.2rem;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        min-height: 110px;
+        z-index: 2;
+      }
+      .profile-info-bar .avatar--sm2 {
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        border: 5px solid #fff;
+        object-fit: cover;
+        margin-right: 1.5rem;
+        margin-top: -40px;
+        background: #fff;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      }
+      .profile-info-bar .user-basic-info {
+        flex: 1;
+      }
+      .profile-info-bar h2 {
+        margin: 0 0 4px 0;
+        font-size: 2rem;
+        font-weight: 700;
+      }
+      .profile-info-bar p {
+        margin: 0;
+        color: #aaa;
+        font-size: 1.1rem;
+      }
+      .profile-buttons {
+        display: flex;
+        gap: 0.7rem;
+        margin-left: 1.5rem;
+      }
+      .profile-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5em;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 500;
+        padding: 8px 18px;
+        cursor: pointer;
+        transition: background 0.15s, color 0.15s;
+        outline: none;
+      }
+      .profile-btn--story {
+        background: #1877f2;
+        color: #fff;
+      }
+      .profile-btn--story:hover {
+        background: #166fe0;
+      }
+      .profile-btn--edit {
+        background: #3a3b3c;
+        color: #fff;
+      }
+      .profile-btn--edit:hover {
+        background: #484a4d;
+      }
+      .profile-btn i {
+        font-size: 1.1em;
+        margin-right: 0.50; /* Increase spacing between icon and text */
+        display: inline-block;
+        vertical-align: middle;
+      }
+      @media (max-width: 700px) {
+        .profile-info-bar {
+          flex-direction: column;
+          align-items: flex-start;
+          padding: 1.2rem;
+          min-height: unset;
+        }
+        .profile-info-bar .avatar--sm2 {
+          margin: -60px 0 0 0;
+          width: 90px;
+          height: 90px;
+        }
+        .profile-buttons {
+          margin-left: 0;
+          margin-top: 1rem;
+        }
+      }
+      /* Fix main grid top margin to account for overlay */
+      .profile-main-grid {
+        margin-top: 8px; /* Reduce space above main grid */
+      }
+
+      /* --- Profile Tabs UI Fixes --- */
+      .profile-tabs {
+        display: flex;
+        gap: 0.5rem;
+        padding: 0 1.5rem;
+        height: 48px;
+        align-items: center;
+        border-radius: 0 0 12px 12px;
+        margin-bottom: 0 !important;
+        background: var(--glass-bg, rgba(30,34,44,0.95));
+        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      }
+      .profile-tabs .tab {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 38px;
+        min-width: 80px;
+        padding: 0 22px;
+        font-size: .95rem;
+        font-weight: 500;
+        color: #bfc6d1;
+        border-radius: 0;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        transition: background 0.15s, color 0.15s;
+        margin-bottom: 0;
+        position: relative;
+      }
+      .profile-tabs .tab.active {
+        background: transparent;
+        color: #3b82f6;
+      }
+      .profile-tabs .tab.active::after {
+        content: "";
+        display: block;
+        position: absolute;
+        left: 18%;
+        right: 18%;
+        bottom: 0;
+        height: 3px;
+        background: #3b82f6;
+        border-radius: 2px;
+      }
+      .profile-tabs .tab:hover:not(.active) {
+        background: rgba(255,255,255,0.08);
+        color: #fff;
+      }
+    </style>
   </head>
 
   <body class="page profile-page">
@@ -298,8 +457,12 @@ if ($usersResult) {
           </div>
           <?php if ($userId == $_SESSION['id']): ?>
           <div class="profile-buttons">
-            <button class="btn btn--primary">Add to Story</button>
-            <button class="btn btn--action" onclick="window.location.href='profile_edit.php'">Edit Profile</button>
+            <button class="profile-btn profile-btn--story">
+              <i class="ri-add-line"></i> Add to story
+            </button>
+            <button class="profile-btn profile-btn--edit" onclick="window.location.href='profile_edit.php'">
+              <i class="ri-pencil-line"></i> Edit profile
+            </button>
           </div>
           <?php endif; ?>
         </div>
