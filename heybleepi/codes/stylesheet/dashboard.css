@@ -2146,3 +2146,17 @@ body.page {
   right: unset !important;
   flex-direction: column;
 }
+
+/* Post location preview */
+.create-post-location-preview {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 0 0;
+  font-size: 0.95rem;
+  color: #000418;
+  background: rgba(79, 138, 255, 0.08);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-weight: 500;
+}

@@ -996,3 +996,106 @@ window.mapFunctions = {
   geocodeAddress,
   reverseGeocode
 };
+
+// Location Map Preview for Create Post
+let previewMap, previewMarker;
+const locationMapPreviewContainer = document.getElementById('locationMapPreviewContainer');
+const locationMapPreview = document.getElementById('locationMapPreview');
+const postLocationInput = document.getElementById('postLocation');
+const removeLocationBtn = document.getElementById('removeLocationBtn');
+
+// Helper: Geocode location string to lat/lng using OpenCage
+async function getLatLngFromLocation(locationText) {
+  const apiKey = "8653b83ddf764a60b2fd8df561100fdd";
+  const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(locationText)}&key=${apiKey}&limit=1`;
+  const res = await fetch(url);
+  const data = await res.json();
+  if (data.results && data.results.length > 0) {
+    return data.results[0].geometry;
+  }
+  return null;
+}
+
+// Show map preview when location is set
+async function showLocationMapPreview(locationText) {
+  if (!locationText) {
+    locationMapPreviewContainer.style.display = 'none';
+    if (previewMap) {
+      previewMap.remove();
+      previewMap = null;
+      previewMarker = null;
+    }
+    return;
+  }
+  locationMapPreviewContainer.style.display = 'block';
+
+  // Only create map if not already created
+  if (!previewMap) {
+    previewMap = L.map(locationMapPreview, { attributionControl: false, zoomControl: false }).setView([0, 0], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: ''
+    }).addTo(previewMap);
+  }
+
+  // Geocode and set marker
+  const coords = await getLatLngFromLocation(locationText);
+  if (coords) {
+    previewMap.setView([coords.lat, coords.lng], 15);
+    if (previewMarker) previewMap.removeLayer(previewMarker);
+    previewMarker = L.marker([coords.lat, coords.lng]).addTo(previewMap);
+  }
+}
+
+// Listener for changes to location input
+if (postLocationInput) {
+  postLocationInput.addEventListener('input', function () {
+    if (this.value) {
+      showLocationMapPreview(this.value);
+    } else {
+      locationMapPreviewContainer.style.display = 'none';
+      if (previewMap) {
+        previewMap.remove();
+        previewMap = null;
+        previewMarker = null;
+      }
+    }
+  });
+}
+
+// Remove location
+if (removeLocationBtn) {
+  removeLocationBtn.onclick = function () {
+    if (postLocationInput) {
+      postLocationInput.value = '';
+      postLocationInput.dispatchEvent(new Event('input'));
+    }
+  };
+}
+
+// When location is selected from the map modal
+window.setLocationPreview = function (locationText) {
+  if (postLocationInput) {
+    postLocationInput.value = locationText;
+    postLocationInput.dispatchEvent(new Event('input'));
+  }
+};
+
+// Show map preview if location is already set on page load
+if (postLocationInput && postLocationInput.value) {
+  showLocationMapPreview(postLocationInput.value);
+}
+
+// Render static maps for posted locations
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('[id^="postMap"]').forEach(async function (div) {
+    const locationText = div.parentElement.querySelector('.post-location i + text, .post-location i + span, .post-location i + div, .post-location i').nextSibling?.textContent?.trim() ||
+      div.parentElement.textContent.trim();
+    if (!locationText) return;
+    const coords = await getLatLngFromLocation(locationText);
+    if (coords) {
+      const map = L.map(div, { attributionControl: false, zoomControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false, boxZoom: false, keyboard: false }).setView([coords.lat, coords.lng], 15);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '' }).addTo(map);
+      L.marker([coords.lat, coords.lng]).addTo(map);
+    }
+  });
+});

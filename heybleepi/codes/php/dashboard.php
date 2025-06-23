@@ -365,6 +365,12 @@ $unreadResult->close();
               <!-- Media Preview Grid -->
               <div id="mediaPreviewGrid" class="media-preview-grid"></div>
 
+              <!-- Location Map Preview -->
+              <div id="locationMapPreviewContainer" style="display:none; margin: 12px 0;">
+                <div id="locationMapPreview" style="width:100%;height:220px;border-radius:10px;"></div>
+                <button type="button" id="removeLocationBtn" style="margin-top:6px;background:none;border:none;color:#f87171;cursor:pointer;font-size:1.2em;">&times; Remove Location</button>
+              </div>
+
               <div class="create-post-actions">
                 <div class="media-actions">
                   <button type="button" class="media-upload-btn photo" onclick="document.getElementById('postImageInput').click()">+ Photo</button>
