@@ -1933,6 +1933,7 @@ body.page {
   --card-bg: rgba(255, 255, 255, 0.03);
 }
 
+/* BODY BACKGROUND - BLUE GRADIENT */
 body.page {
   background: linear-gradient(to right, #1e293b, #0f172a);
   font-family: 'Inter', sans-serif;
@@ -2033,11 +2034,11 @@ body.page {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
 }
 
-/* Style the geocoder/autocomplete input inside the modal */
+/* Geocoder input */
 #geocoder input,
 .leaflet-control-geocoder-form input,
 .geocoder-input {
-  width: 100% !important;
+  width: calc(100% - 50px) !important;
   max-width: 100% !important;
   border-radius: 8px !important;
   background: #232b3b !important;
@@ -2047,13 +2048,7 @@ body.page {
   padding: 10px 14px !important;
   margin-bottom: 0.5rem !important;
   box-sizing: border-box;
-}
-
-#geocoder input::placeholder,
-.leaflet-control-geocoder-form input::placeholder,
-.geocoder-input::placeholder {
-  color: #b0b8c9 !important;
-  opacity: 1 !important;
+  margin-right: 50px !important;
 }
 
 /* Dropdown for location search results */
@@ -2084,6 +2079,7 @@ body.page {
   box-shadow: none !important;
 }
 
+/* Remove white background from selected/active result if any */
 .leaflet-control-geocoder-selected,
 .geocoder-dropdown .selected,
 #geocoder .search-result-item.selected {
@@ -2112,4 +2108,41 @@ body.page {
 .close-button:hover {
   background: #2f95f3;
   color: #fff;
+}
+
+/* Hide the default Leaflet attribution inside the map modal */
+.map-modal .leaflet-control-attribution {
+  display: none !important;
+}
+
+/* Leaflet attribution */
+.map-modal .leaflet-control-attribution {
+  position: absolute !important;
+  left: 24px !important;
+  right: auto !important;
+  bottom: 24px !important;
+  top: auto !important;
+  z-index: 1002 !important;
+  font-size: 0.95em !important;
+  background: rgba(30, 41, 59, 0.85) !important;
+  color: #bfc6d1 !important;
+  border-radius: 6px !important;
+  padding: 3px 10px !important;
+  margin: 0 !important;
+  max-width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+/* Prevent overlap: move zoom controls up a bit */
+.map-modal .leaflet-control-container .leaflet-top,
+.map-modal .leaflet-control-container .leaflet-right {
+  left: 16px !important;
+  bottom: 70px !important;
+  top: unset !important;
+  right: unset !important;
+  flex-direction: column;
 }
