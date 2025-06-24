@@ -2022,6 +2022,7 @@ body.page {
   justify-content: center;
 }
 
+/* Center the modal content in the viewport */
 .map-modal-content {
   background-color: #1e293b;
   padding: 20px;
@@ -2030,6 +2031,7 @@ body.page {
   width: 98vw;
   color: rgb(17, 14, 14);
   position: relative;
+  margin: auto;
   overflow: visible;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
 }
@@ -2115,7 +2117,7 @@ body.page {
   display: none !important;
 }
 
-/* Leaflet attribution */
+/* Place Leaflet attribution at bottom left, outside the map, aligned with "Use This Location" button */
 .map-modal .leaflet-control-attribution {
   position: absolute !important;
   left: 24px !important;
@@ -2147,16 +2149,96 @@ body.page {
   flex-direction: column;
 }
 
-/* Post location preview */
 .create-post-location-preview {
   display: flex;
   align-items: center;
   gap: 6px;
   margin: 8px 0 0 0;
   font-size: 0.95rem;
-  color: #000418;
+  color: #f9faff;
   background: rgba(79, 138, 255, 0.08);
   border-radius: 8px;
   padding: 6px 12px;
   font-weight: 500;
+}
+
+#locationMapPreviewContainer {
+  margin: 12px 0;
+  background: none;
+  border-radius: 12px;
+  box-shadow: none;
+  padding: 0;
+  min-height: 0;
+  display: none;
+}
+
+#locationMapPreview {
+  width: 100% !important;
+  height: 180px !important;
+  min-height: 120px;
+  border-radius: 0;
+  background: #e0e7ef;
+  z-index: 1;
+}
+
+#locationMapPreviewText {
+  font-size: 1.1em;
+  color: #fff;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+#removeLocationBtn {
+  background: none;
+  border: none;
+  color: #f4f4f4;
+  cursor: pointer;
+  font-size: 1.5em;
+  padding: 0 8px;
+  transition: color 0.2s;
+  line-height: 1;
+}
+
+#removeLocationBtn:hover {
+  color: #dc2626;
+}
+
+#locationMapPreviewContainer {
+  position: relative;
+  margin-top: 12px;
+}
+
+#locationMapPreview {
+  width: 100%;
+  height: 220px;
+  border-radius: 10px;
+  background: #e0e7ef;
+  z-index: 1;
+}
+
+.remove-location-btn {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: rgba(63, 63, 63, 0.935) !important;
+  color: white;
+  border: none;
+  font-size: 1.2rem;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  opacity: 1;
+  visibility: visible;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.remove-location-btn:hover {
+  background-color: rgba(63, 63, 63, 0.935) !important;
+  transform: scale(1.05);
 }
