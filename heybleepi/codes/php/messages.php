@@ -143,7 +143,7 @@ $conn->close();
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Messages - HEYBLEEPI</title>
+  <title>Messages  - HEYBLEEPI</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css"
         rel="stylesheet" />
@@ -151,19 +151,17 @@ $conn->close();
 </head>
 <body class="page">
   <header class="top-nav glass">
-    <h1 class="brand">HEYBLEEPI</h1>
+  <h1 class="brand">
+    <a href="dashboard.php" style="color:inherit; text-decoration:none;">
+        HEYBLEEPI
+    </a>
+  </h1>
     <nav class="nav-actions">
       <a 
         class="icon-btn"
         href="dashboard.php"
         title="Home">
         <i class="ri-home-4-line"></i>
-      </a>
-      <a 
-        class="icon-btn"
-        href="messages.php"
-       title="Messages">
-        <i class="ri-message-3-line"></i>
       </a>
     </nav>
   </header>
@@ -181,10 +179,10 @@ $conn->close();
         required></textarea>
 
       <div class="button-row" id="updateCancelRow" style="display:none;">
-        <button type="submit" id="updateBtn">Update Message</button>
+        <button type="submit" id="updateBtn">Update</button>
         <button type="button" id="cancelBtn">Cancel</button>
       </div>
-      <button type="submit" id="addBtn">Add Message</button>
+      <button type="submit" id="addBtn">Send</button>
     </form>
 
     <div class="message-actions">
@@ -211,24 +209,20 @@ $conn->close();
               date("g:i A", strtotime($row['created_at'])) : "No time" ?></span>
             <?php if ($row['user_name'] === $user): ?>
               <span class="comment-actions">
-                <form method="POST" style="display:inline;">
-                  <input
-                    type="hidden"
-                    name="edit_id"
-                    value="<?= $row['id'] ?>">
-                  <span class="comment-edit">Edit</span>
-                </form>
-                <form method="POST" style="display:inline;">
-                  <input
-                    type="hidden"
-                    name="delete_id"
-                    value="<?= $row['id'] ?>">
-                  <span 
-                    class="comment-delete"
-                    data-id="<?= $row['id'] ?>">
-                      Delete
-                  </span>
-                </form>
+                <button 
+                  type="button"
+                  class="action-menu-btn"
+                  data-id="<?= $row['id'] ?>">
+                  <i class="ri-more-2-fill"></i>
+                </button>
+                <div class="action-menu" style="display: none;">
+                  <button class="comment-edit" data-id="<?= $row['id'] ?>">
+                    Edit
+                  </button>
+                  <button class="comment-delete" data-id="<?= $row['id'] ?>">
+                    Delete
+                  </button>
+                </div>
               </span>
             <?php endif; ?>
           </div>
