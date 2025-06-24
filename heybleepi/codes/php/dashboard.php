@@ -365,10 +365,15 @@ $unreadResult->close();
               <!-- Media Preview Grid -->
               <div id="mediaPreviewGrid" class="media-preview-grid"></div>
 
+              <!-- Location Text Preview -->
+              <div class="create-post-location-preview" id="locationTextPreview" style="display: none;">
+                📍 <span id="locationNamePreview">Selected location</span>
+              </div>
+
               <!-- Location Map Preview -->
-              <div id="locationMapPreviewContainer" style="display:none; margin: 12px 0;">
-                <div id="locationMapPreview" style="width:100%;height:220px;border-radius:10px;"></div>
-                <button type="button" id="removeLocationBtn" style="margin-top:6px;background:none;border:none;color:#f87171;cursor:pointer;font-size:1.2em;">&times; Remove Location</button>
+              <div id="locationMapPreviewContainer" style="display:none; position: relative; margin: 12px 0;">
+                <div id="locationMapPreview"></div>
+                <button type="button" id="removeLocationBtn" class="remove-location-btn" title="Remove location">&times;</button>
               </div>
 
               <div class="create-post-actions">
@@ -460,9 +465,12 @@ $unreadResult->close();
                 <p class="post-text"><?= htmlspecialchars($post['content']) ?></p>
 
                 <?php if (!empty($post['location'])): ?>
-                  <p class="post-location" style="margin: 4px 0; font-size: 0.85rem; color: #aaa;">
-                    <i class="ri-map-pin-user-line"></i> <?= htmlspecialchars($post['location']) ?>
-                  </p>
+                  <div class="post-location" style="margin: 8px 0;">
+                    <div id="postMap<?= $post['id'] ?>" style="width:100%;height:220px;border-radius:10px;"></div>
+                    <div style="font-size:0.9em;color:#aaa;margin-top:4px;">
+                      <i class="ri-map-pin-user-line"></i> <?= htmlspecialchars($post['location']) ?>
+                    </div>
+                  </div>
                 <?php endif; ?>
 
                 <?php if (empty($post['shared_post_id'])): ?>

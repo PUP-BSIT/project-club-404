@@ -855,19 +855,15 @@ function initMap() {
 }
 
 // Confirm location selection
-if (confirmBtn) {
-  confirmBtn.addEventListener('click', () => {
-    if (selectedPlaceName && locationInput) {
-      locationInput.value = selectedPlaceName;
-      modal.style.display = 'none';
+confirmBtn.addEventListener('click', () => {
+  if (selectedPlaceName && locationInput) {
+    locationInput.value = selectedPlaceName;
+    modal.style.display = 'none';
 
-      // Trigger change event for other listeners
-      locationInput.dispatchEvent(new Event('change'));
-
-      console.log('Location selected:', selectedPlaceName);
-    }
-  });
-}
+    locationInput.dispatchEvent(new Event('change'));
+    setLocationPreview(selectedPlaceName);
+  }
+});
 
 // Cancel modal for exiting without selection
 if (cancelMapBtn) {
@@ -1004,7 +1000,7 @@ const locationMapPreview = document.getElementById('locationMapPreview');
 const postLocationInput = document.getElementById('postLocation');
 const removeLocationBtn = document.getElementById('removeLocationBtn');
 
-// Helper: Geocode location string to lat/lng using OpenCage
+// Geocode location string to lat/lng using OpenCage
 async function getLatLngFromLocation(locationText) {
   const apiKey = "8653b83ddf764a60b2fd8df561100fdd";
   const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(locationText)}&key=${apiKey}&limit=1`;
@@ -1027,6 +1023,7 @@ async function showLocationMapPreview(locationText) {
     }
     return;
   }
+
   locationMapPreviewContainer.style.display = 'block';
 
   // Only create map if not already created
@@ -1069,6 +1066,7 @@ if (removeLocationBtn) {
       postLocationInput.value = '';
       postLocationInput.dispatchEvent(new Event('input'));
     }
+    document.getElementById('locationTextPreview').style.display = 'none';
   };
 }
 
@@ -1077,6 +1075,14 @@ window.setLocationPreview = function (locationText) {
   if (postLocationInput) {
     postLocationInput.value = locationText;
     postLocationInput.dispatchEvent(new Event('input'));
+  }
+
+  const previewText = document.getElementById('locationTextPreview');
+  const previewName = document.getElementById('locationNamePreview');
+
+  if (previewText && previewName) {
+    previewName.textContent = locationText;
+    previewText.style.display = 'flex'; // make visible
   }
 };
 
