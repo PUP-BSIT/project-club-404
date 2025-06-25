@@ -178,20 +178,17 @@ $conn->close();
         rows="6"
         required></textarea>
 
-      <div class="button-row" id="updateCancelRow" style="display:none;">
-        <button type="submit" id="updateBtn">Update</button>
-        <button type="button" id="cancelBtn">Cancel</button>
-      </div>
-      <button type="submit" id="addBtn">Send</button>
+        <div class="form-actions-row">
+          <button type="button" id="emojiBtn">
+            <i class="ri-emotion-line"></i>
+          </button>
+          <div class="form-actions-right">
+            <button type="submit" id="addBtn">Send</button>
+            <button type="submit" id="updateBtn" style="display:none;">Update</button>
+            <button type="button" id="cancelBtn" style="display:none;">Cancel</button>
+          </div>
+        </div>
     </form>
-
-    <div class="message-actions">
-      <button 
-        type="button"
-        id="emojiBtn">
-        <i class="ri-emotion-line"></i>
-      </button>
-    </div>
 
     <?php if (count($messages) > 0): ?>
       <?php foreach ($messages as $row): ?>
