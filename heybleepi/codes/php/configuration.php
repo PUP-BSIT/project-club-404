@@ -2,9 +2,9 @@
 // Set PHP timezone for date() and time() functions
 date_default_timezone_set('Asia/Manila');
 
-$database = "localhost";
-$username = "root";
-$password = "";
+$database = "srv678.hstgr.io";
+$username = "u937067793_club_404_mem";
+$password = "Club-404-!_!";
 $dbname = "u937067793_club_404";
 
 // Create MySQL connection
