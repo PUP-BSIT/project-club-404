@@ -230,6 +230,17 @@ $conn->close();
     <?php endif; ?>
   </div>
 
+    <!-- Delete Confirmation Modal -->
+  <div id="deleteModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <p>Are you sure you want to delete this message?</p>
+      <div class="modal-actions">
+        <button id="confirmDeleteBtn">Delete</button>
+        <button id="cancelDeleteBtn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <script src="../script/messages.js"></script>
 </body>
 </html>
