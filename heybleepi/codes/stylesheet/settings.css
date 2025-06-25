@@ -161,7 +161,7 @@ body {
   padding: 5px;
   border-radius: 5px;
   border: 1px solid #ccc;
-  width: 20em;
+  width: 9em;
 }
 
 #account_information_container h2,
@@ -203,16 +203,17 @@ body {
 }
 
 #account_information_container #save_btn {
-  background-color: #4CAF50;
+  background-color: #4f8aff;
   color: white;
   cursor: pointer;
   margin-left: 90px;
-  border-radius: 9999px;
+  border-radius: 5px;
   height: 5vh;
+  border: none;
 }
 
 #account_information_container #save_btn:hover {
-  background-color: #227024;
+  background-color: #2f5399;
   color: rgb(255, 255, 255);
   font-weight: bold;
   cursor: pointer;
@@ -232,7 +233,7 @@ body {
 .acct-info-input {
   padding: 5px;
   border-radius: 5px;
-  border: 1px solid #ccc;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   width: 25em;
   height: 2em;
   background-color: rgba(255, 255, 255, .10);
@@ -351,21 +352,21 @@ body {
   padding: px;
   border-radius: 5px;
   border: 1px solid #ccc;
-  width: 20em;
+  width: 10em;
 }
 
 #privacy_settings_container #change_password_btn {
   margin-top: 20px;
-  background-color: #4CAF50;
+  background-color: #4f8aff;
   border: none;
-  border-radius: 9999px;
+  border-radius: 5px;
   padding: 10px;
   color: white;
   cursor: pointer;
 }
 
 #privacy_settings_container #change_password_btn:hover {
-  background-color: #1f6421;
+  background-color: #2f5399;
   font-weight: bold;
 }
 
@@ -387,7 +388,7 @@ body {
   height: 8vh;
   width: 30vw;
   border-radius: 5px;
-  border: 1px solid #ccc;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   padding-left: 10px;
   background-color: rgba(255, 255, 255, .15);
   color: white;
@@ -406,7 +407,7 @@ body {
   color: white;
   cursor: pointer;
   border: none;
-  border-radius: 9999px;
+  border-radius: 5px;
   padding: 10px;
 }
 
@@ -1129,7 +1130,7 @@ body {
   }
 
   #account_information_container #save_btn {
-    margin-left: 156px;
+    margin-left: 230px;
   }
 
   #privacy_settings_container {
@@ -1176,7 +1177,7 @@ body {
   }
 
   #account_information_container #save_btn {
-    margin-left: 155px;
+    margin-left: 235px;
   }
 
   #privacy_settings_container {
@@ -1212,7 +1213,7 @@ body {
   }
 
   #account_information_container #save_btn {
-    margin-left: 150px;
+    margin-left: 235px;
   }
 
   #privacy_settings_container form {
