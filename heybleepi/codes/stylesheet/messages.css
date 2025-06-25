@@ -1,4 +1,3 @@
-messages.css
 * {
   box-sizing: border-box;
   font-family: 'Inter', sans-serif !important;
@@ -157,7 +156,7 @@ form {
 
 form textarea {
   font-family: 'Inter', sans-serif;
-  width: 90%;
+  width: 100%;
   height: 120px;
   min-width: 0;
   max-width: 100%;
@@ -376,6 +375,64 @@ form button:hover,
   transform: scale(1.03);
 }
 
+.form-actions-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 90%;
+  margin: 0 auto 1rem auto;
+  gap: 10px;
+}
+
+#emojiBtn {
+  background: rgba(255,255,255,0.1);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  color: #4f8aff;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#emojiBtn:hover {
+  background: rgba(79,138,255,0.15);
+}
+
+.form-actions-right {
+  display: flex;
+  gap: 8px;
+}
+
+#addBtn,
+#updateBtn,
+#cancelBtn {
+  background: linear-gradient(to right, #4f8aff, #2f6ee5);
+  color: white;
+  border: none;
+  border-radius: 9999px;
+  padding: 0.7rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 0 0 transparent;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+#addBtn:hover,
+#updateBtn:hover,
+#cancelBtn:hover {
+  background: linear-gradient(to right, #5b9aff, #3c79e0);
+  box-shadow: 0 0 8px rgba(79, 138, 255, 0.5);
+  transform: scale(1.03);
+}
+
+
+
 /* Action Menu */
 .action-menu-list {
   position: absolute;
@@ -421,14 +478,18 @@ form button:hover,
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 1.5em;
+  font-size: 1.1em;
   color: white;
-  padding: 2px 8px;
+  padding: 2px 6px;
   line-height: 1;
   vertical-align: middle;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.action-menu-btn i {
+  font-size: 1.2em;
 }
 
 /* Message Preview*/
@@ -466,14 +527,15 @@ form button:hover,
 
 .timestamp {
   position: absolute;
-  top: 1.5rem;
-  right: 24rem;
+  bottom: 1rem;
+  right: 1.5rem;
   font-size: 0.7rem;
   color: rgba(255, 255, 255, 0.7);
   font-weight: 500;
   white-space: nowrap;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
   z-index: 1;
+  margin-top: 18px;
 }
 
 .avatar {
