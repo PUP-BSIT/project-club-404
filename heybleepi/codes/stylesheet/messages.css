@@ -415,7 +415,7 @@ form button:hover,
   color: white;
   border: none;
   border-radius: 9999px;
-  padding: 0.7rem 1.5rem;
+  padding: 0.7rem 1.3rem;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -430,8 +430,6 @@ form button:hover,
   box-shadow: 0 0 8px rgba(79, 138, 255, 0.5);
   transform: scale(1.03);
 }
-
-
 
 /* Action Menu */
 .action-menu-list {
@@ -850,17 +848,24 @@ form button:hover,
 .modal {
   position: fixed;
   z-index: 9999;
-  left: 0; top: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.5);
-  display: flex; align-items: center; justify-content: center;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  backdrop-filter: blur(10%);
+  background-color: rgba(20, 30, 50, 0.5);
 }
 .modal-content {
-  background: #222;
+  background: rgba(15, 20, 35, 0.98);
   color: #fff;
   padding: 2rem 2.5rem;
   border-radius: 10px;
   text-align: center;
   min-width: 260px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 .modal-actions {
   margin-top: 1.5rem;
@@ -868,21 +873,30 @@ form button:hover,
   gap: 1rem;
   justify-content: center;
 }
-#confirmDeleteBtn {
-  background: #e74c3c;
-  color: #fff;
-  border: none;
-  padding: 0.5rem 1.2rem;
-  border-radius: 6px;
-  cursor: pointer;
-}
+
+#confirmDeleteBtn,
 #cancelDeleteBtn {
-  background: #444;
-  color: #fff;
+  background: linear-gradient(to right, #4f8aff, #2f6ee5);
+  color: white;
   border: none;
-  padding: 0.5rem 1.2rem;
-  border-radius: 6px;
+  border-radius: 9999px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
+  box-shadow: 0 0 0 transparent;
+  letter-spacing: 1px;
+  text-align: center;
+  font-family: 'Inter', sans-serif;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+  margin: 0 0.5rem 0 0.5rem;
+}
+
+#confirmDeleteBtn:hover,
+#cancelDeleteBtn:hover {
+  background: linear-gradient(to right, #5b9aff, #3c79e0);
+  box-shadow: 0 0 8px rgba(79, 138, 255, 0.5);
+  transform: scale(1.03);
 }
 
 /* Responsive design for smaller screens */
