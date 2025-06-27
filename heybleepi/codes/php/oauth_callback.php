@@ -68,7 +68,7 @@ if ($user = $result->fetch_assoc()) {
         $user_data_url = match ($provider) {
             'heybleepi' => $provider_url . '/get-user-data.php',
             'hershive'  => $provider_url . '/php/get_user_data.php',
-            'devhive'   => $provider_url . '/public_html/oauth_login/index.html',
+            'devhive'   => $provider_url . '/api/users/get-user-data.php',
             default     => null,
         };
 
@@ -124,7 +124,7 @@ if ($user = $result->fetch_assoc()) {
         $user_data_url = match ($provider) {
             'heybleepi' => $provider_url . '/get-user-data.php',
             'hershive'  => $provider_url . '/php/get_user_data.php',
-            'devhive'   => $provider_url . '/public_html/oauth_login/index.html',
+            'devhive'   => $provider_url . '/api/users/get-user-data.php',
             default     => null,
         };
 
