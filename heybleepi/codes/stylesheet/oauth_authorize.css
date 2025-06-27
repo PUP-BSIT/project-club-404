@@ -1,62 +1,164 @@
-html, body {
-    background-color: rgb(230, 227, 227);
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    height: 100vh;
-}   
-
 body {
-    overflow-y: hidden;
+  background: linear-gradient(135deg, #1a2236 0%, #232946 100%);
+  font-family: 'Inter', Arial, sans-serif;
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .main-container {
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(10px);
-    width: 70%;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 25vh;
-    display: flex;
-    flex-direction: column;
-    border-radius: 20px;
-    height: 55vh;
+  max-width: 400px;
+  width: 100%;
+  margin: 3rem auto;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  padding: 2.5rem 2rem 2rem 2rem;
+  position: relative;
 }
 
-.header {
-    display: flex;
-    align-self: flex-start;
-    align-items: center;
-    gap: 10px;
-    border-bottom: 1px solid rgba(228, 225, 225, 0.15);
-    width: 100%;
+.oauth-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: transparent;
+  margin-bottom: 2rem;
+  font-family: 'Quicksand', sans-serif;
 }
 
-.header > h3 {
-    color: white;
-    font-family:cursive;
+.oauth-mascot {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
 }
 
-.header > img {
-    width: 50px;
-    height: 50px;
-    border-radius: 22%;
-    margin-left: 10px;
+.oauth-title {
+  font-family: 'Quicksand', cursive, Arial, sans-serif;
+  font-size: 1.5rem;
+  color: #fff;
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: 1px;
 }
 
-.main-text {
-    position: relative;
-    left: 8%;
-    top: 15%;
-    display: flex;
-    flex-direction: column;
-    width: 20%;
+.mascot {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  margin-bottom: 0.5rem;
+  object-fit: cover;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
 }
 
-.main-text > h1, h3 {
-    color: white;
-    font-family: cursive; 
-    font-display: initial;      
+.main-text h1, h3 {
+  margin: 0.5rem 0;
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 2.5rem;
+  text-align: center;
 }
 
+.main-text p {
+  color: #c9d1e6;
+  margin-bottom: 1.5rem;
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.2rem;
+  min-height: 48px;
+}
+
+.input-icon {
+  position: absolute;
+  left: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1rem;
+  pointer-events: none;
+}
+
+.form-input::placeholder {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: white;
+  outline: none;
+}
+
+.form-input:focus {
+  box-shadow: 0 0 0 2px rgba(138, 111, 223, 0.5);
+}
+
+.form-input:-webkit-autofill {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  -webkit-box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important;
+  -webkit-text-fill-color: #fff !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+.auth-button {
+  width: 100%;
+  padding: 0.75rem;
+  background-image: linear-gradient(to right, #8A6FDF, #FF9EE5);
+  color: white;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+  border: none;
+  margin-top: 1rem;
+}
+
+.auth-button:hover {
+  opacity: 0.8;
+}
+
+/* Deny button override */
+.auth-button[name="deny"] {
+  background: linear-gradient(to right, #c00, #a00);
+}
+
+.auth-button[name="deny"]:hover {
+  background: linear-gradient(to right, #e74c3c, #c0392b);
+}
+
+/* Password hide/show */
+.input-toggle {
+  position: absolute;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: #b0b8d1;
+  font-size: 1.3rem;
+  cursor: pointer;
+  outline: none;
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
