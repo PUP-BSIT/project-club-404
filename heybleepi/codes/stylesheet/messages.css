@@ -1,3 +1,17 @@
+:root {
+  --primary: #4f8aff;
+  --secondary: #2f95f3;
+  --bg: #f9fafc;
+  --sidebar-hover: rgba(124, 77, 255, 0.15);
+  --sidebar-active: rgba(124, 77, 255, 0.3);
+  --card-bg: #ffffff;
+  --sidebar-bg: #ffffff;
+  --layout-bg: #f1f5f9;
+  --navbar-height: 72px;
+  --glass: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(0, 0, 0, 0.05);
+}
+
 * {
   box-sizing: border-box;
   font-family: 'Inter', sans-serif !important;
@@ -118,7 +132,7 @@ body {
   max-width: 600px;
   margin: 120px auto 40px auto;
   padding: 2rem;
-  background: rgba(20, 30, 50, 0.5);
+  background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(10px);
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -166,7 +180,7 @@ form textarea {
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   font-size: 1rem;
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.05);
   color: white;
   outline: none;
   resize: none;
@@ -213,7 +227,7 @@ form button:hover,
 
 .comment-box {
   position: relative;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 16px;
   padding: 1.2rem;
   display: flex;
