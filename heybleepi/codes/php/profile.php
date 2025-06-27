@@ -74,12 +74,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   // Handle creating a post (only allow if viewing own profile)
   if (isset($_POST['post_content']) && $userId == $_SESSION['id']) {
     $post_content = trim($_POST['post_content']);
+    $location = $_POST['location'] ?? null;
     $upload_dir = "uploads/";
     if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
 
     // Insert post first to get post_id
-    $stmt = $conn->prepare("INSERT INTO posts (user_id, content) VALUES (?, ?)");
-    $stmt->bind_param("is", $userId, $post_content);
+    $stmt = $conn->prepare("INSERT INTO posts (user_id, content, location) VALUES (?, ?, ?)");
+    $stmt->bind_param("iss", $userId, $post_content, $location);
     $stmt->execute();
     $post_id = $stmt->insert_id;
     $stmt->close();
@@ -229,6 +230,8 @@ if ($usersResult) {
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="../stylesheet/dashboard.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
     <style>
       /* --- Profile Banner & Info Bar Fixes --- */
       .profile-top {
@@ -561,8 +564,21 @@ if ($usersResult) {
                 </div>
               </div>
               <textarea class="create-post-input" name="post_content" placeholder="What's happening in your galaxy?" required></textarea>
+
               <!-- Media Preview Grid -->
               <div id="mediaPreviewGrid" class="media-preview-grid"></div>
+
+              <!-- Location Text Preview -->
+              <div class="create-post-location-preview" id="locationTextPreview" style="display: none;">
+                📍 <span id="locationNamePreview">Selected location</span>
+              </div>
+
+              <!-- Location Map Preview -->
+              <div id="locationMapPreviewContainer" style="display:none; position: relative; margin: 12px 0;">
+                <div id="locationMapPreview"></div>
+                <button type="button" id="removeLocationBtn" class="remove-location-btn" title="Remove location">&times;</button>
+              </div>
+
               <div class="create-post-actions">
                 <div class="media-actions">
                   <button type="button" class="media-upload-btn photo" onclick="document.getElementById('postImageInput').click()">+ Photo</button>
@@ -572,15 +588,29 @@ if ($usersResult) {
                 </div>
                 <div class="minor-actions">
                   <input type="hidden" name="location" id="postLocation">
-                  <button class="icon-btn" type="button" id="getLocationBtn" title="Add location">
-                    <i class="ri-map-pin-line"></i>
+                  <button id="openMapModal" type="button" class="btn btn--action">
+                    <i class="ri-map-pin-user-line"></i> Select Location
                   </button>
                 </div>
-                <button class="btn btn--action" type="submit">Post</button>
+                <button class="btn btn--primary" type="submit">Post</button>
               </div>
             </form>
           </div>
           <?php endif; ?>
+
+          <!-- Map Location Modal -->
+          <div id="mapModal" class="map-modal" style="display:none;">
+            <div class="map-modal-content">
+              <span id="cancelMapModal" class="close-button">&times;</span>
+
+              <div id="geocoder" style="margin-bottom: 10px;"></div>
+              <div id="map" style="height: 400px; border-radius: 12px;"></div>
+
+              <div style="text-align: right; margin-top: 1rem;">
+                <button id="confirmLocationBtn" class="btn btn--primary">Use This Location</button>
+              </div>
+            </div>
+          </div>
 
           <!-- Posts will appear here -->
           <?php
@@ -592,6 +622,7 @@ if ($usersResult) {
               p.shared_post_id,
               p.image_path,
               p.video_path,
+              p.location,
               u.first_name,
               u.last_name,
               u.user_name,
@@ -655,6 +686,16 @@ if ($usersResult) {
               <!-- POST CONTENT -->
               <div class="post-content" data-post-id="<?= $post['post_id'] ?>">
                 <p class="post-text"><?= htmlspecialchars($post['content']) ?></p>
+
+                <?php if (!empty($post['location'])): ?>
+                  <div class="post-location" style="margin: 8px 0;">
+                    <div id="postMap<?= $post['post_id'] ?>" style="width:100%;height:220px;border-radius:10px;"></div>
+                    <div style="font-size:0.9em;color:#aaa;margin-top:4px;">
+                      <i class="ri-map-pin-user-line"></i> <?= htmlspecialchars($post['location']) ?>
+                    </div>
+                  </div>
+                <?php endif; ?>
+
                 <?php if (empty($post['shared_post_id'])): ?>
                   <?php
                     // Load multiple media for this post (only if not a shared post)
@@ -866,6 +907,8 @@ if ($usersResult) {
         });
       });
     </script>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="../script/dashboard.js"></script>
   </body>
 </html>
