@@ -420,6 +420,7 @@ $unreadResult->close();
               sp.content AS shared_content,
               sp.image_path AS shared_image_path,
               sp.video_path AS shared_video_path,
+              sp.location AS shared_location,
               su.first_name AS shared_first_name,
               su.last_name AS shared_last_name
             FROM posts p
@@ -517,14 +518,28 @@ $unreadResult->close();
               ?>
 
               <!-- If shared, show shared content block -->
-              <?php if (!empty($post['shared_post_id'])): ?>
-                <div class="shared-post glass" style="margin-top: 10px; padding: 10px; border-left: 3px solid var(--primary); background-color: rgba(255,255,255,0.05);">
+              <?php if ($post['shared_post_id']): ?>
+                <div class="shared-post glass" style="padding: 10px; background-color: rgba(255, 255, 255, 0.05); border-left: 3px solid var(--primary); border-radius: 10px; margin-bottom: 10px;">
                   <small>Shared from <strong><?= htmlspecialchars($post['shared_first_name'] . ' ' . $post['shared_last_name']) ?></strong></small>
-                  <p><?= htmlspecialchars($post['shared_content']) ?></p>
 
                   <?php
-                  // Load multiple media for the shared post
-                  if (!empty($post['shared_post_id'])) {
+                    // Show shared post caption above media grid
+                    if (!empty($post['shared_content'])) {
+                      echo '<p>' . htmlspecialchars($post['shared_content']) . '</p>';
+                    }
+                  ?>
+
+                  <?php if (!empty($post['shared_location'])): ?>
+                    <div class="post-location" style="margin: 8px 0;">
+                      <div id="postMap<?= $post['post_id'] ?>_shared" style="width:100%;height:220px;border-radius:10px;"></div>
+                      <div style="font-size:0.9em;color:#aaa;margin-top:4px;">
+                        <i class="ri-map-pin-user-line"></i> <?= htmlspecialchars($post['shared_location']) ?>
+                      </div>
+                    </div>
+                  <?php endif; ?>
+
+                  <?php
+                    // Load multiple media for the shared post
                     $sharedMediaStmt = $conn->prepare("SELECT file_path, media_type FROM post_media WHERE post_id = ?");
                     $sharedMediaStmt->bind_param("i", $post['shared_post_id']);
                     $sharedMediaStmt->execute();
@@ -533,15 +548,14 @@ $unreadResult->close();
                       echo '<div class="post-media-grid">';
                       while ($media = $sharedMediaResult->fetch_assoc()) {
                         if ($media['media_type'] === 'image') {
-                          echo '<img src="' . htmlspecialchars($media['file_path']) . '" class="post-image" alt="Shared Post Image">';
+                          echo '<img src="' . htmlspecialchars($media['file_path']) . '" class="post-image" alt="Shared Post Image" onclick="openLightbox(\'' . htmlspecialchars($media['file_path']) . '\')">';
                         } elseif ($media['media_type'] === 'video') {
-                          echo '<video controls class="post-video"><source src="' . htmlspecialchars($media['file_path']) . '" type="video/mp4"></video>';
+                          echo '<video controls class="post-video" onclick="openLightboxVideo(\'' . htmlspecialchars($media['file_path']) . '\')"><source src="' . htmlspecialchars($media['file_path']) . '" type="video/mp4"></video>';
                         }
                       }
                       echo '</div>';
                     }
                     $sharedMediaStmt->close();
-                  }
                   ?>
                 </div>
               <?php endif; ?>
