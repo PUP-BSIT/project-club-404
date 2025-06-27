@@ -2022,6 +2022,13 @@ body.page {
   justify-content: center;
 }
 
+/* Shared location post size */
+.map-container {
+  width: 100%;
+  height: 220px;
+  border-radius: 10px;
+}
+
 /* Center the modal content in the viewport */
 .map-modal-content {
   background-color: #1e293b;
