@@ -36,9 +36,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['reset_user_id'])) 
     if ($newPassword !== $confirmPassword) {
         $message = "Passwords do not match.";
         $showForm = true;
-    } elseif (strlen($newPassword) < 12) {
-        $message = "Password must be at least 12 characters.";
-        $showForm = true;
     } else {
         $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
         $stmt = $conn->prepare("UPDATE users SET password = ?, reset_token = NULL, reset_expires = NULL WHERE id = ?");
