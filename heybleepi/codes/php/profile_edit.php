@@ -73,7 +73,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if (isset($_FILES['file_input']) && $_FILES['file_input']['error'] === UPLOAD_ERR_OK) {
     $avatarName = basename($_FILES['file_input']['name']);
     $avatarTmp = $_FILES['file_input']['tmp_name'];
-    $uploadPath = __DIR__ . "/assets/profile/" . $avatarName;
+    $uploadPath = __DIR__ . "/../assets/profile/" . $avatarName;
 
     if (move_uploaded_file($avatarTmp, $uploadPath)) {
       $stmt = $conn->prepare("UPDATE user_details SET profile_picture = ? WHERE id_fk = ?");
@@ -86,7 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if (isset($_FILES['cover_input']) && $_FILES['cover_input']['error'] === UPLOAD_ERR_OK) {
     $coverName = basename($_FILES['cover_input']['name']);
     $coverTmp = $_FILES['cover_input']['tmp_name'];
-    $coverPath = __DIR__ . "/assets/profile/" . $coverName;
+    $coverPath = __DIR__ . "/../assets/profile/" . $coverName;
 
     if (move_uploaded_file($coverTmp, $coverPath)) {
       $stmt = $conn->prepare("UPDATE user_details SET profile_cover = ? WHERE id_fk = ?");
