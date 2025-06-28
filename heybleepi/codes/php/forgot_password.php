@@ -55,7 +55,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html>
 <head>
   <title>Forgot Password</title>
-  <link rel="stylesheet" href="./stylesheet/forgot_password.css" />
+  <link rel="stylesheet" href="../stylesheet/forgot_password.css" />
+  <link rel="icon" href="../assets/heybleepi-mascot.jpg" type="image/png" />
 </head>
 <body>
   <div id="stars-container">
@@ -82,6 +83,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </div>
     </div>
   </div>
-  <script src="./script/form_script.js"></script>
+  <script src="../script/form_script.js"></script>
 </body>
 </html>
