@@ -23,7 +23,7 @@ if ($row = $result->fetch_assoc()) {
             $auth_path = '/oauth_authorize.php';
             break;
         case 'hershive':
-            $auth_path = '/php/oauth_authorize.php'; 
+            $auth_path = '/project-hershell/Hershive/php/oauth_authorize.php'; 
             break;
         case 'devhive': 
             $auth_path = '/api/oauth/oauth_authorize.php';
