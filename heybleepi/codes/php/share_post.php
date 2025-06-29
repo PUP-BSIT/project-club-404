@@ -8,6 +8,7 @@ if (!isset($_SESSION['id']) || $_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($
 }
 
 $user_id = $_SESSION['id'];
+$content = $_POST['share_post_content'] ?? '';
 $shared_post_id = intval($_POST['share_post_id']);
 
 // Prevent duplicate shares
@@ -17,8 +18,8 @@ $check->execute();
 $check->store_result();
 
 if ($check->num_rows === 0) {
-  $insert = $conn->prepare("INSERT INTO posts (user_id, content, shared_post_id) VALUES (?, '', ?)");
-  $insert->bind_param("ii", $user_id, $shared_post_id);
+  $insert = $conn->prepare("INSERT INTO posts (user_id, content, shared_post_id) VALUES (?, ?, ?)");
+  $insert->bind_param("isi", $user_id, $content, $shared_post_id);
   $insert->execute();
   $insert->close();
 }
