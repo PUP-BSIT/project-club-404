@@ -2,27 +2,6 @@ document.addEventListener("DOMContentLoaded", function () {
   // Like Button
   attachDynamicListeners();
 
-  // ENABLE "POST" BUTTON ONLY WHEN TEXTAREA HAS CONTENT
-  const postTextarea = document.querySelector("form[action='profile.php'] .create-post-input");
-  const postButton = document.querySelector("form[action='profile.php'] .btn--primary");
-  const imageInput = document.getElementById("postImageInput");
-  const videoInput = document.getElementById("postVideoInput");
-
-  if (postTextarea && postButton) {
-    const togglePostButton = () => {
-      const hasText = postTextarea.value.trim() !== "";
-      const hasImages = imageInput?.files?.length > 0;
-      const hasVideos = videoInput?.files?.length > 0;
-      postButton.disabled = !(hasText || hasImages || hasVideos);
-    };
-
-    togglePostButton(); // initial
-
-    postTextarea.addEventListener("input", togglePostButton);
-    imageInput?.addEventListener("change", togglePostButton);
-    videoInput?.addEventListener("change", togglePostButton);
-  }
-
   // Home
   const homeLink = document.querySelector(".home-link");
   const feed = document.getElementById("mainFeed");
@@ -1105,3 +1084,97 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 });
+
+// Function to show and close the post preview modal
+function showCreatePostPreview() {
+  const previewOverlay = document.querySelector("#post_preview_overlay");
+  const mainTextArea = document.querySelector(".create-post-input");
+
+  previewOverlay.classList.remove("hidden");
+  mainTextArea.disabled = true;
+}
+
+// Function to close the post preview modal
+function closeCreatePostPreview() {
+  const closeBtn = document.querySelector("#close_preview_btn");
+  const previewOverlay = document.querySelector("#post_preview_overlay");
+  const mainTextArea = document.querySelector(".create-post-input");
+
+  if (closeBtn) {
+    previewOverlay.classList.add("hidden");
+    mainTextArea.disabled = false;
+  }
+  
+}
+
+function showSharePostPreview(postId, firstName, lastName) {
+  const previewOverlay = document.querySelector("#share_preview_overlay");
+
+  previewOverlay.classList.remove("hidden");
+  document.querySelector("#share_post_id_modal").value = postId;
+  document.getElementById("sharedFullname").textContent = firstName + " " + lastName;
+}
+
+function closeSharePostPreview() {
+  const closeBtn = document.querySelector("#close_shared_preview_btn");
+  const previewOverlay = document.querySelector("#share_preview_overlay");
+
+  if (closeBtn) {
+    previewOverlay.classList.add("hidden");
+  }
+}
+
+// Function to check if the text area is empty and enable/disable the submit button
+function isTextAreaEmpty() {
+  const postTextArea = document.querySelector("#post_content_hidden");
+  const postPreviewSubmitBtn = document.querySelector("#post_preview_submit_btn");
+  const postImageInput = document.getElementById("postImageInput");
+  const postVideoInput = document.getElementById("postVideoInput");
+
+  if (!postTextArea || !postPreviewSubmitBtn) return;
+
+  const hasText = postTextArea.value.trim().length > 0;
+  const hasImage = postImageInput && postImageInput.files.length > 0;
+  const hasVideo = postVideoInput && postVideoInput.files.length > 0;
+
+  if (hasText || hasImage || hasVideo) {
+    postPreviewSubmitBtn.disabled = false;
+    postPreviewSubmitBtn.classList.remove("disabled");
+  } else {
+    postPreviewSubmitBtn.disabled = true;
+    postPreviewSubmitBtn.classList.add("disabled");
+  }
+}
+
+document.getElementById("postImageInput").addEventListener("change", isTextAreaEmpty);
+document.getElementById("postVideoInput").addEventListener("change", isTextAreaEmpty);
+
+function formatText(format) {
+  document.execCommand(format, false, null);
+}
+
+// Pass the post content from div to preview modal
+function updateHiddenInput() {
+  const inputDiv = document.getElementById('create_post_input');
+  let value = inputDiv.innerHTML.trim();
+
+  // Treat <br> or empty as empty
+  if (value === '<br>' || value === '') {
+    value = '';
+  }
+
+  document.getElementById('post_content_hidden').value = value;
+}
+
+// For share post.
+function updateHiddenInputShare() {
+  const inputDiv = document.getElementById('share_post_input');
+  let value = inputDiv.innerHTML.trim();
+
+  // Treat <br> or empty as empty
+  if (value === '<br>' || value === '') {
+    value = '';
+  }
+
+  document.getElementById('share_post_content_hidden').value = value;
+}
