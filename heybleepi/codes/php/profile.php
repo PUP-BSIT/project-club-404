@@ -229,6 +229,7 @@ if ($usersResult) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="../stylesheet/dashboard.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=close" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
@@ -555,7 +556,7 @@ if ($usersResult) {
         <section class="right-column">
           <?php if ($userId == $_SESSION['id']): ?>
           <div class="glass create-post">
-            <form method="POST" action="profile.php" enctype="multipart/form-data">
+            <form>
               <div class="create-post-header">
                 <img class="avatar avatar--sm" src="../assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>" alt="">
                 <div class="poster-info">
@@ -563,40 +564,49 @@ if ($usersResult) {
                   <p>@<?= htmlspecialchars($user['user_name']); ?></p>
                 </div>
               </div>
-              <textarea class="create-post-input" name="post_content" placeholder="What's happening in your galaxy?" required></textarea>
 
+              <textarea 
+                class="create-post-input" 
+                name="post_content" 
+                placeholder="What's happening in your galaxy?"
+                onClick="showCreatePostPreview();"
+              ></textarea>
+            
               <!-- Media Preview Grid -->
-              <div id="mediaPreviewGrid" class="media-preview-grid"></div>
-
-              <!-- Location Text Preview -->
-              <div class="create-post-location-preview" id="locationTextPreview" style="display: none;">
-                📍 <span id="locationNamePreview">Selected location</span>
-              </div>
-
-              <!-- Location Map Preview -->
-              <div id="locationMapPreviewContainer" style="display:none; position: relative; margin: 12px 0;">
-                <div id="locationMapPreview"></div>
-                <button type="button" id="removeLocationBtn" class="remove-location-btn" title="Remove location">&times;</button>
-              </div>
-
               <div class="create-post-actions">
                 <div class="media-actions">
-                  <button type="button" class="media-upload-btn photo" onclick="document.getElementById('postImageInput').click()">+ Photo</button>
-                  <button type="button" class="media-upload-btn video" onclick="document.getElementById('postVideoInput').click()">+ Video</button>
-                  <input type="file" name="post_images[]" accept="image/*" multiple id="postImageInput" hidden>
-                  <input type="file" name="post_videos[]" accept="video/*" multiple id="postVideoInput" hidden>
-                </div>
-                <div class="minor-actions">
-                  <input type="hidden" name="location" id="postLocation">
-                  <button id="openMapModal" type="button" class="btn btn--action">
-                    <i class="ri-map-pin-user-line"></i> Select Location
+                  <button 
+                    type="button" 
+                    class="media-upload-btn photo" 
+                    onclick="showCreatePostPreview();">
+                      + Photo
+                  </button>
+                  <button 
+                    type="button" 
+                    class="media-upload-btn video" 
+                    onclick="showCreatePostPreview();">
+                      + Video
                   </button>
                 </div>
-                <button class="btn btn--primary" type="submit">Post</button>
+                <div class="minor-actions">
+                  <button 
+                    class="icon-btn" 
+                    type="button" 
+                    id="getLocationBtn" 
+                    title="Add location"
+                    onClick="showCreatePostPreview();">
+                    <i class="ri-map-pin-line"></i>
+                  </button>
+                </div>
+                <button 
+                  class="btn btn--action" 
+                  onClick="showCreatePostPreview();";
+                  type="button">
+                    Post
+                </button>
               </div>
             </form>
           </div>
-          <?php endif; ?>
 
           <!-- Map Location Modal -->
           <div id="mapModal" class="map-modal" style="display:none;">
@@ -608,6 +618,159 @@ if ($usersResult) {
 
               <div style="text-align: right; margin-top: 1rem;">
                 <button id="confirmLocationBtn" class="btn btn--primary">Use This Location</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Create Post Preview -->
+          <div id="post_preview_overlay" class="post-preview-overlay hidden">
+            <div class="create-post-preview-container">
+              <div id="create_post_preview" class="create-post-preview">
+                <span
+                  id="close_preview_btn"
+                  class="material-symbols-outlined"
+                  onClick="closeCreatePostPreview()">close</span>
+                <form 
+                  method="POST" 
+                  action="profile.php" 
+                  enctype="multipart/form-data" 
+                  class="preview-form">
+                  <h1>Create Post</h1>
+                  <div
+                    id="create_post_input"
+                    class="create-post-div"
+                    contenteditable="true"
+                    onInput="updateHiddenInput(); isTextAreaEmpty();"
+                    data-placeholder="What's happening in your galaxy?"></div>
+                  <input type="hidden" name="post_content" id="post_content_hidden">
+                    
+                  <!-- WYSWYG -->
+                  <div>
+                    <button 
+                      type="button" 
+                      class="wyswyg-btn" 
+                      title="Bold"
+                      onClick="formatText('bold')"><b>b</b></button>
+                    <button 
+                      type="button" 
+                      class="wyswyg-btn" 
+                      title="Italic"
+                      onClick="formatText('italic')"><i>I</i></button>
+                    <button 
+                      type="button" 
+                      class="wyswyg-btn" 
+                      title="Underline"
+                      onClick="formatText('underline')"><u>U</u></button>
+                  </div>
+
+                  <!-- Media Preview Grid -->
+                  <div id="mediaPreviewGrid" class="media-preview-grid"></div>
+    
+                  <!-- Buttons container -->
+                  <div id="buttons_container" class="buttons-container">
+                    <button type="button" class="media-upload-btn photo" onclick="document.getElementById('postImageInput').click()">+ Photo</button>
+                    <button type="button" class="media-upload-btn video" onclick="document.getElementById('postVideoInput').click()">+ Video</button>
+                    <input type="hidden" name="location" id="postLocation">
+                    <button id="openMapModal" type="button" class="btn btn--action">
+                      <i class="ri-map-pin-user-line"></i> Select Location
+                    </button>
+
+                    <input type="file" name="post_images[]" accept="image/*" multiple id="postImageInput" hidden>
+                    <input type="file" name="post_videos[]" accept="video/*" multiple id="postVideoInput" hidden>
+
+                    <button 
+                      type="submit" 
+                      class="btn btn--primary disabled"
+                      id="post_preview_submit_btn"
+                      disabled>
+                        Post
+                    </button>
+                  </div>
+
+                  <div class="styled-hr"></div>
+
+                  <!-- Other social media -->
+                  <div class="share-options">
+                    <a href="#" class="share-to-other">Share to DevHive</a>
+                    <a href="#" class="share-to-other">Share to Hershive</a>
+                  </div>
+                </form>
+              </div>
+              <div>
+                <!-- Location Text Preview -->
+                <div class="create-post-location-preview" id="locationTextPreview" style="display: none;">
+                  📍 <span id="locationNamePreview">Selected location</span>
+                </div>
+
+                <!-- Location Map Preview -->
+                <div id="locationMapPreviewContainer" style="display:none; position: relative; margin: 12px 0;">
+                  <div id="locationMapPreview"></div>
+                  <button type="button" id="removeLocationBtn" class="remove-location-btn" title="Remove location">&times;</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <?php endif; ?>
+
+          <!-- Share post to other social media modal -->
+          <div id="share_preview_overlay" class="post-preview-overlay hidden">
+            <!-- Share post container -->
+            <div class="share-post-container">
+              <div class="share-post-preview">
+                <span
+                  id="close_shared_preview_btn"
+                  class="material-symbols-outlined"
+                  onClick="closeSharePostPreview()">close</span>
+                <form method="POST" action="share_post.php" class="preview-form">
+                  <h1>Share Post</h1>
+                  <div
+                    id="share_post_input"
+                    class="create-post-div"
+                    contenteditable="true"
+                    onInput="updateHiddenInputShare();"
+                    data-placeholder="What's happening in your galaxy?"></div>
+                  <input type="hidden" name="share_post_content" id="share_post_content_hidden">
+                  <input type="hidden" name="share_post_id" id="share_post_id_modal">
+
+                  <!-- WYSWYG -->
+                  <div>
+                    <button 
+                      type="button" 
+                      class="wyswyg-btn" 
+                      title="Bold"
+                      onClick="formatText('bold')"><b>b</b></button>
+                    <button 
+                      type="button" 
+                      class="wyswyg-btn" 
+                      title="Italic"
+                      onClick="formatText('italic')"><i>I</i></button>
+                    <button 
+                      type="button" 
+                      class="wyswyg-btn" 
+                      title="Underline"
+                      onClick="formatText('underline')"><u>U</u></button>
+                  </div>
+
+                  <!-- Post Container: The post to be shared. -->
+                  <div class="user-post-container">
+                    <h4>You are sharing a post by <span id="sharedFullname"></span></h4>
+                  </div>
+
+                  <button 
+                      type="submit" 
+                      class="btn btn--primary"
+                      id="post_preview_submit_btn">
+                        Share Now
+                    </button>
+
+                  <div class="styled-hr"></div>
+
+                  <!-- Other social media -->
+                  <div class="share-options">
+                    <a href="#" class="share-to-other">Share to DevHive</a>
+                    <a href="#" class="share-to-other">Share to Hershive</a>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
@@ -629,8 +792,6 @@ if ($usersResult) {
               sp.content AS shared_content,
               sp.video_path AS shared_video_path,
               sp.image_path AS shared_image_path,
-              sp.video_path AS shared_video_path,
-              sp.location AS shared_location,
               su.first_name AS shared_first_name,
               su.last_name AS shared_last_name
             FROM posts p
@@ -686,11 +847,11 @@ if ($usersResult) {
 
               <!-- POST CONTENT -->
               <div class="post-content" data-post-id="<?= $post['post_id'] ?>">
-                <p class="post-text"><?= htmlspecialchars($post['content']) ?></p>
+                <p class="post-text"><?= $post['content'] ?></p>
 
                 <?php if (!empty($post['location'])): ?>
                   <div class="post-location" style="margin: 8px 0;">
-                    <div id="postMap<?= $post['post_id'] ?>" style="width:100%;height:220px;border-radius:10px;"></div>
+                    <div id="postMap<?= $post['post_id'] ?>" style="width:150%;height:220px;border-radius:10px;"></div>
                     <div style="font-size:0.9em;color:#aaa;margin-top:4px;">
                       <i class="ri-map-pin-user-line"></i> <?= htmlspecialchars($post['location']) ?>
                     </div>
@@ -728,7 +889,7 @@ if ($usersResult) {
                   <?php
                     // Show shared post caption above media grid
                     if (!empty($post['shared_content'])) {
-                      echo '<p>' . htmlspecialchars($post['shared_content']) . '</p>';
+                      echo '<p>' . $post['shared_content'] . '</p>';
                     }
                   ?>
 
@@ -782,14 +943,18 @@ if ($usersResult) {
                   </button>
 
                   <!-- Share -->
-                  <form method="POST" action="share_post.php" style="display:inline;">
-                    <input type="hidden" name="share_post_id" value="<?= $post['post_id'] ?>">
-                    <button type="submit" class="icon-btn">
+                  <form style="display:inline;">
+                    <button type="button" class="icon-btn" 
+                      onClick="showSharePostPreview(
+                        <?= $post['post_id'] ?>,
+                        '<?= htmlspecialchars($post['first_name']) ?>',
+                        '<?= htmlspecialchars($post['last_name']) ?>'
+                      )">
                       <i class="ri-share-forward-line"></i>
                       <span><?= $countShares['total'] ?></span>
                     </button>
                   </form>
-                </div>
+                  </div>
                 <button class="icon-btn"><i class="ri-bookmark-line"></i></button>
               </footer>
 
@@ -921,7 +1086,6 @@ if ($usersResult) {
         });
       });
     </script>
-
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="../script/dashboard.js"></script>
   </body>

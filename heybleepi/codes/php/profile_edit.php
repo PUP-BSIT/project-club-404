@@ -26,7 +26,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $newUsername = $_POST['username'];
   $firstName = $_POST['first_name'];
   $lastName = $_POST['last_name'];
-  $email = $_POST['email'];
   $bio = $_POST['bio'];
   $work = $_POST['work'];
   $school = $_POST['school'];
@@ -37,9 +36,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   // Update users table
   $stmt = $conn->prepare(
-    "UPDATE users SET user_name = ?, first_name = ?, last_name = ?, email = ? WHERE user_name = ?"
+    "UPDATE users SET user_name = ?, first_name = ?, last_name = ? WHERE user_name = ?"
   );
-  $stmt->bind_param("sssss", $newUsername, $firstName, $lastName, $email, $oldUsername);
+  $stmt->bind_param("ssss", $newUsername, $firstName, $lastName, $oldUsername);
   $stmt->execute();
 
   // Get updated user ID
