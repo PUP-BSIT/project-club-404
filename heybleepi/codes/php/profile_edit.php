@@ -26,7 +26,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $newUsername = $_POST['username'];
   $firstName = $_POST['first_name'];
   $lastName = $_POST['last_name'];
-  $email = $_POST['email'];
   $bio = $_POST['bio'];
   $work = $_POST['work'];
   $school = $_POST['school'];
@@ -37,9 +36,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   // Update users table
   $stmt = $conn->prepare(
-    "UPDATE users SET user_name = ?, first_name = ?, last_name = ?, email = ? WHERE user_name = ?"
+    "UPDATE users SET user_name = ?, first_name = ?, last_name = ? WHERE user_name = ?"
   );
-  $stmt->bind_param("sssss", $newUsername, $firstName, $lastName, $email, $oldUsername);
+  $stmt->bind_param("ssss", $newUsername, $firstName, $lastName, $oldUsername);
   $stmt->execute();
 
   // Get updated user ID
@@ -73,7 +72,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if (isset($_FILES['file_input']) && $_FILES['file_input']['error'] === UPLOAD_ERR_OK) {
     $avatarName = basename($_FILES['file_input']['name']);
     $avatarTmp = $_FILES['file_input']['tmp_name'];
-    $uploadPath = __DIR__ . "/assets/profile/" . $avatarName;
+    $uploadPath = __DIR__ . "/../assets/profile/" . $avatarName;
 
     if (move_uploaded_file($avatarTmp, $uploadPath)) {
       $stmt = $conn->prepare("UPDATE user_details SET profile_picture = ? WHERE id_fk = ?");
@@ -86,7 +85,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if (isset($_FILES['cover_input']) && $_FILES['cover_input']['error'] === UPLOAD_ERR_OK) {
     $coverName = basename($_FILES['cover_input']['name']);
     $coverTmp = $_FILES['cover_input']['tmp_name'];
-    $coverPath = __DIR__ . "/assets/profile/" . $coverName;
+    $coverPath = __DIR__ . "/../assets/profile/" . $coverName;
 
     if (move_uploaded_file($coverTmp, $coverPath)) {
       $stmt = $conn->prepare("UPDATE user_details SET profile_cover = ? WHERE id_fk = ?");
