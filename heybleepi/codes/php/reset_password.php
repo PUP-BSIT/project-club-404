@@ -36,9 +36,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['reset_user_id'])) 
     if ($newPassword !== $confirmPassword) {
         $message = "Passwords do not match.";
         $showForm = true;
-    } elseif (strlen($newPassword) < 12) {
-        $message = "Password must be at least 12 characters.";
-        $showForm = true;
     } else {
         $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
         $stmt = $conn->prepare("UPDATE users SET password = ?, reset_token = NULL, reset_expires = NULL WHERE id = ?");
@@ -55,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['reset_user_id'])) 
 <html>
 <head>
   <title>Reset Password</title>
-  <link rel="stylesheet" href="./stylesheet/forgot_password.css" />
+  <link rel="stylesheet" href="../stylesheet/forgot_password.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -95,6 +92,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['reset_user_id'])) 
       <?php endif; ?>
     </div>
   </div>
-  <script src="./script/forgot_password.js"></script>
+  <script src="../script/forgot_password.js"></script>
 </body>
 </html>

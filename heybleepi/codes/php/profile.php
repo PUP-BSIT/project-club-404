@@ -232,6 +232,7 @@ if ($usersResult) {
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=close" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
     <style>
       /* --- Profile Banner & Info Bar Fixes --- */
       .profile-top {
@@ -563,12 +564,14 @@ if ($usersResult) {
                   <p>@<?= htmlspecialchars($user['user_name']); ?></p>
                 </div>
               </div>
+
               <textarea 
                 class="create-post-input" 
                 name="post_content" 
                 placeholder="What's happening in your galaxy?"
                 onClick="showCreatePostPreview();"
               ></textarea>
+            
               <!-- Media Preview Grid -->
               <div class="create-post-actions">
                 <div class="media-actions">
@@ -882,11 +885,24 @@ if ($usersResult) {
               <?php if ($post['shared_post_id']): ?>
                 <div class="shared-post glass" style="padding: 10px; background-color: rgba(255, 255, 255, 0.05); border-left: 3px solid var(--primary); border-radius: 10px; margin-bottom: 10px;">
                   <small>Shared from <strong><?= htmlspecialchars($post['shared_first_name'] . ' ' . $post['shared_last_name']) ?></strong></small>
+
                   <?php
                     // Show shared post caption above media grid
                     if (!empty($post['shared_content'])) {
                       echo '<p>' . $post['shared_content'] . '</p>';
                     }
+                  ?>
+
+                  <?php if (!empty($post['shared_location'])): ?>
+                    <div class="post-location" style="margin: 8px 0;">
+                      <div id="postMap<?= $post['post_id'] ?>_shared" style="width:100%;height:220px;border-radius:10px;"></div>
+                      <div style="font-size:0.9em;color:#aaa;margin-top:4px;">
+                        <i class="ri-map-pin-user-line"></i> <?= htmlspecialchars($post['shared_location']) ?>
+                      </div>
+                    </div>
+                  <?php endif; ?>
+
+                  <?php
                     // Load multiple media for the shared post
                     $sharedMediaStmt = $conn->prepare("SELECT file_path, media_type FROM post_media WHERE post_id = ?");
                     $sharedMediaStmt->bind_param("i", $post['shared_post_id']);

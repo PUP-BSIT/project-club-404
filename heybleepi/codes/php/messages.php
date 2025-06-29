@@ -178,20 +178,17 @@ $conn->close();
         rows="6"
         required></textarea>
 
-      <div class="button-row" id="updateCancelRow" style="display:none;">
-        <button type="submit" id="updateBtn">Update</button>
-        <button type="button" id="cancelBtn">Cancel</button>
-      </div>
-      <button type="submit" id="addBtn">Send</button>
+        <div class="form-actions-row">
+          <button type="button" id="emojiBtn">
+            <i class="ri-emotion-line"></i>
+          </button>
+          <div class="form-actions-right">
+            <button type="submit" id="addBtn">Send</button>
+            <button type="submit" id="updateBtn" style="display:none;">Update</button>
+            <button type="button" id="cancelBtn" style="display:none;">Cancel</button>
+          </div>
+        </div>
     </form>
-
-    <div class="message-actions">
-      <button 
-        type="button"
-        id="emojiBtn">
-        <i class="ri-emotion-line"></i>
-      </button>
-    </div>
 
     <?php if (count($messages) > 0): ?>
       <?php foreach ($messages as $row): ?>
@@ -231,6 +228,17 @@ $conn->close();
     <?php else: ?>
       <p class="no-messages">No messages found.</p>
     <?php endif; ?>
+  </div>
+
+    <!-- Delete Confirmation Modal -->
+  <div id="deleteModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <p>Are you sure you want to delete this message?</p>
+      <div class="modal-actions">
+        <button id="confirmDeleteBtn">Delete</button>
+        <button id="cancelDeleteBtn">Cancel</button>
+      </div>
+    </div>
   </div>
 
   <script src="../script/messages.js"></script>

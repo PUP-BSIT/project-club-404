@@ -67,8 +67,8 @@ if ($user = $result->fetch_assoc()) {
         // Fetch latest user info from provider
         $user_data_url = match ($provider) {
             'heybleepi' => $provider_url . '/get-user-data.php',
-            'hershive'  => $provider_url . '/php/get_user_data.php',
-            'devhive'   => $provider_url . '/public_html/oauth_login/index.html',
+            'hershive'  => $provider_url . '/project-hershell/Hershive/php/get_user_data.php',
+            'devhive'   => $provider_url . '/api/users/get-user-data.php',
             default     => null,
         };
 
@@ -123,8 +123,8 @@ if ($user = $result->fetch_assoc()) {
         // No matching token: fetch user data and match by username
         $user_data_url = match ($provider) {
             'heybleepi' => $provider_url . '/get-user-data.php',
-            'hershive'  => $provider_url . '/php/get_user_data.php',
-            'devhive'   => $provider_url . '/public_html/oauth_login/index.html',
+            'hershive'  => $provider_url . '/project-hershell/Hershive/php/get_user_data.php',
+            'devhive'   => $provider_url . '/api/users/get-user-data.php',
             default     => null,
         };
 

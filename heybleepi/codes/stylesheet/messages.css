@@ -1,4 +1,17 @@
-messages.css
+:root {
+  --primary: #4f8aff;
+  --secondary: #2f95f3;
+  --bg: #f9fafc;
+  --sidebar-hover: rgba(124, 77, 255, 0.15);
+  --sidebar-active: rgba(124, 77, 255, 0.3);
+  --card-bg: #ffffff;
+  --sidebar-bg: #ffffff;
+  --layout-bg: #f1f5f9;
+  --navbar-height: 72px;
+  --glass: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(0, 0, 0, 0.05);
+}
+
 * {
   box-sizing: border-box;
   font-family: 'Inter', sans-serif !important;
@@ -119,7 +132,7 @@ body {
   max-width: 600px;
   margin: 120px auto 40px auto;
   padding: 2rem;
-  background: rgba(20, 30, 50, 0.5);
+  background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(10px);
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -157,7 +170,7 @@ form {
 
 form textarea {
   font-family: 'Inter', sans-serif;
-  width: 90%;
+  width: 100%;
   height: 120px;
   min-width: 0;
   max-width: 100%;
@@ -167,7 +180,7 @@ form textarea {
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   font-size: 1rem;
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.05);
   color: white;
   outline: none;
   resize: none;
@@ -214,7 +227,7 @@ form button:hover,
 
 .comment-box {
   position: relative;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 16px;
   padding: 1.2rem;
   display: flex;
@@ -376,6 +389,62 @@ form button:hover,
   transform: scale(1.03);
 }
 
+.form-actions-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 90%;
+  margin: 0 auto 1rem auto;
+  gap: 10px;
+}
+
+#emojiBtn {
+  background: rgba(255,255,255,0.1);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  color: #4f8aff;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#emojiBtn:hover {
+  background: rgba(79,138,255,0.15);
+}
+
+.form-actions-right {
+  display: flex;
+  gap: 8px;
+}
+
+#addBtn,
+#updateBtn,
+#cancelBtn {
+  background: linear-gradient(to right, #4f8aff, #2f6ee5);
+  color: white;
+  border: none;
+  border-radius: 9999px;
+  padding: 0.7rem 1.3rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 0 0 transparent;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+#addBtn:hover,
+#updateBtn:hover,
+#cancelBtn:hover {
+  background: linear-gradient(to right, #5b9aff, #3c79e0);
+  box-shadow: 0 0 8px rgba(79, 138, 255, 0.5);
+  transform: scale(1.03);
+}
+
 /* Action Menu */
 .action-menu-list {
   position: absolute;
@@ -421,14 +490,18 @@ form button:hover,
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 1.5em;
+  font-size: 1.1em;
   color: white;
-  padding: 2px 8px;
+  padding: 2px 6px;
   line-height: 1;
   vertical-align: middle;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.action-menu-btn i {
+  font-size: 1.2em;
 }
 
 /* Message Preview*/
@@ -466,14 +539,15 @@ form button:hover,
 
 .timestamp {
   position: absolute;
-  top: 1.5rem;
-  right: 24rem;
+  bottom: 1rem;
+  right: 1.5rem;
   font-size: 0.7rem;
   color: rgba(255, 255, 255, 0.7);
   font-weight: 500;
   white-space: nowrap;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
   z-index: 1;
+  margin-top: 18px;
 }
 
 .avatar {
@@ -782,6 +856,61 @@ form button:hover,
 
 .emoji-container::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
+}
+
+/* Simple modal styles */
+.modal {
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  backdrop-filter: blur(10%);
+  background-color: rgba(20, 30, 50, 0.5);
+}
+.modal-content {
+  background: rgba(15, 20, 35, 0.98);
+  color: #fff;
+  padding: 2rem 2.5rem;
+  border-radius: 10px;
+  text-align: center;
+  min-width: 260px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.modal-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+#confirmDeleteBtn,
+#cancelDeleteBtn {
+  background: linear-gradient(to right, #4f8aff, #2f6ee5);
+  color: white;
+  border: none;
+  border-radius: 9999px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 0 0 transparent;
+  letter-spacing: 1px;
+  text-align: center;
+  font-family: 'Inter', sans-serif;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+  margin: 0 0.5rem 0 0.5rem;
+}
+
+#confirmDeleteBtn:hover,
+#cancelDeleteBtn:hover {
+  background: linear-gradient(to right, #5b9aff, #3c79e0);
+  box-shadow: 0 0 8px rgba(79, 138, 255, 0.5);
+  transform: scale(1.03);
 }
 
 /* Responsive design for smaller screens */
