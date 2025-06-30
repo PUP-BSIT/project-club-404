@@ -348,7 +348,7 @@ input:checked+.toggle-slider:before {
 
 .name-group {
   width: 68%;
-  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  padding: 0.875rem 1rem 0.875rem 2.5rem;
   background-color: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
@@ -358,7 +358,7 @@ input:checked+.toggle-slider:before {
 }
 
 .name-group::placeholder {
-    color: white;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .form-input::placeholder {
@@ -441,6 +441,7 @@ input:checked+.toggle-slider:before {
   transition: opacity 0.3s ease;
   border: none;
   font-family: 'Quicksand', sans-serif;
+  font-size: 1rem;
 }
 
 .auth-button:hover {
@@ -468,6 +469,7 @@ input:checked+.toggle-slider:before {
   transition: background 0.2s;
   font-weight: 500;
   font-family: 'Quicksand', sans-serif;
+  font-size: 1rem;
 }
 
 .account-btn img {
