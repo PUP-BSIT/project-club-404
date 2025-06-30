@@ -115,14 +115,14 @@ if (isset($_GET['message'])) {
                 </div>
 
                 <div class="social-connection">
-                  <button type="button" class="account-btn">
-                    <img src="../assets/connected_accounts/devhive.jpg" alt="Devhive logo">
-                    Devhive
-                  </button>
-                  <button type="button" class="account-btn">
-                    <img src="../assets/connected_accounts/hershell.png" alt="Hershell logo">
-                    Hershell
-                  </button>
+                    <a href="oauth_login.php?provider=devhive" class="account-btn">
+                      <img src="../assets/connected_accounts/devhive.jpg" alt="Devhive logo">
+                      Devhive
+                    </a>
+                    <a href="oauth_login.php?provider=hershive" class="account-btn">
+                      <img src="../assets/connected_accounts/hershell.png" alt="Hershell logo">
+                      Hershell
+                    </a>
                 </div>
               </form>
 
