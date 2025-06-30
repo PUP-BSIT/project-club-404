@@ -440,6 +440,7 @@ input:checked+.toggle-slider:before {
   cursor: pointer;
   transition: opacity 0.3s ease;
   border: none;
+  font-family: 'Quicksand', sans-serif;
 }
 
 .auth-button:hover {
@@ -466,6 +467,7 @@ input:checked+.toggle-slider:before {
   cursor: pointer;
   transition: background 0.2s;
   font-weight: 500;
+  font-family: 'Quicksand', sans-serif;
 }
 
 .account-btn img {
@@ -532,6 +534,7 @@ input[type="password"]::-webkit-inner-spin-button {
   font-size: 1rem;
   cursor: pointer;
   transition: background 0.3s ease;
+  font-family: 'Quicksand', sans-serif;
 }
 
 .tab-btn:hover {
