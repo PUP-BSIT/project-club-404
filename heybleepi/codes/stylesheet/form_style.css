@@ -469,6 +469,7 @@ input:checked+.toggle-slider:before {
   font-weight: 500;
   font-family: 'Quicksand', sans-serif;
   font-size: 1rem;
+  text-decoration: none;
 }
 
 .account-btn img {
