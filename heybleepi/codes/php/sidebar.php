@@ -37,6 +37,19 @@ $followingCount = $followingCountRes ? $followingCountRes->fetch_assoc()['total'
     </ul>
   </section>
 
+  <!-- Sidebar Actions: Search & Notification -->
+  <div class="sidebar-actions">
+    <button class="icon-btn" id="sidebarSearchBtn" title="Search">
+      <i class="ri-search-line"></i>
+    </button>
+    <button class="icon-btn" id="notificationBtn" aria-label="Notifications">
+      <i class="ri-notification-3-line"></i>
+      <?php if (!empty($unread_count) && $unread_count > 0): ?>
+        <span class="badge" id="notification_count"><?= $unread_count ?></span>
+      <?php endif; ?>
+    </button>
+  </div>
+
   <!-- Navigation -->
   <nav class="glass card nav-list">
     <a class="nav-item <?= basename($_SERVER['PHP_SELF']) === 'dashboard.php' ? 'nav-item--active' : '' ?>" href="dashboard.php">
@@ -50,9 +63,6 @@ $followingCount = $followingCountRes ? $followingCountRes->fetch_assoc()['total'
     </a>
     <a class="nav-item" href="settings.php">
       <i class="ri-settings-4-line"></i> Settings & Privacy
-    </a>
-    <a class="nav-item" href="bookmarks.php">
-      <i class="ri-bookmark-line"></i> Saved
     </a>
     <a class="nav-item" href="logout.php">
       <i class="ri-logout-box-line"></i> Logout
