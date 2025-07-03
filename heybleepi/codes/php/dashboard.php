@@ -198,6 +198,23 @@ $unreadResult->bind_result($unread_count);
 $unreadResult->fetch();
 $unreadResult->close();
 
+function timeAgo($datetime) {
+    $timestamp = strtotime($datetime);
+    $diff = time() - $timestamp;
+
+    if ($diff < 60) {
+        return $diff . "s";
+    } elseif ($diff < 3600) {
+        return floor($diff / 60) . "m";
+    } elseif ($diff < 86400) {
+        return floor($diff / 3600) . "h";
+    } elseif ($diff < 604800) {
+        return floor($diff / 86400) . "d";
+    } else {
+        return floor($diff / 604800) . "w";
+    }
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -217,189 +234,111 @@ $unreadResult->close();
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body class="page">
-    <!-- Search and Notifications Bar -->
-    <div class="top-actions">
-        <div class="search">
-            <input class="search-input" id="searchInput" type="text" placeholder="Search in space…" />
-            <i class="ri-search-line search-icon"></i>
-            <div id="searchResults" class="search-results"></div>
-        </div>
-
-        <div class="notification-wrapper" id="notification_wrapper">
-            <button class="icon-btn" id="notificationBtn" aria-label="Notifications">
-                <i class="ri-notification-3-line ri-lg"></i>
-                <?php if ($unread_count > 0): ?>
-                    <span class="badge" id="notification_count"><?= $unread_count ?></span>
-                <?php endif; ?>
-            </button>
-
-            <div class="notification-dropdown" id="notification_dropdown">
-              <h4>Notifications</h4>
-              <ul>
-                <?php if (empty($notifications)): ?>
-                  <li>No new notifications.</li>
-                <?php else: ?>
-                  <?php foreach ($notifications as $notification): ?>
-                    <li>
-                      <strong><?= htmlspecialchars($notification['first_name'] . ' ' . $notification['last_name']) ?></strong>
-                      <?= htmlspecialchars($notification['type']) ?> your post.
-                      <br><small><?= date("M d, g:i A", strtotime($notification['created_at'])) ?></small>
-                    </li>
-                  <?php endforeach; ?>
-                <?php endif; ?>
-              </ul>
-              <form method="POST" action="mark_notifications_read.php">
-                <button class="mark-read" type="submit" name="mark_read" id="markAllReadBtn">Mark all as read</button>
-              </form>
-            </div>
-        </div>
-    </div>
-
     <!-- Main Layout -->
     <main class="layout" style="padding-top:0;">
         <!-- LEFT SIDEBAR -->
-        <aside class="sidebar sidebar--left">
-          <!-- Profile Card -->
-          <section class="glass card card--profile">
-            <?php
-            $postAvatarPath = '../assets/profile/' . ($_SESSION['avatar'] ?? 'default.png');
-            if (!file_exists($postAvatarPath)) {
-              $postAvatarPath = '../assets/profile/default.png';
-            }
-            ?>
-            <img class="avatar avatar--sm" src="<?= $postAvatarPath ?>" alt="">
+        <aside class="sidebar sidebar--icononly">
+          <!-- Logo at the top -->
+          <div class="sidebar-logo">
+            <img src="../assets/logo-hb.png" alt="HEYBLEEPI Logo" style="width:36px;height:36px;">
+          </div>
 
-            <h3 class="card-title"><?= htmlspecialchars($_SESSION['first_name'] . " " . $_SESSION['last_name']) ?></h3>
-            <p class="card-subtitle">@<?= htmlspecialchars($_SESSION['username']) ?></p>
-
-            <ul class="stats">
-              <li><strong>
-                <?php
-                  // Count all posts (original + shared) for the user
-                  $userPostCount = $conn->query("SELECT COUNT(*) AS total FROM posts WHERE user_id = " . intval($_SESSION['id']));
-                  $postCount = $userPostCount ? $userPostCount->fetch_assoc()['total'] : 0;
-                  echo $postCount;
-                ?>
-              </strong><span>Posts</span></li>
-              <li><strong>
-                <?php
-                  // Count all users except the current user (for followers)
-                  $followersCountRes = $conn->query("SELECT COUNT(*) AS total FROM users WHERE id != " . intval($_SESSION['id']));
-                  $followersCount = $followersCountRes ? $followersCountRes->fetch_assoc()['total'] : 0;
-                  echo number_format($followersCount);
-                ?>
-              </strong><span>Followers</span></li>
-              <li><strong>
-                <?php
-                  // Count all users except the current user (for following)
-                  $followingCountRes = $conn->query("SELECT COUNT(*) AS total FROM users WHERE id != " . intval($_SESSION['id']));
-                  $followingCount = $followingCountRes ? $followingCountRes->fetch_assoc()['total'] : 0;
-                  echo number_format($followingCount);
-                ?>
-              </strong><span>Following</span></li>
-            </ul>
-          </section>
-
-          <!-- Navigation -->
-          <nav class="glass card nav-list">
-            <a class="nav-item <?= basename($_SERVER['PHP_SELF']) === 'dashboard.php' ? 'nav-item--active' : '' ?>" href="dashboard.php">
+          <nav class="sidebar-nav">
+            <a class="sidebar-icon-link" href="#" title="Search">
+              <i class="ri-search-line"></i>
+            </a>
+            <button class="sidebar-icon-link" id="notificationBtnSidebar" title="Notifications" type="button">
+              <i class="ri-notification-3-line"></i>
+              <?php if ($unread_count > 0): ?>
+                <span class="badge" id="notification_count"><?= $unread_count ?></span>
+              <?php endif; ?>
+            </button>
+            <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'dashboard.php' ? 'active' : '' ?>" href="dashboard.php" title="Home">
               <i class="ri-home-4-line"></i>
-              Home
             </a>
-
-            <a class="nav-item <?= basename($_SERVER['PHP_SELF']) === 'messages.php' ? 'nav-item--active' : '' ?>" href="messages.php">
+            <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'messages.php' ? 'active' : '' ?>" href="messages.php" title="Messages">
               <i class="ri-message-3-line"></i>
-              <span class="nav-label">
-                Messages
-                <?php if ($unreadMessages > 0): ?>
-                  <span class="badge badge-inline"><?= $unreadMessages ?></span>
-                <?php endif; ?>
-              </span>
+              <?php if ($unreadMessages > 0): ?>
+                <span class="sidebar-badge"></span>
+              <?php endif; ?>
             </a>
-
-            <a class="nav-item <?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'nav-item--active' : '' ?>" href="profile.php">
+            <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'active' : '' ?>" href="profile.php" title="Profile">
               <i class="ri-user-line"></i>
-              Profile
-            </a>
-
-            <a class="nav-item" href="settings.php">
-              <i class="ri-settings-4-line"></i>
-              Settings & Privacy
-            </a>
-
-            <a class="nav-item" href="bookmarks.php"> <!-- Link to saved items -->
-              <i class="ri-bookmark-line"></i>
-              Saved
-            </a>
-
-            <a class="nav-item" href="logout.php">
-              <i class="ri-logout-box-line"></i>
-              Logout
             </a>
           </nav>
+
+          <button class="sidebar-more-btn" id="sidebarMoreBtn" title="More">
+            <i class="ri-menu-line"></i>
+          </button>
         </aside>
+
+        <div class="notification-dropdown" id="notification_dropdown">
+          <h4>Notifications</h4>
+          <ul>
+            <?php if (empty($notifications)): ?>
+              <li>No new notifications.</li>
+            <?php else: ?>
+              <?php foreach ($notifications as $notification): ?>
+                <li>
+                  <strong><?= htmlspecialchars($notification['first_name'] . ' ' . $notification['last_name']) ?></strong>
+                  <?php if ($notification['type'] === 'like'): ?>
+                    liked your post.
+                  <?php elseif ($notification['type'] === 'comment'): ?>
+                    commented on your post.
+                  <?php elseif ($notification['type'] === 'share'): ?>
+                    shared your post.
+                  <?php else: ?>
+                    <?= htmlspecialchars($notification['type']) ?> your post.
+                  <?php endif; ?>
+                  <br><small><?= date("M d, g:i A", strtotime($notification['created_at'])) ?></small>
+                </li>
+              <?php endforeach; ?>
+            <?php endif; ?>
+          </ul>
+          <form method="POST" action="mark_notifications_read.php">
+            <button class="mark-read" type="submit" name="mark_read" id="markAllReadBtn">Mark all as read</button>
+          </form>
+        </div>
+
+        <!-- More Menu Popup -->
+        <div id="sidebarMoreMenu" class="sidebar-more-menu hidden">
+          <ul>
+            <li>
+              <a href="settings.php"><i class="ri-settings-4-line"></i> Settings</a>
+            </li>
+            <li>
+              <a href="logout.php" style="color:#ff4d4f;"><i class="ri-logout-box-line"></i> Log out</a>
+            </li>
+          </ul>
+        </div>
 
         <!-- FEED -->
         <section class="feed" id="mainFeed">
 
           <!-- Create Post -->
-          <form>
-            <div class="glass create-post">
-              <div class="create-post-header">
-
-                <?php
+          <form class="simple-create-post" autocomplete="off" onsubmit="return false;">
+            <div class="simple-create-post-inner">
+              <?php
                 $postAvatarPath = '../assets/profile/' . ($_SESSION['avatar'] ?? 'default.png');
                 if (!file_exists($postAvatarPath)) {
                   $postAvatarPath = '../assets/profile/default.png';
                 }
-                ?>
-                <img class="avatar avatar--sm" src="<?= $postAvatarPath ?>" alt="">
-
-                <div class="poster-info">
-                  <a href="profile.php" class="poster-name"><?= $_SESSION['first_name'] . ' ' . $_SESSION['last_name'] ?></a>
-                  <p>@<?= $_SESSION['username'] ?></p>
-                </div>
-              </div>
-
-              <textarea 
-                class="create-post-input" 
-                name="post_content" 
-                placeholder="What's happening in your galaxy?"
-                onClick="showCreatePostPreview();"
-                ></textarea>
-
-                <div class="create-post-actions">
-                  <div class="media-actions">
-                    <button 
-                      type="button" 
-                      class="media-upload-btn photo" 
-                      onClick="showCreatePostPreview();">
-                        + Photo
-                    </button>
-                    <button 
-                      type="button"
-                      class="media-upload-btn video" 
-                      onClick="showCreatePostPreview();">
-                        + Video
-                    </button>
-                  </div>
-                  <div class="minor-actions">
-                    <button 
-                      class="icon-btn" 
-                      type="button" 
-                      id="getLocationBtn" 
-                      title="Add location"
-                      onClick="showCreatePostPreview();">
-                      <i class="ri-map-pin-line"></i>
-                    </button>
-                  </div>
-                  <button 
-                    class="btn btn--primary" 
-                    onClick="showCreatePostPreview();"
-                    type="button">
-                      Post
-                  </button>
-                </div>
+              ?>
+              <img class="avatar avatar--sm" src="<?= $postAvatarPath ?>" alt="Profile">
+              <input
+                type="text"
+                class="simple-create-post-input"
+                placeholder="What's new?"
+                autocomplete="off"
+                readonly
+                onclick="openCreatePostPreview();"
+                style="cursor:pointer;"
+              >
+              <button
+                type="button"
+                class="btn btn--primary simple-post-btn"
+                onclick="openCreatePostPreview();"
+              >Post</button>
             </div>
           </form>
 
@@ -417,7 +356,7 @@ $unreadResult->close();
             </div>
           </div>
 
-          <!-- Create Post Preview -->
+          <!-- Create Post Preview / Share post OAuth -->
           <div id="post_preview_overlay" class="post-preview-overlay hidden">
             <div class="create-post-preview-container">
               <div id="create_post_preview" class="create-post-preview">
@@ -425,10 +364,10 @@ $unreadResult->close();
                   id="close_preview_btn"
                   class="material-symbols-outlined"
                   onClick="closeCreatePostPreview();">close</span>
-                <form 
-                  method="POST" 
-                  action="dashboard.php" 
-                  enctype="multipart/form-data" 
+                <form
+                  method="POST"
+                  action="dashboard.php"
+                  enctype="multipart/form-data"
                   class="preview-form">
                   <h1>Create Post</h1>
                   <div
@@ -438,29 +377,29 @@ $unreadResult->close();
                     onInput="updateHiddenInput(); isTextAreaEmpty();"
                     data-placeholder="What's happening in your galaxy?"></div>
                   <input type="hidden" name="post_content" id="post_content_hidden">
-                    
+
                   <!-- WYSWYG -->
                   <div>
-                    <button 
-                      type="button" 
-                      class="wyswyg-btn" 
+                    <button
+                      type="button"
+                      class="wyswyg-btn"
                       title="Bold"
                       onClick="formatText('bold')"><b>b</b></button>
-                    <button 
-                      type="button" 
-                      class="wyswyg-btn" 
+                    <button
+                      type="button"
+                      class="wyswyg-btn"
                       title="Italic"
                       onClick="formatText('italic')"><i>I</i></button>
-                    <button 
-                      type="button" 
-                      class="wyswyg-btn" 
+                    <button
+                      type="button"
+                      class="wyswyg-btn"
                       title="Underline"
                       onClick="formatText('underline')"><u>U</u></button>
                   </div>
 
                   <!-- Media Preview Grid -->
                   <div id="mediaPreviewGrid" class="media-preview-grid"></div>
-    
+
                   <!-- Buttons container -->
                   <div id="buttons_container" class="buttons-container">
                     <button type="button" class="media-upload-btn photo" onclick="document.getElementById('postImageInput').click()">+ Photo</button>
@@ -473,8 +412,8 @@ $unreadResult->close();
                     <input type="file" name="post_images[]" accept="image/*" multiple id="postImageInput" hidden>
                     <input type="file" name="post_videos[]" accept="video/*" multiple id="postVideoInput" hidden>
 
-                    <button 
-                      type="submit" 
+                    <button
+                      type="submit"
                       class="btn btn--primary disabled"
                       id="post_preview_submit_btn"
                       disabled>
@@ -528,19 +467,19 @@ $unreadResult->close();
 
                   <!-- WYSWYG -->
                   <div>
-                    <button 
-                      type="button" 
-                      class="wyswyg-btn" 
+                    <button
+                      type="button"
+                      class="wyswyg-btn"
                       title="Bold"
                       onClick="formatText('bold')"><b>b</b></button>
-                    <button 
-                      type="button" 
-                      class="wyswyg-btn" 
+                    <button
+                      type="button"
+                      class="wyswyg-btn"
                       title="Italic"
                       onClick="formatText('italic')"><i>I</i></button>
-                    <button 
-                      type="button" 
-                      class="wyswyg-btn" 
+                    <button
+                      type="button"
+                      class="wyswyg-btn"
                       title="Underline"
                       onClick="formatText('underline')"><u>U</u></button>
                   </div>
@@ -550,8 +489,8 @@ $unreadResult->close();
                     <h4>You are sharing a post by <span id="sharedFullname"></span></h4>
                   </div>
 
-                  <button 
-                      type="submit" 
+                  <button
+                      type="submit"
                       class="btn btn--primary"
                       id="post_preview_submit_btn">
                         Share Now
@@ -598,13 +537,15 @@ $unreadResult->close();
                 <a href="profile.php?user=<?= urlencode($post['user_name']) ?>">
                   <img class="avatar avatar--sm" src="../assets/profile/<?= htmlspecialchars($post['profile_picture'] ?? 'default.png') ?>" alt="">
                 </a>
-                <div>
-                  <!-- Show only user's name as a link to their profile page -->
-                  <a href="profile.php?user=<?= urlencode($post['user_name']) ?>" class="poster-name" style="display:block;">
+                <div class="poster-meta">
+                  <a href="profile.php?user=<?= urlencode($post['user_name']) ?>" class="poster-name" style="display:inline;">
                     <?= htmlspecialchars($post['first_name'] . ' ' . $post['last_name']) ?>
                   </a>
-                  <time><?= date("g:i A", strtotime($post['created_at'])) ?></time>
+                  <span class="post-time" style="color:#aaa; font-size:0.98em; margin-left:8px;">
+                    <?= timeAgo($post['created_at']) ?>
+                  </span>
                 </div>
+
                 <?php if ($post['user_id'] == $_SESSION['id']): ?>
                   <div class="post-options" style="margin-left: auto;">
                     <button class="icon-btn toggle-options"><i class="ri-more-fill"></i></button>
@@ -745,7 +686,7 @@ $unreadResult->close();
                   ?>
 
                   <!-- Get the post creator name -->
-                  <?php 
+                  <?php
                     $postId = $post['id'];
                     $stmt = $conn->prepare("
                       SELECT users.first_name, users.last_name
@@ -767,7 +708,7 @@ $unreadResult->close();
                   ?>
 
                   <form style="display:inline;">
-                    <button type="button" class="icon-btn" 
+                    <button type="button" class="icon-btn"
                       onClick="showSharePostPreview(
                         <?= $post['id'] ?>,
                         '<?= htmlspecialchars($postCreator['first_name']) ?>',
@@ -778,7 +719,6 @@ $unreadResult->close();
                     </button>
                   </form>
                 </div>
-                <button class="icon-btn"><i class="ri-bookmark-line"></i></button>
               </footer>
 
               <!-- COMMENT FORM -->

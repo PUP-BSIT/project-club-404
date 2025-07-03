@@ -13,29 +13,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Suggestions "See more"
-  const seeMoreBtn = document.getElementById("seeMoreBtn");
-  const suggestionList = document.getElementById("suggestion_list");
-
-  if (seeMoreBtn && suggestionList) {
-    const allSuggestions = Array.from(suggestionList.querySelectorAll(".suggestion"));
-    let visibleCount = 2;
-
-    allSuggestions.forEach((item, index) => {
-      if (index >= visibleCount) item.classList.add("hidden");
-    });
-
-    seeMoreBtn.addEventListener("click", function () {
-      const nextSet = allSuggestions.slice(visibleCount, visibleCount + 2);
-      nextSet.forEach((item) => item.classList.remove("hidden"));
-      visibleCount += 2;
-
-      if (visibleCount >= allSuggestions.length) {
-        seeMoreBtn.style.display = "none";
-      }
-    });
-  }
-
   // Notification Dropdown
   const notificationBtn = document.getElementById("notificationBtn");
   const notificationDropdown = document.getElementById("notification_dropdown");
@@ -1104,7 +1081,7 @@ function closeCreatePostPreview() {
     previewOverlay.classList.add("hidden");
     mainTextArea.disabled = false;
   }
-  
+
 }
 
 function showSharePostPreview(postId, firstName, lastName) {
@@ -1166,7 +1143,7 @@ function updateHiddenInput() {
   document.getElementById('post_content_hidden').value = value;
 }
 
-// For share post.
+// For share post
 function updateHiddenInputShare() {
   const inputDiv = document.getElementById('share_post_input');
   let value = inputDiv.innerHTML.trim();
@@ -1177,4 +1154,50 @@ function updateHiddenInputShare() {
   }
 
   document.getElementById('share_post_content_hidden').value = value;
+}
+
+// Sidebar menu for settings and logout
+document.addEventListener('DOMContentLoaded', function () {
+  const moreBtn = document.getElementById('sidebarMoreBtn');
+  const moreMenu = document.getElementById('sidebarMoreMenu');
+
+  if (moreBtn && moreMenu) {
+    moreBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      moreMenu.classList.toggle('hidden');
+    });
+
+    // Hide menu when clicking outside
+    document.addEventListener('click', function (e) {
+      if (!moreMenu.contains(e.target) && !moreBtn.contains(e.target)) {
+        moreMenu.classList.add('hidden');
+      }
+    });
+  }
+});
+
+const notificationBtnSidebar = document.getElementById("notificationBtnSidebar");
+const notificationDropdown = document.getElementById("notification_dropdown");
+
+if (notificationBtnSidebar && notificationDropdown) {
+  notificationBtnSidebar.addEventListener("click", function (e) {
+    e.stopPropagation();
+    notificationDropdown.classList.toggle("visible");
+  });
+}
+
+document.addEventListener("click", function () {
+  notificationDropdown.classList.remove("visible");
+});
+
+notificationDropdown.addEventListener("click", function (e) {
+  e.stopPropagation();
+});
+
+// Post preview
+function openCreatePostPreview() {
+  document.getElementById('post_preview_overlay').classList.remove('hidden');
+}
+function closeCreatePostPreview() {
+  document.getElementById('post_preview_overlay').classList.add('hidden');
 }
