@@ -220,6 +220,43 @@ if ($usersResult) {
     $allUsers[] = $row;
   }
 }
+
+// Fetch latest 10 notifications
+$notifications = [];
+$unread_count = 0;
+
+$nstmt = $conn->prepare("SELECT n.*, u.first_name, u.last_name FROM notifications n JOIN users u ON n.actor_id = u.id WHERE n.user_id = ? ORDER BY n.created_at DESC LIMIT 10");
+$nstmt->bind_param("i", $user_id);
+$nstmt->execute();
+$result = $nstmt->get_result();
+while ($row = $result->fetch_assoc()) {
+  $notifications[] = $row;
+}
+$nstmt->close();
+
+$unreadResult = $conn->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = ? AND is_read = 0");
+$unreadResult->bind_param("i", $user_id);
+$unreadResult->execute();
+$unreadResult->bind_result($unread_count);
+$unreadResult->fetch();
+$unreadResult->close();
+
+function timeAgo($datetime) {
+    $timestamp = strtotime($datetime);
+    $diff = time() - $timestamp;
+
+    if ($diff < 60) {
+        return $diff . "s";
+    } elseif ($diff < 3600) {
+        return floor($diff / 60) . "m";
+    } elseif ($diff < 86400) {
+        return floor($diff / 3600) . "h";
+    } elseif ($diff < 604800) {
+        return floor($diff / 86400) . "d";
+    } else {
+        return floor($diff / 604800) . "w";
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -233,221 +270,85 @@ if ($usersResult) {
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=close" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
-    <style>
-      /* --- Profile Banner & Info Bar Fixes --- */
-      .profile-top {
-        position: relative;
-        padding: 0;
-        overflow: visible;
-        min-height: 220px;
-        margin-bottom: 2.5rem;
-      }
-      .profile-top .banner-img {
-        width: 100%;
-        height: 180px;
-        object-fit: cover;
-        border-radius: 12px 12px 0 0;
-        display: block;
-      }
-      .profile-info-bar {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: -56px;
-        display: flex;
-        align-items: center;
-        background: var(--glass-bg, rgba(30,34,44,0.95));
-        border-radius: 0 0 12px 12px;
-        padding: 1.2rem 2rem 1.2rem 1.2rem;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-        min-height: 110px;
-        z-index: 2;
-      }
-      .profile-info-bar .avatar--sm2 {
-        width: 110px;
-        height: 110px;
-        border-radius: 50%;
-        border: 5px solid #fff;
-        object-fit: cover;
-        margin-right: 1.5rem;
-        margin-top: -40px;
-        background: #fff;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-      }
-      .profile-info-bar .user-basic-info {
-        flex: 1;
-      }
-      .profile-info-bar h2 {
-        margin: 0 0 4px 0;
-        font-size: 2rem;
-        font-weight: 700;
-      }
-      .profile-info-bar p {
-        margin: 0;
-        color: #aaa;
-        font-size: 1.1rem;
-      }
-      .profile-buttons {
-        display: flex;
-        gap: 0.7rem;
-        margin-left: 1.5rem;
-      }
-      .profile-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5em;
-        border: none;
-        border-radius: 8px;
-        font-size: 1rem;
-        font-weight: 500;
-        padding: 8px 18px;
-        cursor: pointer;
-        transition: background 0.15s, color 0.15s;
-        outline: none;
-      }
-      .profile-btn--story {
-        background: #1877f2;
-        color: #fff;
-      }
-      .profile-btn--story:hover {
-        background: #166fe0;
-      }
-      .profile-btn--edit {
-        background: #3a3b3c;
-        color: #fff;
-      }
-      .profile-btn--edit:hover {
-        background: #484a4d;
-      }
-      .profile-btn i {
-        font-size: 1.1em;
-        margin-right: 0.50; /* Increase spacing between icon and text */
-        display: inline-block;
-        vertical-align: middle;
-      }
-      @media (max-width: 700px) {
-        .profile-info-bar {
-          flex-direction: column;
-          align-items: flex-start;
-          padding: 1.2rem;
-          min-height: unset;
-        }
-        .profile-info-bar .avatar--sm2 {
-          margin: -60px 0 0 0;
-          width: 90px;
-          height: 90px;
-        }
-        .profile-buttons {
-          margin-left: 0;
-          margin-top: 1rem;
-        }
-      }
-      /* Fix main grid top margin to account for overlay */
-      .profile-main-grid {
-        margin-top: 8px; /* Reduce space above main grid */
-      }
-
-      /* --- Profile Tabs UI Fixes --- */
-      .profile-tabs {
-        display: flex;
-        gap: 0.5rem;
-        padding: 0 1.5rem;
-        height: 48px;
-        align-items: center;
-        border-radius: 0 0 12px 12px;
-        margin-bottom: 0 !important;
-        background: var(--glass-bg, rgba(30,34,44,0.95));
-        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-      }
-      .profile-tabs .tab {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        height: 38px;
-        min-width: 80px;
-        padding: 0 22px;
-        font-size: .95rem;
-        font-weight: 500;
-        color: #bfc6d1;
-        border-radius: 0;
-        background: transparent;
-        border: none;
-        cursor: pointer;
-        transition: background 0.15s, color 0.15s;
-        margin-bottom: 0;
-        position: relative;
-      }
-      .profile-tabs .tab.active {
-        background: transparent;
-        color: #3b82f6;
-      }
-      .profile-tabs .tab.active::after {
-        content: "";
-        display: block;
-        position: absolute;
-        left: 18%;
-        right: 18%;
-        bottom: 0;
-        height: 3px;
-        background: #3b82f6;
-        border-radius: 2px;
-      }
-      .profile-tabs .tab:hover:not(.active) {
-        background: rgba(255,255,255,0.08);
-        color: #fff;
-      }
-    </style>
   </head>
 
   <body class="page profile-page">
-    <!-- Top Navbar -->
-    <header class="top-nav glass">
-      <div style="display: flex; align-items: center; width: 100%; justify-content: space-between;">
-        <h1 class="brand">HEYBLEEPI</h1>
-
-        <nav class="nav-actions">
-          <a class="icon-btn" href="dashboard.php" title="Home"><i class="ri-home-4-line"></i></a>
-
-          <a class="icon-btn" href="messages.php" title="Messages">
-            <i class="ri-message-3-line"></i>
-            <?php if ($unreadMessages > 0): ?>
-              <span class="badge badge--message"><?= $unreadMessages ?></span>
-            <?php endif; ?>
-          </a>
-
-          <div class="notification-wrapper" id="notification_wrapper">
-            <button class="icon-btn" id="notificationBtn" aria-label="Notifications">
-              <i class="ri-notification-3-line ri-lg"></i>
-              <?php if ($unread_count > 0): ?>
-                <span class="badge" id="notification_count"><?= $unread_count ?></span>
-              <?php endif; ?>
-            </button>
-
-            <div class="notification-dropdown" id="notification_dropdown">
-              <h4>Notifications</h4>
-              <ul>
-                <?php if (empty($notifications)): ?>
-                  <li>No new notifications.</li>
-                <?php else: ?>
-                  <?php foreach ($notifications as $notification): ?>
-                    <li>
-                      <strong><?= htmlspecialchars($notification['actor_first_name'] . ' ' . $notification['actor_last_name']) ?></strong>
-                      <?= htmlspecialchars($notification['type']) ?> your post.
-                      <br><small><?= date("M d, g:i A", strtotime($notification['created_at'])) ?></small>
-                    </li>
-                  <?php endforeach; ?>
-                <?php endif; ?>
-              </ul>
-
-              <form method="POST" action="mark_notifications_read.php">
-                <button class="mark-read" type="submit" name="mark_read" id="markAllReadBtn">Mark all as read</button>
-              </form>
-            </div>
-          </div>
-        </nav>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar sidebar--icononly">
+      <!-- Logo at the top -->
+      <div class="sidebar-logo">
+        <img src="../assets/logo-hb.png" alt="HEYBLEEPI Logo" style="width:36px;height:36px;">
       </div>
-    </header>
+
+      <nav class="sidebar-nav">
+        <a class="sidebar-icon-link" href="#" title="Search">
+          <i class="ri-search-line"></i>
+        </a>
+        <button class="sidebar-icon-link" id="notificationBtnSidebar" title="Notifications" type="button">
+          <i class="ri-notification-3-line"></i>
+          <?php if ($unread_count > 0): ?>
+            <span class="badge" id="notification_count"><?= $unread_count ?></span>
+          <?php endif; ?>
+        </button>
+        <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'dashboard.php' ? 'active' : '' ?>" href="dashboard.php" title="Home">
+          <i class="ri-home-4-line"></i>
+        </a>
+        <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'messages.php' ? 'active' : '' ?>" href="messages.php" title="Messages">
+          <i class="ri-message-3-line"></i>
+          <?php if ($unreadMessages > 0): ?>
+            <span class="sidebar-badge"></span>
+          <?php endif; ?>
+        </a>
+        <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'active' : '' ?>" href="profile.php" title="Profile">
+          <i class="ri-user-line"></i>
+        </a>
+      </nav>
+
+      <button class="sidebar-more-btn" id="sidebarMoreBtn" title="More">
+        <i class="ri-menu-line"></i>
+      </button>
+    </aside>
+
+    <div class="notification-dropdown" id="notification_dropdown">
+      <h4>Notifications</h4>
+      <ul>
+        <?php if (empty($notifications)): ?>
+          <li>No new notifications.</li>
+        <?php else: ?>
+          <?php foreach ($notifications as $notification): ?>
+            <li>
+              <strong><?= htmlspecialchars($notification['first_name'] . ' ' . $notification['last_name']) ?></strong>
+              <?php if ($notification['type'] === 'like'): ?>
+                liked your post.
+              <?php elseif ($notification['type'] === 'comment'): ?>
+                commented on your post.
+              <?php elseif ($notification['type'] === 'share'): ?>
+                shared your post.
+              <?php else: ?>
+                <?= htmlspecialchars($notification['type']) ?> your post.
+              <?php endif; ?>
+              <br><small><?= date("M d, g:i A", strtotime($notification['created_at'])) ?></small>
+            </li>
+          <?php endforeach; ?>
+        <?php endif; ?>
+      </ul>
+      <form method="POST" action="mark_notifications_read.php">
+        <button class="mark-read" type="submit" name="mark_read" id="markAllReadBtn">Mark all as read</button>
+      </form>
+    </div>
+
+    <!-- More Menu Popup -->
+    <div id="sidebarMoreMenu" class="sidebar-more-menu hidden">
+      <ul>
+        <li>
+          <a href="settings.php"><i class="ri-settings-4-line"></i> Settings</a>
+        </li>
+        <li>
+          <a href="logout.php" style="color:#ff4d4f;"><i class="ri-logout-box-line"></i> Log out</a>
+        </li>
+      </ul>
+    </div>
+
 
     <!-- Main Layout -->
     <main class="profile-container">
@@ -462,9 +363,6 @@ if ($usersResult) {
           </div>
           <?php if ($userId == $_SESSION['id']): ?>
           <div class="profile-buttons">
-            <button class="profile-btn profile-btn--story">
-              <i class="ri-add-line"></i> Add to story
-            </button>
             <button class="profile-btn profile-btn--edit" onclick="window.location.href='profile_edit.php'">
               <i class="ri-pencil-line"></i> Edit profile
             </button>
@@ -527,30 +425,6 @@ if ($usersResult) {
               <?php endforeach; ?>
             </div>
           </section>
-
-          <!-- Albums Section -->
-          <section class="glass card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-              <h4 class="card-title" style="margin: 0;">Albums</h4>
-              <a href="create_album.php" class="btn btn--action create-album-btn" style="font-size: 0.95em; padding: 6px 16px;">+ Create Album</a>
-            </div>
-            <div class="photo-grid">
-              <?php if (empty($albums)): ?>
-                <p style="padding: 1rem;">No albums created yet.</p>
-              <?php else: ?>
-                <?php foreach ($albums as $album): ?>
-                  <div class="album-item" onclick="window.location.href='view_album.php?album_id=<?= $album['id'] ?>'">
-                    <img src="<?= htmlspecialchars(getAlbumCover($album['id'], $conn)) ?>" alt="Album Cover" />
-                    <div class="album-info">
-                      <strong><?= htmlspecialchars($album['title']) ?></strong>
-                      <p><?= $album['media_count'] ?> item(s)</p>
-                    </div>
-                  </div>
-                <?php endforeach; ?>
-              <?php endif; ?>
-            </div>
-          </section>
-
         </aside>
 
         <!-- Create Post -->
@@ -566,41 +440,41 @@ if ($usersResult) {
                 </div>
               </div>
 
-              <textarea 
-                class="create-post-input" 
-                name="post_content" 
+              <textarea
+                class="create-post-input"
+                name="post_content"
                 placeholder="What's happening in your galaxy?"
                 onClick="showCreatePostPreview();"
               ></textarea>
-            
+
               <!-- Media Preview Grid -->
               <div class="create-post-actions">
                 <div class="media-actions">
-                  <button 
-                    type="button" 
-                    class="media-upload-btn photo" 
+                  <button
+                    type="button"
+                    class="media-upload-btn photo"
                     onclick="showCreatePostPreview();">
                       + Photo
                   </button>
-                  <button 
-                    type="button" 
-                    class="media-upload-btn video" 
+                  <button
+                    type="button"
+                    class="media-upload-btn video"
                     onclick="showCreatePostPreview();">
                       + Video
                   </button>
                 </div>
                 <div class="minor-actions">
-                  <button 
-                    class="icon-btn" 
-                    type="button" 
-                    id="getLocationBtn" 
+                  <button
+                    class="icon-btn"
+                    type="button"
+                    id="getLocationBtn"
                     title="Add location"
                     onClick="showCreatePostPreview();">
                     <i class="ri-map-pin-line"></i>
                   </button>
                 </div>
-                <button 
-                  class="btn btn--action" 
+                <button
+                  class="btn btn--action"
                   onClick="showCreatePostPreview();";
                   type="button">
                     Post
@@ -631,10 +505,10 @@ if ($usersResult) {
                   id="close_preview_btn"
                   class="material-symbols-outlined"
                   onClick="closeCreatePostPreview()">close</span>
-                <form 
-                  method="POST" 
-                  action="profile.php" 
-                  enctype="multipart/form-data" 
+                <form
+                  method="POST"
+                  action="profile.php"
+                  enctype="multipart/form-data"
                   class="preview-form">
                   <h1>Create Post</h1>
                   <div
@@ -644,29 +518,29 @@ if ($usersResult) {
                     onInput="updateHiddenInput(); isTextAreaEmpty();"
                     data-placeholder="What's happening in your galaxy?"></div>
                   <input type="hidden" name="post_content" id="post_content_hidden">
-                    
+
                   <!-- WYSWYG -->
                   <div>
-                    <button 
-                      type="button" 
-                      class="wyswyg-btn" 
+                    <button
+                      type="button"
+                      class="wyswyg-btn"
                       title="Bold"
                       onClick="formatText('bold')"><b>b</b></button>
-                    <button 
-                      type="button" 
-                      class="wyswyg-btn" 
+                    <button
+                      type="button"
+                      class="wyswyg-btn"
                       title="Italic"
                       onClick="formatText('italic')"><i>I</i></button>
-                    <button 
-                      type="button" 
-                      class="wyswyg-btn" 
+                    <button
+                      type="button"
+                      class="wyswyg-btn"
                       title="Underline"
                       onClick="formatText('underline')"><u>U</u></button>
                   </div>
 
                   <!-- Media Preview Grid -->
                   <div id="mediaPreviewGrid" class="media-preview-grid"></div>
-    
+
                   <!-- Buttons container -->
                   <div id="buttons_container" class="buttons-container">
                     <button type="button" class="media-upload-btn photo" onclick="document.getElementById('postImageInput').click()">+ Photo</button>
@@ -679,8 +553,8 @@ if ($usersResult) {
                     <input type="file" name="post_images[]" accept="image/*" multiple id="postImageInput" hidden>
                     <input type="file" name="post_videos[]" accept="video/*" multiple id="postVideoInput" hidden>
 
-                    <button 
-                      type="submit" 
+                    <button
+                      type="submit"
                       class="btn btn--primary disabled"
                       id="post_preview_submit_btn"
                       disabled>
@@ -735,19 +609,19 @@ if ($usersResult) {
 
                   <!-- WYSWYG -->
                   <div>
-                    <button 
-                      type="button" 
-                      class="wyswyg-btn" 
+                    <button
+                      type="button"
+                      class="wyswyg-btn"
                       title="Bold"
                       onClick="formatText('bold')"><b>b</b></button>
-                    <button 
-                      type="button" 
-                      class="wyswyg-btn" 
+                    <button
+                      type="button"
+                      class="wyswyg-btn"
                       title="Italic"
                       onClick="formatText('italic')"><i>I</i></button>
-                    <button 
-                      type="button" 
-                      class="wyswyg-btn" 
+                    <button
+                      type="button"
+                      class="wyswyg-btn"
                       title="Underline"
                       onClick="formatText('underline')"><u>U</u></button>
                   </div>
@@ -759,11 +633,11 @@ if ($usersResult) {
 
                   <!-- INTERNAL SHARING -->
                   <button 
-                      type="submit" 
-                      class="btn btn--primary"
-                      id="post_preview_submit_btn">
-                        Share Now
-                    </button>
+                    type="submit" 
+                    class="btn btn--primary"
+                    id="post_preview_submit_btn">
+                      Share Now
+                  </button>
 
                   <div class="styled-hr"></div>
                 </form>
@@ -833,10 +707,13 @@ if ($usersResult) {
             <article class="glass post">
               <header class="post-header">
                 <img class="avatar avatar--sm" src="../assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>" alt="User Avatar">
-                <div>
-                  <h4><?= htmlspecialchars($post['first_name'] . ' ' . $post['last_name']) ?></h4>
-                  <time><?= date("M d, g:i A", strtotime($post['created_at'])) ?></time>
+                <div class="poster-meta" style="display: flex; align-items: center; gap: 8px;">
+                  <h4 style="margin:0; font-size:1.08em;"><?= htmlspecialchars($post['first_name'] . ' ' . $post['last_name']) ?></h4>
+                  <span class="post-time" style="color:#aaa; font-size:0.98em;">
+                    <?= timeAgo($post['created_at']) ?>
+                  </span>
                 </div>
+
                 <div class="post-options" style="margin-left: auto;">
                   <button class="icon-btn toggle-options"><i class="ri-more-fill"></i></button>
                   <ul class="dropdown hidden">
@@ -950,7 +827,7 @@ if ($usersResult) {
 
                   <!-- Share -->
                   <form style="display:inline;">
-                    <button type="button" class="icon-btn" 
+                    <button type="button" class="icon-btn"
                       onClick="showSharePostPreview(
                         <?= $post['post_id'] ?>,
                         '<?= htmlspecialchars($post['first_name']) ?>',
@@ -961,7 +838,6 @@ if ($usersResult) {
                     </button>
                   </form>
                   </div>
-                <button class="icon-btn"><i class="ri-bookmark-line"></i></button>
               </footer>
 
                <!-- COMMENTS SECTION -->
