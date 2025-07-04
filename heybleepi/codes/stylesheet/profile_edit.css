@@ -16,7 +16,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: 'Quicksand', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 body {
@@ -90,7 +90,7 @@ body {
 .profile-picture h2 {
   margin-top: 1rem;
   font-size: 1.5rem;
-  font-weight: 600;
+  font-weight: 500;
   color: #facc15;
 }
 
@@ -219,4 +219,20 @@ button {
 .return-to-profile {
   background: #e4e6eb;
   color: #050505;
+}
+
+.success-toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #101114;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  font-weight: bold;
+  display: none;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
 }

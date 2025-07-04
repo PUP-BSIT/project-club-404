@@ -16,7 +16,6 @@ $stmt = $conn->prepare(
    ON users.id = user_details.id_fk
    WHERE users.user_name = ?"
 );
-
 $stmt->bind_param("s", $username);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -78,6 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $stmt = $conn->prepare("UPDATE user_details SET profile_picture = ? WHERE id_fk = ?");
       $stmt->bind_param("si", $avatarName, $userId);
       $stmt->execute();
+      $_SESSION['avatar'] = $avatarName;
     }
   }
 
@@ -94,17 +94,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
   }
 
-  // Update session variables to reflect new profile
+  // Update session variables
   $_SESSION['username'] = $newUsername;
   $_SESSION['first_name'] = $firstName;
   $_SESSION['last_name'] = $lastName;
-  
-  if (!empty($avatarName)) {
-    $_SESSION['avatar'] = $avatarName;
-  }
 
-  header("Location: profile_edit.php");
-  exit;
+  // Return success for AJAX or redirect normally
+  if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || $_SERVER['HTTP_X_REQUESTED_WITH'] !== 'XMLHttpRequest') {
+    header("Location: profile_edit.php");
+    exit;
+  } else {
+    echo json_encode(['success' => true]);
+    exit;
+  }
 }
 ?>
 
@@ -119,29 +121,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   </head>
 
   <body>
+    <div class="success-toast" id="successToast">
+      Changes saved successfully!
+    </div>
+
     <div class="container">
       <!-- FORM -->
-      <form id="profile_form" method="POST" enctype="multipart/form-data">
-
+      <form id="profile_form" enctype="multipart/form-data">
         <!-- Cover Upload -->
-        <div class="cover-preview-div"
-          style="background-image: url('../assets/profile/<?= htmlspecialchars($user['profile_cover'] ?? 'dark_mode.jpg') ?>');"
-          id="cover_preview_div">
-        </div>
+        <div class="cover-preview-div" style="background-image: url('../assets/profile/<?= htmlspecialchars($user['profile_cover'] ?? 'dark_mode.jpg') ?>');" id="cover_preview_div"></div>
         <button class="change-profile-pic" type="button" onclick="changeCover()">Change Cover Photo</button>
         <input type="file" name="cover_input" id="cover_input" accept="image/*" hidden>
 
-        <!-- Edit Profile Title -->
+        <!-- Profile Section -->
         <div class="profile-picture">
-          <img id="profile_image"
-            src="../assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>"
-            alt="Profile Picture" />
+          <img id="profile_image" src="../assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>" alt="Profile Picture" />
           <label for="file_input" class="change-profile-image">+</label>
           <input type="file" name="file_input" id="file_input" accept="image/*" hidden />
           <h2>Edit Profile</h2>
         </div>
 
-        <!-- Basic Information -->
+        <!-- Basic Info -->
         <div class="grid-2">
           <div class="input-group">
             <label for="first_name">First Name</label>
@@ -153,8 +153,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           </div>
           <div class="input-group">
             <label for="username">Username</label>
-            <input type="text" id="username" name="username" value="<?= htmlspecialchars($user['user_name']) ?>" 
-            <?= isset($_SESSION['oauth_provider']) ? 'readonly style="background-color:#8f9585;cursor:not-allowed;"' : '' ?> />
+            <input type="text" id="username" name="username" value="<?= htmlspecialchars($user['user_name']) ?>" <?= isset($_SESSION['oauth_provider']) ? 'readonly style="background-color:#8f9585;cursor:not-allowed;"' : '' ?> />
           </div>
         </div>
 
@@ -165,7 +164,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <button type="button" class="change-bio" onclick="enableTextArea()">Change Bio</button>
         </div>
 
-        <!-- Profile Details -->
+        <!-- Details -->
         <div class="grid-2">
           <div class="input-group">
             <label for="work">💼 Works at</label>
@@ -185,7 +184,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           </div>
         </div>
 
-        <!-- Relationship Status -->
+        <!-- Relationship -->
         <div class="input-group relationship-group">
           <label>❤️ Relationship Status</label>
           <div class="radio-options">
@@ -202,7 +201,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <button type="button" class="return-to-profile" onclick="window.location.href='profile.php'">Back to Profile</button>
         </div>
       </form>
-
     </div>
     <script src="../script/profile_edit.js"></script>
   </body>
