@@ -1084,14 +1084,17 @@ function closeCreatePostPreview() {
 
 }
 
+// Opens the share post modal
 function showSharePostPreview(postId, firstName, lastName) {
   const previewOverlay = document.querySelector("#share_preview_overlay");
 
   previewOverlay.classList.remove("hidden");
-  document.querySelector("#share_post_id_modal").value = postId;
+  document.querySelector("#share_post_id_internal").value = postId;
+  document.querySelector("#share_post_id_external").value = postId;
   document.getElementById("sharedFullname").textContent = firstName + " " + lastName;
 }
 
+// Close the share post modal
 function closeSharePostPreview() {
   const closeBtn = document.querySelector("#close_shared_preview_btn");
   const previewOverlay = document.querySelector("#share_preview_overlay");
