@@ -166,8 +166,17 @@ if ($user = $result->fetch_assoc()) {
 }
 
 // Insert token if not already recorded
-$stmt = $conn->prepare("SELECT id FROM oauth_tokens WHERE token = ? AND client_id = ?");
-$stmt->bind_param("ss", $token, $local_client_id);
+$stmt = $conn->prepare("
+  SELECT token 
+  FROM oauth_tokens 
+  WHERE user_id = ? 
+    AND client_id = ? 
+    AND is_revoked = 0 
+    AND expires_at > NOW() 
+  LIMIT 1
+");
+
+$stmt->bind_param("is", $local_user_id, $local_client_id);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -179,6 +188,10 @@ if ($result->num_rows === 0) {
     ");
     $stmt->bind_param("isss", $local_user_id, $local_client_id, $token, $expires_at);
     $stmt->execute();
+} else {
+    //reuse existing token
+    $row = $result->fetch_assoc();
+    $token = $row['token'];
 }
 
 // Re-fetch user for session
@@ -196,6 +209,9 @@ $_SESSION['first_name'] = $user['first_name'];
 $_SESSION['middle_name'] = $user['middle_name'];
 $_SESSION['last_name'] = $user['last_name'];
 $_SESSION['full_name'] = $user['first_name'] . ' ' . $user['last_name'];
+
+// CHANGES 
+$_SESSION['isAllowed'] = 'allowed_to_share';
 
 header('Location: dashboard.php');
 exit;

@@ -191,6 +191,7 @@ $albumResult = $albumStmt->get_result();
 $albums = $albumResult->fetch_all(MYSQLI_ASSOC);
 
 function getAlbumCover($albumId, $conn) {
+  $path = null;
   $stmt = $conn->prepare("SELECT file_path FROM album_photos WHERE album_id = ? ORDER BY id ASC LIMIT 1");
   $stmt->bind_param("i", $albumId);
   $stmt->execute();
@@ -630,20 +631,25 @@ function timeAgo($datetime) {
                     <h4>You are sharing a post by <span id="sharedFullname"></span></h4>
                   </div>
 
-                  <button
-                      type="submit"
-                      class="btn btn--primary"
-                      id="post_preview_submit_btn">
-                        Share Now
-                    </button>
+                  <!-- INTERNAL SHARING -->
+                  <button 
+                    type="submit" 
+                    class="btn btn--primary"
+                    id="post_preview_submit_btn">
+                      Share Now
+                  </button>
 
                   <div class="styled-hr"></div>
+                </form>
 
-                  <!-- Other social media -->
-                  <div class="share-options">
-                    <a href="#" class="share-to-other">Share to DevHive</a>
-                    <a href="#" class="share-to-other">Share to Hershive</a>
-                  </div>
+                <!-- EXTERNAL SHARING -->
+                <form action="create-post.php" method="POST">
+                    <input type="hidden" name="share_post_id" id="share_post_id_external">
+                  
+                    <div class="share-options">
+                      <button type="submit" name="share_to_other" value="devhive" class="share-to-other">Share to DevHive</button>
+                      <button type="submit" name="share_to_other" value="hershive" class="share-to-other">Share to Hershive</button>
+                    </div>
                 </form>
               </div>
             </div>

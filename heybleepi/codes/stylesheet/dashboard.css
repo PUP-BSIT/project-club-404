@@ -1029,6 +1029,9 @@ html {
   text-decoration: none;
   font-size: 0.85rem;
   transition: color 0.2s ease;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
 .share-to-other:hover {
