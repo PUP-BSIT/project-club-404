@@ -31,3 +31,34 @@ function changeCover() {
     }
   };
 }
+
+// AJAX submit
+document.getElementById('profile_form').addEventListener('submit', function (e) {
+  e.preventDefault();
+
+  const formData = new FormData(this);
+
+  fetch('profile_edit.php', {
+    method: 'POST',
+    body: formData,
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest'
+    }
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const toast = document.getElementById('successToast');
+        toast.style.display = 'block';
+        setTimeout(() => {
+          toast.style.display = 'none';
+        }, 1500);
+      } else {
+        alert("Error saving changes.");
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert("An error occurred.");
+    });
+});
