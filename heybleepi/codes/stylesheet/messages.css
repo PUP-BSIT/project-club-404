@@ -170,7 +170,7 @@ form {
 
 form textarea {
   font-family: 'Inter', sans-serif;
-  width: 100%;
+  width: 535px;
   height: 120px;
   min-width: 0;
   max-width: 100%;
@@ -245,7 +245,7 @@ form button:hover,
   position: absolute;
   top: 1rem;
   right: 1rem;
-  z-index: 3; 
+  z-index: 3;
 }
 
 .comment-actions form {
@@ -259,7 +259,7 @@ form button:hover,
   border-radius: 4px;
   padding: 5px;
   z-index: 100;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .action-menu button {
@@ -292,7 +292,7 @@ form button:hover,
   height: 32px;
   font-size: 1.5rem;
   font-weight: bold;
-  transform: rotate(90deg); 
+  transform: rotate(90deg);
   font-family: 'Inter', sans-serif;
 }
 
@@ -307,7 +307,7 @@ form button:hover,
   background: #222;
   color: #fff;
   border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   min-width: 50px;
   z-index: 10;
   display: none;
@@ -399,7 +399,7 @@ form button:hover,
 }
 
 #emojiBtn {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
   border: none;
   border-radius: 50%;
   width: 40px;
@@ -414,7 +414,7 @@ form button:hover,
 }
 
 #emojiBtn:hover {
-  background: rgba(79,138,255,0.15);
+  background: rgba(79, 138, 255, 0.15);
 }
 
 .form-actions-right {
@@ -866,12 +866,13 @@ form button:hover,
   top: 0;
   right: 0;
   bottom: 0;
-  display: flex; 
-  align-items: center; 
+  display: flex;
+  align-items: center;
   justify-content: center;
   backdrop-filter: blur(10%);
   background-color: rgba(20, 30, 50, 0.5);
 }
+
 .modal-content {
   background: rgba(15, 20, 35, 0.98);
   color: #fff;
@@ -881,6 +882,7 @@ form button:hover,
   min-width: 260px;
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
+
 .modal-actions {
   margin-top: 1.5rem;
   display: flex;
