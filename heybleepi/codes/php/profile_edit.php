@@ -347,7 +347,6 @@ $update->close();
           <!-- Buttons -->
           <div style="display:flex; gap: 1rem; margin-top: 2rem;">
             <button type="submit" class="save-changes">Save Changes</button>
-            <button type="button" class="return-to-profile" onclick="window.location.href='profile.php'">Back to Profile</button>
           </div>
         </form>
       </div>
