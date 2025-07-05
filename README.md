@@ -30,7 +30,7 @@
 ## 🌐 Web Hosting
 
 - **Hosted on:** Hostinger
-- **Live URL:** [heybleepi.site](https://heybleepi.site/)
+- **Live URL:** [heybleepi.site](https://heybleepi.site/PROJECT-CLUB-404/heybleepi/codes/php/index.php)
 
 ---
 
