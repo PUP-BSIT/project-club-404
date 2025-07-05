@@ -304,43 +304,57 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // --- Add new message at the top of the list ---
-  function addNewMessageToDOM(messageData) {
-    const container = document.querySelector('.container');
-    const noMessagesElement = document.querySelector('.no-messages');
-    if (noMessagesElement) noMessagesElement.remove();
+ // --- Add new message at the top of the list ---
+ function addNewMessageToDOM(messageData) {
+  const container = document.querySelector('.container');
+  const noMessagesElement = document.querySelector('.no-messages');
+  if (noMessagesElement) noMessagesElement.remove();
 
-    const createdAt = new Date(messageData.created_at);
-    const formattedTime = createdAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const createdAt = new Date(messageData.created_at);
 
-    const newMessage = document.createElement('div');
-    newMessage.className = 'message-preview';
-    newMessage.innerHTML = `
-          <div class="comment-box">
-              <div class="comment-header">
-                  <img src="../assets/profile/${messageData.profile_picture || 'rawr.png'}"
-                      alt="Avatar" class="avatar avatar--sm" />
-                  <div class="preview-text">
-                      <h4>${messageData.user_name}</h4>
-                      <p>${messageData.message}</p>
-                  </div>
+    // Format date as "Month Day, Year"
+    const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+    const date = createdAt.toLocaleDateString('en-US', dateOptions);
+
+  // Format time manually to avoid "at"
+  let hours = createdAt.getHours();
+  const minutes = createdAt.getMinutes().toString().padStart(2, '0');
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12 || 12;
+
+  const time = `${hours}:${minutes} ${ampm}`;
+  const formattedTime = `${date} ${time}`;
+
+
+  const newMessage = document.createElement('div');
+  newMessage.className = 'message-preview';
+  newMessage.innerHTML = `
+      <div class="comment-box">
+          <div class="comment-header">
+              <img src="../assets/profile/${messageData.profile_picture || 'rawr.png'}"
+                  alt="Avatar" class="avatar avatar--sm" />
+              <div class="preview-text">
+                  <h4>${messageData.user_name}</h4>
+                  <p>${messageData.message}</p>
               </div>
-              <span class="timestamp">${formattedTime}</span>
-              <span class="comment-actions">
-                  <button type="button" class="action-menu-btn" data-id="${messageData.id}">
-                      <i class="ri-more-2-fill"></i>
-                  </button>
-                  <div class="action-menu" style="display: none;">
-                      <button class="comment-edit" data-id="${messageData.id}">
-                          Edit
-                      </button>
-                      <button class="comment-delete" data-id="${messageData.id}">
-                          Delete
-                      </button>
-                  </div>
-              </span>
           </div>
-      `;
+          <span class="timestamp">${formattedTime}</span>
+          <span class="comment-actions">
+              <button type="button" class="action-menu-btn" data-id="${messageData.id}">
+                  <i class="ri-more-2-fill"></i>
+              </button>
+              <div class="action-menu" style="display: none;">
+                  <button class="comment-edit" data-id="${messageData.id}">
+                      Edit
+                  </button>
+                  <button class="comment-delete" data-id="${messageData.id}">
+                      Delete
+                  </button>
+              </div>
+          </span>
+      </div>
+  `;
+
 
     // Insert at the top of the messages list
     const firstMessage = container.querySelector('.message-preview');
@@ -379,5 +393,25 @@ document.getElementById('markAllReadBtn')?.addEventListener('click', function() 
   const badge = document.getElementById('notification_count');
   if (badge) {
     badge.style.display = 'none';
+  }
+});
+
+// Sidebar menu for settings and logout
+document.addEventListener('DOMContentLoaded', function () {
+  const moreBtn = document.getElementById('sidebarMoreBtn');
+  const moreMenu = document.getElementById('sidebarMoreMenu');
+
+  if (moreBtn && moreMenu) {
+    moreBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      moreMenu.classList.toggle('hidden');
+    });
+
+    // Hide menu when clicking outside
+    document.addEventListener('click', function (e) {
+      if (!moreMenu.contains(e.target) && !moreBtn.contains(e.target)) {
+        moreMenu.classList.add('hidden');
+      }
+    });
   }
 });
