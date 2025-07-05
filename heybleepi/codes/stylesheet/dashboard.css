@@ -301,7 +301,7 @@ body {
 }
 
 .notification-dropdown {
-  position: fixed;
+  position: absolute;
   top: 40px;
   left: 90px;
   width: 320px;
@@ -310,12 +310,11 @@ body {
   color: #fff;
   border-radius: 12px;
   box-shadow: 0 4px 32px rgba(0, 0, 0, 0.25);
-  z-index: 9999;
+  z-index: 2000;
   display: none;
   max-height: 400px;
   overflow-y: auto;
   padding-bottom: 12px;
-  display: none;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.18s, transform 0.18s;
@@ -1029,9 +1028,6 @@ html {
   text-decoration: none;
   font-size: 0.85rem;
   transition: color 0.2s ease;
-  background: none;
-  border: none;
-  cursor: pointer;
 }
 
 .share-to-other:hover {
@@ -1880,11 +1876,11 @@ textarea:focus {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  margin: 0 auto;
-  margin-left: 133px;
+  margin: 2px;
+  margin-left: 139px;
   padding: 2rem 0 0 0;
   box-sizing: border-box;
-  max-width: 82vw;
+  max-width: 79vw;
   flex: 1 1 auto;
 }
 
@@ -2670,6 +2666,7 @@ body.page {
 /* Create Post */
 .simple-create-post {
   padding: 1rem 1.25rem;
+  /*border: 1px solid rgba(255, 255, 255, 0.08); */
 }
 
 .simple-create-post-inner {
@@ -2710,7 +2707,7 @@ body.page {
   transition: none !important;
 }
 
-/* --- Profile Banner & Info Bar--- */
+/* --- Profile Banner & Info Bar Fixes --- */
 .profile-top {
   position: relative;
   padding: 0;
@@ -2802,6 +2799,7 @@ body.page {
 .profile-btn i {
   font-size: 1.1em;
   margin-right: 0.50;
+  /* Increase spacing between icon and text */
   display: inline-block;
   vertical-align: middle;
 }
@@ -2826,12 +2824,12 @@ body.page {
   }
 }
 
-/* --- Profile Main Grid --- */
+/* Fix main grid top margin to account for overlay */
 .profile-main-grid {
   margin-top: 8px;
 }
 
-/* --- Profile Tabs UI --- */
+/* --- Profile Tabs UI Fixes --- */
 .profile-tabs {
   display: flex;
   gap: 0.5rem;
