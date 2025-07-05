@@ -554,11 +554,12 @@ html {
 .sidebar-nav {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 25px;
   width: 100%;
   align-items: center;
   margin: 0;
   padding: 0;
+  height: 400px;
 }
 
 .sidebar-nav.sidebar-center {
