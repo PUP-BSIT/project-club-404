@@ -1,17 +1,19 @@
 <aside class="sidebar sidebar--icononly">
   <div class="sidebar-logo">
-    <img src="./assets/logo-hb.png" alt="HEYBLEEPI Logo" style="width:36px;height:36px;">
+    <img src="../assets/logo-hb.png" alt="HEYBLEEPI Logo" style="width:36px;height:36px;">
   </div>
   <nav class="sidebar-nav">
     <a class="sidebar-icon-link" href="#" title="Search">
       <i class="ri-search-line"></i>
     </a>
-    <button class="sidebar-icon-link" id="notificationBtnSidebar" title="Notifications" type="button">
+    <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'notification.php' ? 'active' : '' ?>"
+      href="notification.php"
+      title="Notifications">
       <i class="ri-notification-3-line"></i>
       <?php if ($unread_count > 0): ?>
         <span class="badge" id="notification_count"><?= $unread_count ?></span>
       <?php endif; ?>
-    </button>
+    </a>
     <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'dashboard.php' ? 'active' : '' ?>" href="dashboard.php" title="Home">
       <i class="ri-home-4-line"></i>
     </a>
@@ -24,6 +26,8 @@
     <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'active' : '' ?>" href="profile.php" title="Profile">
       <i class="ri-user-line"></i>
     </a>
+
+    <div style="flex:1"></div>
     <button class="sidebar-more-btn" id="sidebarMoreBtn" title="More" type="button">
       <i class="ri-menu-line"></i>
     </button>
