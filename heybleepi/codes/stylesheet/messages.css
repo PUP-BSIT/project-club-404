@@ -130,7 +130,7 @@ body {
 /* Main Container */
 .container {
   max-width: 600px;
-  margin: 120px auto 40px auto;
+  margin: 8px auto 8px auto;
   padding: 2rem;
   background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(10px);
@@ -838,7 +838,7 @@ form button:hover,
 }
 
 .modal-content {
-  background: #101114;
+  background: #292a2e;
   color: #fff;
   padding: 2rem 2.5rem;
   border-radius: 10px;
@@ -852,6 +852,12 @@ form button:hover,
   display: flex;
   gap: 1rem;
   justify-content: center;
+}
+
+.modal-text {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 1rem;
 }
 
 #cancelDeleteBtn {
@@ -900,7 +906,7 @@ form button:hover,
 }
 
 /* --- Icon-only Sidebar --- */
-.sidebar--icononly {
+/* .sidebar--icononly {
   width: 80px;
   background: #101114;
   height: 100vh;
@@ -1115,10 +1121,10 @@ form button:hover,
 
 .hidden {
   display: none !important;
-}
+} */
 
 /* notification badge */
-.notification-wrapper {
+/* .notification-wrapper {
   position: relative;
 }
 
@@ -1217,19 +1223,19 @@ form button:hover,
   color: white;
   transition: color 0.3s ease;
   font-size: 1.8rem;
-}
+} */
 
 /* badge color*/
-.icon-btn:hover i {
+/* .icon-btn:hover i {
   color: white;
 }
 
 .icon-btn:hover {
   background: rgba(255, 255, 255, 0.1);
-}
+} */
 
 /* Mark read button */
-.mark-read {
+/* .mark-read {
   margin-top: 0.5rem;
   display: block;
   text-align: right;
@@ -1277,7 +1283,7 @@ form button:hover,
   line-height: 1;
   font-weight: bold;
   z-index: 10;
-}
+} */
 
 /* Responsive design for smaller screens */
 @media (max-width: 480px) {
