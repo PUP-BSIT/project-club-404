@@ -244,7 +244,9 @@ function timeAgo($datetime) {
           </div>
 
           <nav class="sidebar-nav">
-            <a class="sidebar-icon-link" href="#" title="Search">
+            <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'search.php' ? 'active' : '' ?>"
+              href="search.php"
+              title="Search">
               <i class="ri-search-line"></i>
             </a>
             <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'notification.php' ? 'active' : '' ?>"
