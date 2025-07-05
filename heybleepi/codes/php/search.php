@@ -137,7 +137,7 @@ if ($search !== '') {
       align-items: center;
       margin: 0;
       padding: 0;
-      height: 490px;
+      height: 522px;
     }
   </style>
 </head>
