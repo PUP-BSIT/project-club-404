@@ -206,21 +206,23 @@ $conn->close();
             <a class="sidebar-icon-link" href="#" title="Search">
               <i class="ri-search-line"></i>
             </a>
-          <button class="sidebar-icon-link icon-btn" id="notificationBtnSidebar" title="Notifications" type="button">
-            <i class="ri-notification-3-line"></i>
-            <?php if ($unread_count > 0): ?>
-              <span class="badge" id="notification_count"><?= $unread_count ?></span>
-            <?php endif; ?>
-          </button>
+            <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'notification.php' ? 'active' : '' ?>"
+              href="notification.php"
+              title="Notifications">
+              <i class="ri-notification-3-line"></i>
+              <?php if ($unread_count > 0): ?>
+                <span class="badge" id="notification_count"><?= $unread_count ?></span>
+              <?php endif; ?>
+            </a>
             <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'dashboard.php' ? 'active' : '' ?>" href="dashboard.php" title="Home">
               <i class="ri-home-4-line"></i>
             </a>
-              <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'messages.php' ? 'active' : '' ?>" href="messages.php" title="Messages">
-                <i class="ri-message-3-line"></i>
-                <?php if ($unreadMessages > 0): ?>
-                  <span class="sidebar-badge"><?= $unreadMessages ?></span>
-                <?php endif; ?>
-              </a>
+            <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'messages.php' ? 'active' : '' ?>" href="messages.php" title="Messages">
+              <i class="ri-message-3-line"></i>
+              <?php if ($unreadMessages > 0): ?>
+                <span class="sidebar-badge"></span>
+              <?php endif; ?>
+            </a>
             <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'active' : '' ?>" href="profile.php" title="Profile">
               <i class="ri-user-line"></i>
             </a>
@@ -235,35 +237,28 @@ $conn->close();
           <h4>Notifications</h4>
           <ul>
             <?php if (empty($notifications)): ?>
-              <li class="notification-item">No new notifications.</li>
+              <li>No new notifications.</li>
             <?php else: ?>
               <?php foreach ($notifications as $notification): ?>
-                <li class="notification-item">
-                  <div class="notification-content">
-                    <strong><?= htmlspecialchars($notification['actor_first_name'] . ' ' . $notification['actor_last_name']) ?></strong>
-                    <?php if ($notification['type'] === 'like'): ?>
-                      liked your post.
-                    <?php elseif ($notification['type'] === 'comment'): ?>
-                      commented on your post.
-                    <?php elseif ($notification['type'] === 'share'): ?>
-                      shared your post.
-                    <?php else: ?>
-                      <?= htmlspecialchars($notification['type']) ?> your post.
-                    <?php endif; ?>
-                    <?php if (!empty($notification['post_content'])): ?>
-                      <div class="post-preview">"<?= htmlspecialchars(substr($notification['post_content'], 0, 50)) ?><?= strlen($notification['post_content']) > 50 ? '...' : '' ?>"</div>
-                    <?php endif; ?>
-                    <div class="notification-time"><?= date("M d, g:i A", strtotime($notification['created_at'])) ?></div>
-                  </div>
+                <li>
+                  <strong><?= htmlspecialchars($notification['first_name'] . ' ' . $notification['last_name']) ?></strong>
+                  <?php if ($notification['type'] === 'like'): ?>
+                    liked your post.
+                  <?php elseif ($notification['type'] === 'comment'): ?>
+                    commented on your post.
+                  <?php elseif ($notification['type'] === 'share'): ?>
+                    shared your post.
+                  <?php else: ?>
+                    <?= htmlspecialchars($notification['type']) ?> your post.
+                  <?php endif; ?>
+                  <br><small><?= date("M d, g:i A", strtotime($notification['created_at'])) ?></small>
                 </li>
               <?php endforeach; ?>
             <?php endif; ?>
           </ul>
-          <?php if (!empty($notifications)): ?>
-            <form method="POST" action="mark_notifications_read.php">
-              <button class="mark-read" type="submit" name="mark_read" id="markAllReadBtn">Mark all as read</button>
-            </form>
-          <?php endif; ?>
+          <form method="POST" action="mark_notifications_read.php">
+            <button class="mark-read" type="submit" name="mark_read" id="markAllReadBtn">Mark all as read</button>
+          </form>
         </div>
 
         <!-- More Menu Popup -->
@@ -315,7 +310,7 @@ $conn->close();
               </div>
             </div>
             <span class="timestamp"><?= $row['created_at'] ?
-              date("g:i A", strtotime($row['created_at'])) : "No time" ?></span>
+              date("F j, Y g:i A", strtotime($row['created_at'])) : "No time" ?></span>
             <?php if ($row['user_name'] === $user): ?>
               <span class="comment-actions">
                 <button
@@ -345,7 +340,7 @@ $conn->close();
     <!-- Delete Confirmation Modal -->
   <div id="deleteModal" class="modal" style="display:none;">
     <div class="modal-content">
-      <p>Are you sure you want to delete this message?</p>
+      <p class="modal-text">Are you sure you want to delete this message?</p>
       <div class="modal-actions">
         <button id="confirmDeleteBtn">Delete</button>
         <button id="cancelDeleteBtn">Cancel</button>
@@ -354,5 +349,40 @@ $conn->close();
   </div>
 
   <script src="../script/messages.js"></script>
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Notification Dropdown
+      const notifBtn = document.getElementById('notificationBtnSidebar');
+      const notifDropdown = document.getElementById('notification_dropdown');
+      if (notifBtn && notifDropdown) {
+        notifBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          notifDropdown.classList.toggle('show');
+        });
+        // Optional: Hide dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+          if (!notifDropdown.contains(e.target) && !notifBtn.contains(e.target)) {
+            notifDropdown.classList.remove('show');
+          }
+        });
+      }
+
+      // More Menu Popup
+      const moreBtn = document.getElementById('sidebarMoreBtn');
+      const moreMenu = document.getElementById('sidebarMoreMenu');
+      if (moreBtn && moreMenu) {
+        moreBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          moreMenu.classList.toggle('hidden');
+        });
+        document.addEventListener('click', function(e) {
+          if (!moreMenu.contains(e.target) && !moreBtn.contains(e.target)) {
+            moreMenu.classList.add('hidden');
+          }
+        });
+      }
+    });
+  </script>
 </body>
 </html>
