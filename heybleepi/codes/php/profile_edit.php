@@ -117,91 +117,136 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Edit Your Profile!</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand&display=swap" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="../stylesheet/profile_edit.css" />
+    <link rel="stylesheet" href="../stylesheet/dashboard.css" />
+    <style>
+      .sidebar-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+        width: 100%;
+        align-items: center;
+        margin: 0;
+        padding: 0;
+        height: 475px;
+      }
+    </style>
   </head>
 
   <body>
-    <div class="success-toast" id="successToast">
-      Changes saved successfully!
+    <?php
+    if (!isset($unread_count)) $unread_count = 0;
+    if (!isset($unreadMessages)) $unreadMessages = 0;
+    include 'sidebar.php';
+    ?>
+
+    <div id="sidebarMoreMenu" class="sidebar-more-menu hidden">
+      <ul>
+        <li><a href="settings.php"><i class="ri-settings-4-line"></i> Settings</a></li>
+        <li><a href="logout.php" style="color:#ff4d4f;"><i class="ri-logout-box-line"></i> Log out</a></li>
+      </ul>
     </div>
 
-    <div class="container">
-      <!-- FORM -->
-      <form id="profile_form" enctype="multipart/form-data">
-        <!-- Cover Upload -->
-        <div class="cover-preview-div" style="background-image: url('../assets/profile/<?= htmlspecialchars($user['profile_cover'] ?? 'dark_mode.jpg') ?>');" id="cover_preview_div"></div>
-        <button class="change-profile-pic" type="button" onclick="changeCover()">Change Cover Photo</button>
-        <input type="file" name="cover_input" id="cover_input" accept="image/*" hidden>
+    <div class="main-content">
+      <div class="success-toast" id="successToast">
+        Changes saved successfully!
+      </div>
 
-        <!-- Profile Section -->
-        <div class="profile-picture">
-          <img id="profile_image" src="../assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>" alt="Profile Picture" />
-          <label for="file_input" class="change-profile-image">+</label>
-          <input type="file" name="file_input" id="file_input" accept="image/*" hidden />
-          <h2>Edit Profile</h2>
-        </div>
+      <div class="container">
+        <!-- FORM -->
+        <form id="profile_form" enctype="multipart/form-data">
+          <!-- Cover Upload -->
+          <div class="cover-preview-div" style="background-image: url('../assets/profile/<?= htmlspecialchars($user['profile_cover'] ?? 'dark_mode.jpg') ?>');" id="cover_preview_div"></div>
+          <button class="change-profile-pic" type="button" onclick="changeCover()">Change Cover Photo</button>
+          <input type="file" name="cover_input" id="cover_input" accept="image/*" hidden>
 
-        <!-- Basic Info -->
-        <div class="grid-2">
-          <div class="input-group">
-            <label for="first_name">First Name</label>
-            <input type="text" id="first_name" name="first_name" value="<?= htmlspecialchars($user['first_name']) ?>" />
+          <!-- Profile Section -->
+          <div class="profile-picture">
+            <img id="profile_image" src="../assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>" alt="Profile Picture" />
+            <label for="file_input" class="change-profile-image">+</label>
+            <input type="file" name="file_input" id="file_input" accept="image/*" hidden />
+            <h2>Edit Profile</h2>
           </div>
-          <div class="input-group">
-            <label for="last_name">Last Name</label>
-            <input type="text" id="last_name" name="last_name" value="<?= htmlspecialchars($user['last_name']) ?>" />
-          </div>
-          <div class="input-group">
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" value="<?= htmlspecialchars($user['user_name']) ?>" <?= isset($_SESSION['oauth_provider']) ? 'readonly style="background-color:#8f9585;cursor:not-allowed;"' : '' ?> />
-          </div>
-        </div>
 
-        <!-- Bio -->
-        <div class="input-group">
-          <label for="bio">Bio</label>
-          <textarea id="bio" name="bio" readonly><?= htmlspecialchars($user['bio'] ?? '') ?></textarea>
-          <button type="button" class="change-bio" onclick="enableTextArea()">Change Bio</button>
-        </div>
+          <!-- Basic Info -->
+          <div class="grid-2">
+            <div class="input-group">
+              <label for="first_name">First Name</label>
+              <input type="text" id="first_name" name="first_name" value="<?= htmlspecialchars($user['first_name']) ?>" />
+            </div>
+            <div class="input-group">
+              <label for="last_name">Last Name</label>
+              <input type="text" id="last_name" name="last_name" value="<?= htmlspecialchars($user['last_name']) ?>" />
+            </div>
+            <div class="input-group">
+              <label for="username">Username</label>
+              <input type="text" id="username" name="username" value="<?= htmlspecialchars($user['user_name']) ?>" <?= isset($_SESSION['oauth_provider']) ? 'readonly style="background-color:#8f9585;cursor:not-allowed;"' : '' ?> />
+            </div>
+          </div>
 
-        <!-- Details -->
-        <div class="grid-2">
+          <!-- Bio -->
           <div class="input-group">
-            <label for="work">💼 Works at</label>
-            <input type="text" id="work" name="work" value="<?= htmlspecialchars($user['work'] ?? '') ?>" />
+            <label for="bio">Bio</label>
+            <textarea id="bio" name="bio" readonly><?= htmlspecialchars($user['bio'] ?? '') ?></textarea>
+            <button type="button" class="change-bio" onclick="enableTextArea()">Change Bio</button>
           </div>
-          <div class="input-group">
-            <label for="school">🎓 Studies at</label>
-            <input type="text" id="school" name="school" value="<?= htmlspecialchars($user['school'] ?? '') ?>" />
-          </div>
-          <div class="input-group">
-            <label for="home">🏠 Lives in</label>
-            <input type="text" id="home" name="home" value="<?= htmlspecialchars($user['home'] ?? '') ?>" />
-          </div>
-          <div class="input-group">
-            <label for="religion">✝️ Religion</label>
-            <input type="text" id="religion" name="religion" value="<?= htmlspecialchars($user['religion'] ?? '') ?>" />
-          </div>
-        </div>
 
-        <!-- Relationship -->
-        <div class="input-group relationship-group">
-          <label>❤️ Relationship Status</label>
-          <div class="radio-options">
-            <label><input type="radio" name="relationship" value="single" <?= ($user['relationship_status'] ?? '') == 'single' ? 'checked' : '' ?>> Single</label>
-            <label><input type="radio" name="relationship" value="in_a_relationship" <?= ($user['relationship_status'] ?? '') == 'in_a_relationship' ? 'checked' : '' ?>> In a Relationship</label>
-            <label><input type="radio" name="relationship" value="married" <?= ($user['relationship_status'] ?? '') == 'married' ? 'checked' : '' ?>> Married</label>
-            <label><input type="radio" name="relationship" value="complicated" <?= ($user['relationship_status'] ?? '') == 'complicated' ? 'checked' : '' ?>> It’s Complicated</label>
+          <!-- Details -->
+          <div class="grid-2">
+            <div class="input-group">
+              <label for="work">💼 Works at</label>
+              <input type="text" id="work" name="work" value="<?= htmlspecialchars($user['work'] ?? '') ?>" />
+            </div>
+            <div class="input-group">
+              <label for="school">🎓 Studies at</label>
+              <input type="text" id="school" name="school" value="<?= htmlspecialchars($user['school'] ?? '') ?>" />
+            </div>
+            <div class="input-group">
+              <label for="home">🏠 Lives in</label>
+              <input type="text" id="home" name="home" value="<?= htmlspecialchars($user['home'] ?? '') ?>" />
+            </div>
+            <div class="input-group">
+              <label for="religion">✝️ Religion</label>
+              <input type="text" id="religion" name="religion" value="<?= htmlspecialchars($user['religion'] ?? '') ?>" />
+            </div>
           </div>
-        </div>
 
-        <!-- Buttons -->
-        <div style="display:flex; gap: 1rem; margin-top: 2rem;">
-          <button type="submit" class="save-changes">Save Changes</button>
-          <button type="button" class="return-to-profile" onclick="window.location.href='profile.php'">Back to Profile</button>
-        </div>
-      </form>
+          <!-- Relationship -->
+          <div class="input-group relationship-group">
+            <label>❤️ Relationship Status</label>
+            <div class="radio-options">
+              <label><input type="radio" name="relationship" value="single" <?= ($user['relationship_status'] ?? '') == 'single' ? 'checked' : '' ?>> Single</label>
+              <label><input type="radio" name="relationship" value="in_a_relationship" <?= ($user['relationship_status'] ?? '') == 'in_a_relationship' ? 'checked' : '' ?>> In a Relationship</label>
+              <label><input type="radio" name="relationship" value="married" <?= ($user['relationship_status'] ?? '') == 'married' ? 'checked' : '' ?>> Married</label>
+              <label><input type="radio" name="relationship" value="complicated" <?= ($user['relationship_status'] ?? '') == 'complicated' ? 'checked' : '' ?>> It’s Complicated</label>
+            </div>
+          </div>
+
+          <!-- Buttons -->
+          <div style="display:flex; gap: 1rem; margin-top: 2rem;">
+            <button type="submit" class="save-changes">Save Changes</button>
+            <button type="button" class="return-to-profile" onclick="window.location.href='profile.php'">Back to Profile</button>
+          </div>
+        </form>
+      </div>
     </div>
     <script src="../script/profile_edit.js"></script>
+    <script src="../script/dashboard.js"></script>
+    <script>
+      const moreBtn = document.getElementById('sidebarMoreBtn');
+        const moreMenu = document.getElementById('sidebarMoreMenu');
+        if (moreBtn && moreMenu) {
+          moreBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            moreMenu.classList.toggle('hidden');
+          });
+          document.addEventListener('click', function(e) {
+            if (!moreMenu.contains(e.target) && !moreBtn.contains(e.target)) {
+              moreMenu.classList.add('hidden');
+            }
+          });
+        }
+    </script>
   </body>
 </html>
