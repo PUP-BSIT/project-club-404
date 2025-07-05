@@ -351,3 +351,33 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 });
+
+// Notification dropdown toggle
+document.getElementById('notificationBtnSidebar').addEventListener('click', function(e) {
+  e.stopPropagation();
+  const dropdown = document.getElementById('notification_dropdown');
+  dropdown.classList.toggle('hidden');
+  
+  // Close other open dropdowns if any
+  document.querySelectorAll('.notification-dropdown:not(#notification_dropdown)').forEach(d => {
+    d.classList.add('hidden');
+  });
+});
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+  const dropdown = document.getElementById('notification_dropdown');
+  const button = document.getElementById('notificationBtnSidebar');
+  
+  if (!dropdown.contains(e.target) && !button.contains(e.target)) {
+    dropdown.classList.add('hidden');
+  }
+});
+
+// Mark all as read
+document.getElementById('markAllReadBtn')?.addEventListener('click', function() {
+  const badge = document.getElementById('notification_count');
+  if (badge) {
+    badge.style.display = 'none';
+  }
+});

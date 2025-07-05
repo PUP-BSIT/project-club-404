@@ -30,7 +30,6 @@ if (isset($_SESSION['id'])) {
     $user_id = $user_row['id'];
 }
 
-// Fetch notifications (same as dashboard.php)
 $notificationQuery = "
   SELECT n.*,
          u.first_name AS actor_first_name,
@@ -176,26 +175,6 @@ if (!$result) {
 
 $messages = $result->fetch_all(MYSQLI_ASSOC);
 
-// Fetch latest 10 notifications
-$notifications = [];
-$unread_count = 0;
-
-$nstmt = $conn->prepare("SELECT n.*, u.first_name, u.last_name FROM notifications n JOIN users u ON n.actor_id = u.id WHERE n.user_id = ? ORDER BY n.created_at DESC LIMIT 10");
-$nstmt->bind_param("i", $user_id);
-$nstmt->execute();
-$result = $nstmt->get_result();
-while ($row = $result->fetch_assoc()) {
-  $notifications[] = $row;
-}
-$nstmt->close();
-
-$unreadResult = $conn->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = ? AND is_read = 0");
-$unreadResult->bind_param("i", $user_id);
-$unreadResult->execute();
-$unreadResult->bind_result($unread_count);
-$unreadResult->fetch();
-$unreadResult->close();
-
 $conn->close();
 ?>
 
@@ -209,53 +188,96 @@ $conn->close();
         rel="stylesheet" />
   <link rel="stylesheet" href="../stylesheet/dashboard.css" />
   <link rel="stylesheet" href="../stylesheet/messages.css" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=close" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=close" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body class="page">
-  <?php include 'sidebar.php';?>
+    <!-- Main Layout -->
+    <main class="layout" style="padding-top:0;">
+        <!-- LEFT SIDEBAR -->
+        <aside class="sidebar sidebar--icononly">
+          <!-- Logo at the top -->
+          <div class="sidebar-logo">
+            <img src="../assets/logo-hb.png" alt="HEYBLEEPI Logo" style="width:36px;height:36px;">
+          </div>
 
-  <div class="notification-dropdown" id="notification_dropdown">
-    <h4>Notifications</h4>
-    <ul>
-      <?php if (empty($notifications)): ?>
-        <li>No new notifications.</li>
-      <?php else: ?>
-        <?php foreach ($notifications as $notification): ?>
-          <li>
-            <strong><?= htmlspecialchars($notification['actor_first_name'] . ' ' . $notification['actor_last_name']) ?></strong>
-            <?php if ($notification['type'] === 'like'): ?>
-              liked your post.
-            <?php elseif ($notification['type'] === 'comment'): ?>
-              commented on your post.
-            <?php elseif ($notification['type'] === 'share'): ?>
-              shared your post.
-            <?php else: ?>
-              <?= htmlspecialchars($notification['type']) ?> your post.
+          <nav class="sidebar-nav">
+            <a class="sidebar-icon-link" href="#" title="Search">
+              <i class="ri-search-line"></i>
+            </a>
+          <button class="sidebar-icon-link icon-btn" id="notificationBtnSidebar" title="Notifications" type="button">
+            <i class="ri-notification-3-line"></i>
+            <?php if ($unread_count > 0): ?>
+              <span class="badge" id="notification_count"><?= $unread_count ?></span>
             <?php endif; ?>
-            <br><small><?= date("M d, g:i A", strtotime($notification['created_at'])) ?></small>
-          </li>
-        <?php endforeach; ?>
-      <?php endif; ?>
-    </ul>
-    <form method="POST" action="mark_notifications_read.php">
-      <button class="mark-read" type="submit" name="mark_read" id="markAllReadBtn">Mark all as read</button>
-    </form>
-  </div>
+          </button>
+            <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'dashboard.php' ? 'active' : '' ?>" href="dashboard.php" title="Home">
+              <i class="ri-home-4-line"></i>
+            </a>
+              <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'messages.php' ? 'active' : '' ?>" href="messages.php" title="Messages">
+                <i class="ri-message-3-line"></i>
+                <?php if ($unreadMessages > 0): ?>
+                  <span class="sidebar-badge"><?= $unreadMessages ?></span>
+                <?php endif; ?>
+              </a>
+            <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'active' : '' ?>" href="profile.php" title="Profile">
+              <i class="ri-user-line"></i>
+            </a>
+          </nav>
 
-  <!-- More Menu Popup -->
-  <div id="sidebarMoreMenu" class="sidebar-more-menu hidden">
-    <ul>
-      <li>
-        <a href="settings.php"><i class="ri-settings-4-line"></i> Settings</a>
-      </li>
-      <li>
-        <a href="logout.php" style="color:#ff4d4f;"><i class="ri-logout-box-line"></i> Log out</a>
-      </li>
-    </ul>
-  </div>
+          <button class="sidebar-more-btn" id="sidebarMoreBtn" title="More">
+            <i class="ri-menu-line"></i>
+          </button>
+        </aside>
+
+        <div class="notification-dropdown" id="notification_dropdown">
+          <h4>Notifications</h4>
+          <ul>
+            <?php if (empty($notifications)): ?>
+              <li class="notification-item">No new notifications.</li>
+            <?php else: ?>
+              <?php foreach ($notifications as $notification): ?>
+                <li class="notification-item">
+                  <div class="notification-content">
+                    <strong><?= htmlspecialchars($notification['actor_first_name'] . ' ' . $notification['actor_last_name']) ?></strong>
+                    <?php if ($notification['type'] === 'like'): ?>
+                      liked your post.
+                    <?php elseif ($notification['type'] === 'comment'): ?>
+                      commented on your post.
+                    <?php elseif ($notification['type'] === 'share'): ?>
+                      shared your post.
+                    <?php else: ?>
+                      <?= htmlspecialchars($notification['type']) ?> your post.
+                    <?php endif; ?>
+                    <?php if (!empty($notification['post_content'])): ?>
+                      <div class="post-preview">"<?= htmlspecialchars(substr($notification['post_content'], 0, 50)) ?><?= strlen($notification['post_content']) > 50 ? '...' : '' ?>"</div>
+                    <?php endif; ?>
+                    <div class="notification-time"><?= date("M d, g:i A", strtotime($notification['created_at'])) ?></div>
+                  </div>
+                </li>
+              <?php endforeach; ?>
+            <?php endif; ?>
+          </ul>
+          <?php if (!empty($notifications)): ?>
+            <form method="POST" action="mark_notifications_read.php">
+              <button class="mark-read" type="submit" name="mark_read" id="markAllReadBtn">Mark all as read</button>
+            </form>
+          <?php endif; ?>
+        </div>
+
+        <!-- More Menu Popup -->
+        <div id="sidebarMoreMenu" class="sidebar-more-menu hidden">
+          <ul>
+            <li>
+              <a href="settings.php"><i class="ri-settings-4-line"></i> Settings</a>
+            </li>
+            <li>
+              <a href="logout.php" style="color:#ff4d4f;"><i class="ri-logout-box-line"></i> Log out</a>
+            </li>
+          </ul>
+        </div>
+        
   <div class="container">
     <h2>Messages</h2>
 
@@ -332,39 +354,5 @@ $conn->close();
   </div>
 
   <script src="../script/messages.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Notification Dropdown
-      const notifBtn = document.getElementById('notificationBtnSidebar');
-      const notifDropdown = document.getElementById('notification_dropdown');
-      if (notifBtn && notifDropdown) {
-        notifBtn.addEventListener('click', function(e) {
-          e.preventDefault();
-          notifDropdown.classList.toggle('show');
-        });
-        // Optional: Hide dropdown when clicking outside
-        document.addEventListener('click', function(e) {
-          if (!notifDropdown.contains(e.target) && !notifBtn.contains(e.target)) {
-            notifDropdown.classList.remove('show');
-          }
-        });
-      }
-
-      // More Menu Popup
-      const moreBtn = document.getElementById('sidebarMoreBtn');
-      const moreMenu = document.getElementById('sidebarMoreMenu');
-      if (moreBtn && moreMenu) {
-        moreBtn.addEventListener('click', function(e) {
-          e.preventDefault();
-          moreMenu.classList.toggle('hidden');
-        });
-        document.addEventListener('click', function(e) {
-          if (!moreMenu.contains(e.target) && !moreBtn.contains(e.target)) {
-            moreMenu.classList.add('hidden');
-          }
-        });
-      }
-    });
-  </script>
 </body>
 </html>
