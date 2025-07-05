@@ -3,7 +3,9 @@
     <img src="../assets/logo-hb.png" alt="HEYBLEEPI Logo" style="width:36px;height:36px;">
   </div>
   <nav class="sidebar-nav">
-    <a class="sidebar-icon-link" href="#" title="Search">
+    <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'search.php' ? 'active' : '' ?>"
+      href="search.php"
+      title="Search">
       <i class="ri-search-line"></i>
     </a>
     <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'notification.php' ? 'active' : '' ?>"
