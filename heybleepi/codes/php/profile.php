@@ -284,12 +284,14 @@ function timeAgo($datetime) {
         <a class="sidebar-icon-link" href="#" title="Search">
           <i class="ri-search-line"></i>
         </a>
-        <button class="sidebar-icon-link" id="notificationBtnSidebar" title="Notifications" type="button">
+        <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'notification.php' ? 'active' : '' ?>"
+          href="notification.php"
+          title="Notifications">
           <i class="ri-notification-3-line"></i>
           <?php if ($unread_count > 0): ?>
             <span class="badge" id="notification_count"><?= $unread_count ?></span>
           <?php endif; ?>
-        </button>
+        </a>
         <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'dashboard.php' ? 'active' : '' ?>" href="dashboard.php" title="Home">
           <i class="ri-home-4-line"></i>
         </a>
