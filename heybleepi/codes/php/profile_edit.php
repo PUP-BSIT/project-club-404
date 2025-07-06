@@ -1,5 +1,9 @@
 <?php
 session_start();
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 require_once 'configuration.php';
 
 if (!isset($_SESSION['username'])) {
@@ -20,6 +24,7 @@ $stmt->bind_param("s", $username);
 $stmt->execute();
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
+$user_id = $user['id']; // ✅ Add this line to fix the SQL error
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $newUsername = $_POST['username'];
@@ -99,7 +104,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $_SESSION['first_name'] = $firstName;
   $_SESSION['last_name'] = $lastName;
 
-  // Return success for AJAX or redirect normally
   if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || $_SERVER['HTTP_X_REQUESTED_WITH'] !== 'XMLHttpRequest') {
     header("Location: profile_edit.php");
     exit;
@@ -108,7 +112,58 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     exit;
   }
 }
+
+// Notifications
+$notificationQuery = "
+  SELECT n.*, u.first_name AS actor_first_name, u.last_name AS actor_last_name, p.content AS post_content
+  FROM notifications n
+  JOIN users u ON n.actor_id = u.id
+  LEFT JOIN posts p ON n.post_id = p.id
+  WHERE n.user_id = ?
+  ORDER BY n.created_at DESC
+  LIMIT 10
+";
+$notificationStmt = $conn->prepare($notificationQuery);
+$notificationStmt->bind_param("i", $user_id);
+$notificationStmt->execute();
+$notificationsResult = $notificationStmt->get_result();
+$notifications = $notificationsResult->fetch_all(MYSQLI_ASSOC);
+$notificationStmt->close();
+
+// Count unread notifications
+$unreadCountRes = $conn->query("SELECT COUNT(*) AS unread FROM notifications WHERE user_id = $user_id AND is_read = 0");
+$unread_count = $unreadCountRes->fetch_assoc()['unread'] ?? 0;
+
+// Count unread messages
+$lastSeenQuery = $conn->prepare("SELECT last_seen_message_id FROM users WHERE id = ?");
+$lastSeenQuery->bind_param("i", $user_id);
+$lastSeenQuery->execute();
+$lastSeenQuery->bind_result($lastSeenMessageId);
+$lastSeenQuery->fetch();
+$lastSeenQuery->close();
+
+$lastSeenMessageId = $lastSeenMessageId ?? 0;
+$countNewMessages = $conn->query("SELECT COUNT(*) AS unread_messages FROM messages WHERE id > $lastSeenMessageId");
+$unreadMessages = $countNewMessages->fetch_assoc()['unread_messages'] ?? 0;
+
+// Update last seen message
+$latest_msg_query = $conn->query("SELECT MAX(id) as max_id FROM messages");
+$latest_msg = $latest_msg_query->fetch_assoc();
+$latest_msg_id = $latest_msg['max_id'] ?? 0;
+
+$update_last_seen = $conn->prepare("UPDATE users SET last_seen_message_id = ? WHERE id = ?");
+$update_last_seen->bind_param("ii", $latest_msg_id, $user_id);
+$update_last_seen->execute();
+$update_last_seen->close();
+
+// Mark messages as read
+$update = $conn->prepare("UPDATE messages SET is_read = 1 WHERE user_id = ? AND is_read = 0");
+$update->bind_param("i", $user_id);
+$update->execute();
+$update->close();
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -129,29 +184,95 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         align-items: center;
         margin: 0;
         padding: 0;
-        height: 475px;
+        height: 400px;
       }
     </style>
   </head>
 
-  <body>
-    <?php
-    if (!isset($unread_count)) $unread_count = 0;
-    if (!isset($unreadMessages)) $unreadMessages = 0;
-    include 'sidebar.php';
-    ?>
+<body>
+        <!-- Main Layout -->
+        <main class="layout" style="padding-top:0;">
+        <!-- LEFT SIDEBAR -->
+        <aside class="sidebar sidebar--icononly">
+          <!-- Logo at the top -->
+          <div class="sidebar-logo">
+            <img src="../assets/logo-hb.png" alt="HEYBLEEPI Logo" style="width:36px;height:36px;">
+          </div>
 
-    <div id="sidebarMoreMenu" class="sidebar-more-menu hidden">
-      <ul>
-        <li><a href="settings.php"><i class="ri-settings-4-line"></i> Settings</a></li>
-        <li><a href="logout.php" style="color:#ff4d4f;"><i class="ri-logout-box-line"></i> Log out</a></li>
-      </ul>
+          <nav class="sidebar-nav">
+            <a class="sidebar-icon-link" href="search.php" title="Search">
+              <i class="ri-search-line"></i>
+            </a>
+            <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'notification.php' ? 'active' : '' ?>"
+              href="notification.php"
+              title="Notifications">
+              <i class="ri-notification-3-line"></i>
+              <?php if ($unread_count > 0): ?>
+                <span class="badge" id="notification_count"><?= $unread_count ?></span>
+              <?php endif; ?>
+            </a>
+            <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'dashboard.php' ? 'active' : '' ?>" href="dashboard.php" title="Home">
+              <i class="ri-home-4-line"></i>
+            </a>
+            <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'messages.php' ? 'active' : '' ?>" href="messages.php" title="Messages">
+              <i class="ri-message-3-line"></i>
+              <?php if ($unreadMessages > 0): ?>
+                <span class="sidebar-badge"></span>
+              <?php endif; ?>
+            </a>
+            <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'active' : '' ?>" href="profile.php" title="Profile">
+              <i class="ri-user-line"></i>
+            </a>
+          </nav>
+
+          <button class="sidebar-more-btn" id="sidebarMoreBtn" title="More">
+            <i class="ri-menu-line"></i>
+          </button>
+        </aside>
+
+        <div class="notification-dropdown" id="notification_dropdown">
+          <h4>Notifications</h4>
+          <ul>
+            <?php if (empty($notifications)): ?>
+              <li>No new notifications.</li>
+            <?php else: ?>
+              <?php foreach ($notifications as $notification): ?>
+                <li>
+                  <strong><?= htmlspecialchars($notification['first_name'] . ' ' . $notification['last_name']) ?></strong>
+                  <?php if ($notification['type'] === 'like'): ?>
+                    liked your post.
+                  <?php elseif ($notification['type'] === 'comment'): ?>
+                    commented on your post.
+                  <?php elseif ($notification['type'] === 'share'): ?>
+                    shared your post.
+                  <?php else: ?>
+                    <?= htmlspecialchars($notification['type']) ?> your post.
+                  <?php endif; ?>
+                  <br><small><?= date("M d, g:i A", strtotime($notification['created_at'])) ?></small>
+                </li>
+              <?php endforeach; ?>
+            <?php endif; ?>
+          </ul>
+          <form method="POST" action="mark_notifications_read.php">
+            <button class="mark-read" type="submit" name="mark_read" id="markAllReadBtn">Mark all as read</button>
+          </form>
+        </div>
+
+        <!-- More Menu Popup -->
+        <div id="sidebarMoreMenu" class="sidebar-more-menu hidden">
+          <ul>
+            <li>
+              <a href="settings.php"><i class="ri-settings-4-line"></i> Settings</a>
+            </li>
+            <li>
+              <a href="logout.php" style="color:#ff4d4f;"><i class="ri-logout-box-line"></i> Log out</a>
+            </li>
+          </ul>
+        </div>
+
+    <div class="success-toast" id="successToast">
+      Changes saved successfully!
     </div>
-
-    <div class="main-content">
-      <div class="success-toast" id="successToast">
-        Changes saved successfully!
-      </div>
 
       <div class="container">
         <!-- FORM -->
@@ -226,13 +347,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <!-- Buttons -->
           <div style="display:flex; gap: 1rem; margin-top: 2rem;">
             <button type="submit" class="save-changes">Save Changes</button>
-            <button type="button" class="return-to-profile" onclick="window.location.href='profile.php'">Back to Profile</button>
           </div>
         </form>
       </div>
     </div>
     <script src="../script/profile_edit.js"></script>
-    <script src="../script/dashboard.js"></script>
+    <!-- <script src="../script/dashboard.js"></script> -->
     <script>
       const moreBtn = document.getElementById('sidebarMoreBtn');
         const moreMenu = document.getElementById('sidebarMoreMenu');
