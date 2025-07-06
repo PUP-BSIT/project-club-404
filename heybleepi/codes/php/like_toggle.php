@@ -30,6 +30,22 @@ if ($check->num_rows > 0) {
   $insert->bind_param("ii", $user_id, $post_id);
   $insert->execute();
   $liked = true;
+
+  // Get post owner
+  $getOwner = $conn->prepare("SELECT user_id FROM posts WHERE id = ?");
+  $getOwner->bind_param("i", $post_id);
+  $getOwner->execute();
+  $ownerResult = $getOwner->get_result();
+  $owner = $ownerResult->fetch_assoc()['user_id'] ?? null;
+  $getOwner->close();
+
+  if ($owner && $owner != $user_id) {
+    $type = 'like';
+    $notif = $conn->prepare("INSERT INTO notifications (user_id, actor_id, type, is_read, created_at) VALUES (?, ?, ?, 0, NOW())");
+    $notif->bind_param("iis", $owner, $user_id, $type);
+    $notif->execute();
+    $notif->close();
+  }
 }
 
 // Get updated count
