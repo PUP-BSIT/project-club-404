@@ -59,6 +59,6 @@ $_SESSION['first_name'] = $updatedFirstName;
 $_SESSION['middle_name'] = $updatedMiddleName;
 $_SESSION['last_name'] = $updatedLastName;
 
-echo "Account Information Updated!";
+echo "Changes Saved!";
 mysqli_close($conn);
 ?>
