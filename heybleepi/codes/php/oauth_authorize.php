@@ -142,7 +142,7 @@ if (!isset($_SESSION['user_id'])) {
         <input type="hidden" name="client_id" value="<?= htmlspecialchars($client_id) ?>">
         <input type="hidden" name="redirect_uri" value="<?= htmlspecialchars($redirect_uri) ?>">
         <button type="submit" name="approve" value="1" class="auth-button">Approve</button>
-        <button type="submit" name="deny" value="1" class="auth-button" style="background:#c00;">Deny</button>
+        <button type="submit" name="deny" value="1" class="auth-button" style="background:#c00;" onclick="window.location.href='../php/index.php;">Deny</button>
       </form>
     </div>
   </div>
