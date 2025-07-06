@@ -268,7 +268,7 @@ if ($result->num_rows > 0) {
           type="button"
           id="change_password_btn"
           onClick="changePassword()"
-          <?php if (isset($_SESSION['oauth_provider'])) echo 'readonly style="background-color: #8f9585; cursor: not-allowed;"'; ?>>
+          <?php if (isset($_SESSION['oauth_provider'])) echo 'readonly style="background-color: #8f9585; cursor: not-allowed; pointer-event: none;"'; ?>>
             Change Password
         </button>
       </form>
