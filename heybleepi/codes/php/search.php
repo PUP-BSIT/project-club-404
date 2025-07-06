@@ -186,34 +186,37 @@ $unreadMessages = $unreadMsgResult ? $unreadMsgResult->fetch_assoc()['unread'] :
       const inputUsername = document.querySelector('#user_name').value;
       // const userList = document.querySelector('.search-feed-item');
       
+     userListContainer.innerHTML = `<li class="search-feed-item" style="justify-content:center;">Loading...</li>`;
 
       fetch(searchEndpoint + "?q=" + encodeURIComponent(inputUsername))
       .then((response) => response.json())
       .then((usersData) => {
-        userListContainer.innerHTML = "";
-
-         if (!usersData || usersData.length === 0) {
-          const userRow = document.createElement('li');
-          userRow.classList.add('search-feed-item');
-          userRow.innerHTML = 'No Users Found.';
-          userListContainer.append(userRow);
-          return;
-        }
-
-        for(const user of usersData) {
-          const userRow = document.createElement('li');
-          userRow.classList.add('search-feed-item');
-          userRow.title = user.first_name + ' ' + user.last_name;
-
-          userRow.innerHTML = `<img class="search-avatar" src='../assets/profile/${user.profile_picture}'>
-                            <div class="search-content">
-                              <div class="search-username"><a class="username-link"href=profile.php?user=${user.user_name}>${user.user_name}</a></div>
-                              <div class="search-bio">${user.bio}</div>
-                            </div>
-                            <button class="follow-btn">Follow</button>`;
-          userListContainer.append(userRow);
-        }
-      })
+        setTimeout(() => {
+            userListContainer.innerHTML = "";
+    
+             if (!usersData || usersData.length === 0) {
+              const userRow = document.createElement('li');
+              userRow.classList.add('search-feed-item');
+              userRow.innerHTML = 'No Users Found.';
+              userListContainer.append(userRow);
+              return;
+            }
+    
+            for(const user of usersData) {
+              const userRow = document.createElement('li');
+              userRow.classList.add('search-feed-item');
+              userRow.title = user.first_name + ' ' + user.last_name;
+    
+              userRow.innerHTML = `<img class="search-avatar" src='../assets/profile/${user.profile_picture}'>
+                                <div class="search-content">
+                                  <div class="search-username"><a class="username-link"href=profile.php?user=${user.user_name}>${user.user_name}</a></div>
+                                  <div class="search-bio">${user.bio}</div>
+                                </div>
+                                <button class="follow-btn">Follow</button>`;
+              userListContainer.append(userRow);
+            }
+          }, 500);
+        });
     }
 
     document.querySelector('#user_name').addEventListener('keydown', function(event) {
