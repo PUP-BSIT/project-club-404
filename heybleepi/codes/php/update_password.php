@@ -28,11 +28,11 @@ if(password_verify($currentPasswordInput, $currentPassword)) {
           WHERE id = ${currentId}";
   $result = mysqli_query($conn, $sql);
 } else {
-    die("Incorrect Current Password");
+  die("Incorrect Current Password");
 }
 
 if(!$result) {
-   echo "Error:" . $sql . "<br>" . mysqli_error($conn); 
+  echo "Error:" . $sql . "<br>" . mysqli_error($conn); 
 }
 
 echo "Password change success";

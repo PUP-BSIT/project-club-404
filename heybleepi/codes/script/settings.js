@@ -5,6 +5,8 @@ let accountInformationBtn = document.querySelector('#acct_info_btn');
 let privacySettingsBtn = document.querySelector('#privacy_settings_btn');
 let logoutPrompt = document.querySelector('#logout_prompt');
 let deleteAccPrompt = document.querySelector('#delete_acc');
+let smallModal = document.querySelector('#small_modal_container');
+let textInfo = document.querySelector('#text_info');
 
 // change this from delete_account.php endpoint to web domain
 const deleteEndpointLocation = "delete_account.php" 
@@ -18,6 +20,7 @@ function switchToAccountInformation() {
   privacySettings.classList.remove('show-privacy-settings');
   accountInformation.classList.remove('hide-account-info');
   accountInformation.classList.add('show-account-info');
+
   accountInformationBtn.disabled = true;
   privacySettingsBtn.disabled = false;
 }
@@ -27,6 +30,7 @@ function switchToPrivacySettings() {
   accountInformation.classList.remove('show-account-info');
   privacySettings.classList.remove('hide-privacy-settings');
   privacySettings.classList.add('show-privacy-settings');
+
   accountInformationBtn.disabled = false;
   privacySettingsBtn.disabled = true;
 }
@@ -55,7 +59,6 @@ function showPassword() {
   const oldPassword = document.querySelector("#old_password");
   const newPassword = document.querySelector("#new_password");
   const confirmPassword = document.querySelector("#confirm_new_password");
-  const showPassBtn = document.querySelector("#show_password");
 
   if(oldPassword.type == "password") {
     oldPassword.type = "text";
@@ -116,9 +119,13 @@ function updateAccountInformation() {
   })
   .then((response) => response.text())
   .then(responseText => {
-    alert(responseText);
-    window.location.reload();
-  })
+    smallModal.classList.remove('hidden');
+    textInfo.innerHTML = responseText;
+
+    setTimeout(() => {
+      smallModal.classList.add('hidden');
+    }, 1600);
+  });
 }
 
 function changePassword() {
@@ -129,7 +136,12 @@ function changePassword() {
   if(!currentPasswordInput.value.trim() ||
     !newPasswordInput.value.trim() ||
     !confirmPasswordInput.value.trim()) {
-        alert("Please fill the important fields.");
+      smallModal.classList.remove('hidden');
+      textInfo.innerHTML = "Please fill the important fields.";
+
+      setTimeout(() => {
+        smallModal.classList.add('hidden');
+      }, 1900);
         return;
     }
 
@@ -144,15 +156,35 @@ function changePassword() {
   .then((response) => response.text())
   .then(responseText => {
     if(!newPasswordInput.value && !confirmPasswordInput.value) {
-          alert("Please fill the fields.")
+      smallModal.classList.remove('hidden');
+      textInfo.innerHTML = "Please fill the important fields.";
+
+      setTimeout(() => {
+        smallModal.classList.add('hidden');
+      }, 1900);
+        return;
     }
 
     if (newPasswordInput.value != confirmPasswordInput.value) {
-      alert("New password and Confirm password are not the same.");
-      return;
+      smallModal.classList.remove('hidden');
+      textInfo.innerHTML = "New password and Confirm password are not the same.";
+
+      setTimeout(() => {
+        smallModal.classList.add('hidden');
+      }, 1900);
+        return;
     }
 
-    alert(responseText);
-    window.location.reload();
-  })
+    smallModal.classList.remove('hidden');
+    textInfo.innerHTML = responseText;
+
+    setTimeout(() => {
+      smallModal.classList.add('hidden');
+    }, 1600);
+
+    // Resets the password input.
+    currentPasswordInput.value = "";
+    newPasswordInput.value = "";
+    confirmPasswordInput.value = "";
+  });
 }
