@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bind_param("sss", $token, $expires, $email);
         $stmt->execute();
 
-        $resetLink = "https://heybleepi.site/reset_password.php?token=$token";
+        $resetLink = "https://heybleepi.site/PROJECT-CLUB-404/heybleepi/codes/php/reset_password.php?token=$token";
         $subject = "Password Reset Request";
 
         $body = "
