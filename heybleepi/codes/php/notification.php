@@ -9,6 +9,17 @@ if (!isset($_SESSION['username'])) {
 
 $user_id = $_SESSION['id'];
 
+// Mark all notifications as read for this user
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
+    $notifId = intval($_POST['id']);
+    $userId = $_SESSION['id'];
+    $status = (isset($_POST['status']) && $_POST['status'] === 'unread') ? 0 : 1;
+
+    $stmt = $conn->prepare("UPDATE notifications SET is_read = ? WHERE id = ? AND user_id = ?");
+    $stmt->bind_param("iii", $status, $notifId, $userId);
+    $stmt->execute();
+}
+
 // Fetch notifications for the user
 $stmt = $conn->prepare("
     SELECT n.*, u.first_name, u.last_name, ud.profile_picture
@@ -34,6 +45,7 @@ $unreadResult->close();
 
 $stmt->close();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -52,6 +64,7 @@ $stmt->close();
       box-shadow: 0 4px 24px rgba(0,0,0,0.18);
       padding: 0;
     }
+
     .notif-feed-header {
       padding: 22px 24px 22px 24px;
       font-size: 1.3rem;
@@ -59,11 +72,13 @@ $stmt->close();
       color: #fff;
       text-align: center;
     }
+
     .notif-feed-list {
       list-style: none;
       margin: 0;
-        padding: 0;
+      padding: 0;
     }
+
     .notif-feed-item {
       display: flex;
       align-items: flex-start;
@@ -72,34 +87,50 @@ $stmt->close();
       border-bottom: 1px solid #23242a;
       color: #fff;
     }
+
     .notif-feed-item:last-child {
       border-bottom: none;
     }
+
     .notif-avatar {
       width: 48px;
       height: 48px;
       border-radius: 50%;
       object-fit: cover;
     }
+
     .notif-content {
       flex: 1;
     }
+
     .notif-actor {
       font-weight: 600;
       color: #fff;
     }
+
     .notif-meta {
       font-size: 0.9rem;
       color: #aaa;
       margin-top: 2px;
     }
+
     .notif-time {
       font-size: 0.8rem;
       color: #888;
       margin-left: 8px;
     }
+
     .notif-feed-item.unread {
       background: rgba(79, 138, 255, 0.08);
+    }
+
+    .mark-unread-btn {
+      background: transparent;
+      border: none;
+      color: #4f8aff;
+      font-size: 0.8rem;
+      cursor: pointer;
+      margin-top: 6px;
     }
 
     .sidebar-nav {
@@ -137,37 +168,62 @@ $stmt->close();
                   <div class="notif-content">No notifications yet.</div>
               </li>
           <?php else: ?>
-              <?php foreach ($notifications as $notif): ?>
-                  <li class="notif-feed-item<?= $notif['is_read'] ? '' : ' unread' ?>">
-                      <img class="notif-avatar" src="../assets/profile/<?= htmlspecialchars($notif['profile_picture'] ?? 'rawr.png') ?>" alt="Avatar">
-                      <div class="notif-content">
-                          <span class="notif-actor"><?= htmlspecialchars($notif['first_name'] . ' ' . $notif['last_name']) ?></span>
-                          <?php
-                              // Customize this for your notification types
-                              if ($notif['type'] === 'like') {
-                                  echo " liked your post.";
-                              } elseif ($notif['type'] === 'comment') {
-                                  echo " commented on your post.";
-                              } elseif ($notif['type'] === 'follow') {
-                                  echo " started following you.";
-                              } else {
-                                  echo " " . htmlspecialchars($notif['type']);
-                              }
-                          ?>
-                          <div class="notif-meta">
-                              <span class="notif-time"><?= date("M d, g:i A", strtotime($notif['created_at'])) ?></span>
-                              <span style="margin-left:12px; color:#4f8aff;">
-                                  <?= $notif['is_read'] ? '' : '• Unread' ?>
-                              </span>
-                          </div>
-                      </div>
-                  </li>
-              <?php endforeach; ?>
+            <?php foreach ($notifications as $notif): ?>
+              <li class="notif-feed-item<?= $notif['is_read'] ? '' : ' unread' ?>" data-id="<?= $notif['id'] ?>">
+                <img class="notif-avatar" src="../assets/profile/<?= htmlspecialchars($notif['profile_picture'] ?? 'rawr.png') ?>" alt="Avatar">
+                <div class="notif-content">
+                  <span class="notif-actor"><?= htmlspecialchars($notif['first_name'] . ' ' . $notif['last_name']) ?></span>
+                  <?php
+                      if ($notif['type'] === 'like') {
+                          echo " liked your post.";
+                      } elseif ($notif['type'] === 'comment') {
+                          echo " commented on your post.";
+                      } elseif ($notif['type'] === 'share') {
+                          echo " shared your post.";
+                      } else {
+                          echo " " . htmlspecialchars($notif['type']);
+                      }
+                  ?>
+                  <div class="notif-meta">
+                    <span class="notif-time"><?= date("M d, g:i A", strtotime($notif['created_at'])) ?></span>
+                    <?php if ($notif['is_read']): ?>
+                      <button class="mark-unread-btn" onclick="markAsUnread(event, <?= $notif['id'] ?>)">Mark as unread</button>
+                    <?php endif; ?>
+                  </div>
+                </div>
+              </li>
+            <?php endforeach; ?>
           <?php endif; ?>
       </ul>
   </div>
   <script src="../script/dashboard.js"></script>
   <script>
+    // Mark notifications as read when clicked
+    document.querySelectorAll('.notif-feed-item.unread').forEach(note => {
+      note.addEventListener('click', function () {
+        const notifId = this.dataset.id;
+        fetch('mark_notifications_read.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: 'id=' + notifId
+        }).then(() => {
+          this.classList.remove('unread');
+        });
+      });
+    });
+
+    function markAsUnread(event, id) {
+      event.stopPropagation();
+      fetch('mark_notifications_read.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'id=' + id + '&status=unread'
+      }).then(() => {
+        location.reload();
+      });
+    }
+
+    // Sidebar more menu toggle
     const moreBtn = document.getElementById('sidebarMoreBtn');
       const moreMenu = document.getElementById('sidebarMoreMenu');
       if (moreBtn && moreMenu) {
