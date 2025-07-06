@@ -129,7 +129,6 @@ if ($result->num_rows > 0) {
     <!-- End of Navigation-->
 
     <!-- Start of Section -->
-    <!-- <div id="section"> -->
     <div id="account_information_container" 
       class="show-account-info">
       <h2>Account Information</h2>
@@ -204,7 +203,8 @@ if ($result->num_rows > 0) {
             name="birthdate"
             class="acct-info-input"
             value="<?php echo htmlspecialchars($user['birthdate']); ?>"
-            required>
+            required
+            <?php if (isset($_SESSION['oauth_provider'])) echo 'readonly style="background-color: #8f9585; cursor: not-allowed;"'; ?>>
         </div>
 
         <button
@@ -215,7 +215,6 @@ if ($result->num_rows > 0) {
         </button>
       </form>
     </div>
-    <!-- </div> -->
 
   <div id="privacy_settings_container" 
       class="hide-privacy-settings">
@@ -268,7 +267,8 @@ if ($result->num_rows > 0) {
         <button 
           type="button"
           id="change_password_btn"
-          onClick="changePassword()">
+          onClick="changePassword()"
+          <?php if (isset($_SESSION['oauth_provider'])) echo 'disabled style="background-color: #8f9585; cursor: not-allowed; pointer-event: none;"'; ?>>
             Change Password
         </button>
       </form>
