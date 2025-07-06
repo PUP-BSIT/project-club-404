@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['reset_user_id'])) 
     <div class="glass-container">
       <h2 class="heading">Reset Your Password</h2>
       <?php if ($message): ?>
-        <p class="text-center text-red-500"><?php echo $message; ?></p>
+        <p class="reset-message"><?php echo $message; ?></p>
       <?php endif; ?>
 
       <?php if ($showForm): ?>
