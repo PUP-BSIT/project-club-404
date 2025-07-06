@@ -135,12 +135,31 @@ body {
 }
 
 /* Deny button override */
-.auth-button[name="deny"] {
+.deny-auth-button {
+  width: 94%;
+  padding: 0.75rem;
   background: linear-gradient(to right, #c00, #a00);
+  color: white;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+  border: none;
+  font-family: 'Quicksand', sans-serif;
+  display: block;
+  text-align: center;
+  text-decoration: none;
 }
 
-.auth-button[name="deny"]:hover {
-  background: linear-gradient(to right, #e74c3c, #c0392b);
+.deny-auth-button:hover {
+  opacity: 0.8;
+}
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
 }
 
 /* Password hide/show */
