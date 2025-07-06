@@ -23,19 +23,8 @@ $lastSeenRow = $conn->query("SELECT last_seen_message_id FROM users WHERE id = $
 $lastSeenMessageId = $lastSeenRow ? ($lastSeenRow->fetch_assoc()['last_seen_message_id'] ?? 0) : 0;
 $unreadMsgResult = $conn->query("SELECT COUNT(*) AS unread FROM messages WHERE id > $lastSeenMessageId");
 $unreadMessages = $unreadMsgResult ? $unreadMsgResult->fetch_assoc()['unread'] : 0;
-
-// Handle search
-$search = trim($_GET['q'] ?? '');
-$results = [];
-if ($search !== '') {
-    $stmt = $conn->prepare("SELECT user_name, first_name, last_name, bio, profile_picture FROM users LEFT JOIN user_details ON users.id = user_details.id_fk WHERE user_name LIKE CONCAT('%', ?, '%') OR first_name LIKE CONCAT('%', ?, '%') OR last_name LIKE CONCAT('%', ?, '%') LIMIT 20");
-    $stmt->bind_param("sss", $search, $search, $search);
-    $stmt->execute();
-    $res = $stmt->get_result();
-    $results = $res->fetch_all(MYSQLI_ASSOC);
-    $stmt->close();
-}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -51,7 +40,7 @@ if ($search !== '') {
       background: #18191c;
       border-radius: 18px;
       box-shadow: 0 4px 24px rgba(0,0,0,0.18);
-      padding: 0;
+      padding: 10px;
     }
     .search-feed-header {
       padding: 18px 24px 0 24px;
@@ -62,6 +51,7 @@ if ($search !== '') {
     }
     .search-bar {
       display: flex;
+      flex-direction: row;
       align-items: center;
       background: #23242a;
       border-radius: 12px;
@@ -139,6 +129,11 @@ if ($search !== '') {
       padding: 0;
       height: 505px;
     }
+    
+    .username-link {
+      text-decoration: none;
+      color: white;
+    }
   </style>
 </head>
 <body class="page">
@@ -153,31 +148,20 @@ if ($search !== '') {
 
   <div class="search-feed-container">
     <div class="search-feed-header">Search</div>
-    <form class="search-bar" method="get" action="search.php">
+    <form class="search-bar">
         <i class="ri-search-line"></i>
-        <input type="text" name="q" placeholder="Search" value="<?= htmlspecialchars($search) ?>" autocomplete="off" />
+        <input 
+          type="text" 
+          name="q" 
+          id="user_name"
+          placeholder="Search" 
+          autocomplete="off" />
     </form>
-    <ul class="search-feed-list">
-        <?php if ($search === ''): ?>
-            <li class="search-feed-item" style="justify-content:center; color:#aaa;">Follow suggestions</li>
-        <?php else: ?>
-            <?php if (empty($results)): ?>
-                <li class="search-feed-item" style="justify-content:center; color:#aaa;">No results found.</li>
-            <?php else: ?>
-                <?php foreach ($results as $user): ?>
-                    <li class="search-feed-item">
-                        <img class="search-avatar" src="./assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>" alt="Avatar">
-                        <div class="search-content">
-                            <div class="search-username"><?= htmlspecialchars($user['user_name']) ?></div>
-                            <div class="search-bio"><?= htmlspecialchars($user['bio'] ?? '') ?></div>
-                        </div>
-                        <button class="follow-btn">Follow</button>
-                    </li>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        <?php endif; ?>
-    </ul>
-  </div>
+
+    <ul class="search-feed-list"></ul>
+
+    <!-- Here -->
+
   <script src="../script/dashboard.js"></script>
   <script>
     const moreBtn = document.getElementById('sidebarMoreBtn');
@@ -193,6 +177,55 @@ if ($search !== '') {
         }
         });
     }
+
+    // AJAX for searching
+    function searchUser() {
+      const searchEndpoint = 'search_user.php';
+      const userListContainer = document.querySelector('.search-feed-list');
+      // Username searched
+      const inputUsername = document.querySelector('#user_name').value;
+      // const userList = document.querySelector('.search-feed-item');
+      
+     userListContainer.innerHTML = `<li class="search-feed-item" style="justify-content:center;">Loading...</li>`;
+
+      fetch(searchEndpoint + "?q=" + encodeURIComponent(inputUsername))
+      .then((response) => response.json())
+      .then((usersData) => {
+        setTimeout(() => {
+            userListContainer.innerHTML = "";
+    
+             if (!usersData || usersData.length === 0) {
+              const userRow = document.createElement('li');
+              userRow.classList.add('search-feed-item');
+              userRow.innerHTML = 'No Users Found.';
+              userListContainer.append(userRow);
+              return;
+            }
+    
+            for(const user of usersData) {
+              const userRow = document.createElement('li');
+              userRow.classList.add('search-feed-item');
+              userRow.title = user.first_name + ' ' + user.last_name;
+    
+              userRow.innerHTML = `<img class="search-avatar" src='../assets/profile/${user.profile_picture}'>
+                                <div class="search-content">
+                                  <div class="search-username"><a class="username-link"href=profile.php?user=${user.user_name}>${user.user_name}</a></div>
+                                  <div class="search-bio">${user.bio}</div>
+                                </div>
+                                <button class="follow-btn">Follow</button>`;
+              userListContainer.append(userRow);
+            }
+          }, 500);
+        });
+    }
+
+    document.querySelector('#user_name').addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        console.log(event.key);
+        searchUser();
+      }
+    });
   </script>
 </body>
 </html>
