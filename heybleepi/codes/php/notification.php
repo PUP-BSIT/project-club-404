@@ -110,7 +110,7 @@ $stmt->close();
       align-items: center;
       margin: 0;
       padding: 0;
-      height: 522px;
+      height: 505px;
     }
   </style>
 </head>
