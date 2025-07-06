@@ -129,7 +129,6 @@ if ($result->num_rows > 0) {
     <!-- End of Navigation-->
 
     <!-- Start of Section -->
-    <!-- <div id="section"> -->
     <div id="account_information_container" 
       class="show-account-info">
       <h2>Account Information</h2>
@@ -216,7 +215,6 @@ if ($result->num_rows > 0) {
         </button>
       </form>
     </div>
-    <!-- </div> -->
 
   <div id="privacy_settings_container" 
       class="hide-privacy-settings">
