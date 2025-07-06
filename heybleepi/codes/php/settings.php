@@ -204,7 +204,8 @@ if ($result->num_rows > 0) {
             name="birthdate"
             class="acct-info-input"
             value="<?php echo htmlspecialchars($user['birthdate']); ?>"
-            required>
+            required
+            <?php if (isset($_SESSION['oauth_provider'])) echo 'readonly style="background-color: #8f9585; cursor: not-allowed;"'; ?>>
         </div>
 
         <button
