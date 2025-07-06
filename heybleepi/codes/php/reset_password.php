@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['reset_user_id'])) 
         $stmt->execute();
 
         unset($_SESSION['reset_user_id']);
-        $message = "Password reset successfully. You can now <a href='PROJECT-CLUB-404/heybleepi/codes/php/index.php'>login</a>.";
+        $message = "Password reset successfully. You can now <a href='/PROJECT-CLUB-404/heybleepi/codes/php/index.php'>login</a>.";
     }
 }
 ?>
