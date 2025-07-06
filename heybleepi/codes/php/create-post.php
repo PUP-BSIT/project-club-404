@@ -127,7 +127,8 @@ switch ($client) {
     // Handles JSON post data
     $data = [
     'token'=>$user_token,
-    'posts'=>$posts
+    'posts'=>$posts,
+    'provider'=>'heybleepi'
     ];
     
     // Checks if the user has a session that is allowed to share post to other soc med.
