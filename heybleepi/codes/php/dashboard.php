@@ -300,7 +300,7 @@ function timeAgo($datetime) {
                 <span class="sidebar-badge"></span>
               <?php endif; ?>
             </a>
-            <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'active' : '' ?>" href="profile.php" title="Profile">
+            <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'active' : '' ?>" href="profile.php?user_id=<?= $_SESSION['id']?>" title="Profile">
               <i class="ri-user-line"></i>
             </a>
           </nav>
@@ -366,7 +366,7 @@ function timeAgo($datetime) {
               <input
                 type="text"
                 class="simple-create-post-input"
-                placeholder="What's new?"
+                placeholder="What's new, <?= $_SESSION['first_name']?>?"
                 autocomplete="off"
                 readonly
                 onclick="openCreatePostPreview();"
@@ -492,7 +492,7 @@ function timeAgo($datetime) {
                   id="close_shared_preview_btn"
                   class="material-symbols-outlined"
                   onClick="closeSharePostPreview()">close</span>
-                <form method="POST" action="dashboard.php" class="preview-form">
+                <form method="POST" action="share_post.php" class="preview-form">
                   <h1>Share Post</h1>
                   <div
                     id="share_post_input"
@@ -502,7 +502,7 @@ function timeAgo($datetime) {
                     data-placeholder="What's happening in your galaxy?"></div>
 
                   <input type="hidden" name="share_post_content" id="share_post_content_hidden">
-                  <input type="hidden" name="share_post_id" id="share_post_id_modal">
+                  <input type="hidden" name="share_post_id" id="share_post_id_internal">
                   <input type="hidden" name="location" id="shareLocationInput">
 
                   <!-- WYSWYG -->
@@ -529,6 +529,7 @@ function timeAgo($datetime) {
                     <h4>You are sharing a post by <span id="sharedFullname"></span></h4>
                   </div>
 
+                  <!-- Internal Sharing -->
                   <button
                       type="submit"
                       class="btn btn--primary"
@@ -537,13 +538,17 @@ function timeAgo($datetime) {
                     </button>
 
                   <div class="styled-hr"></div>
-
-                  <!-- Other social media -->
-                  <div class="share-options">
-                    <a href="#" class="share-to-other">Share to DevHive</a>
-                    <a href="#" class="share-to-other">Share to Hershive</a>
-                  </div>
                 </form>
+
+                <!-- EXTERNAL SHARING -->
+                  <form action="create-post.php" method="POST">
+                      <input type="hidden" name="share_post_id" id="share_post_id_external">
+                    
+                      <div class="share-options">
+                        <button type="submit" name="share_to_other" value="devhive" class="share-to-other">Share to DevHive</button>
+                        <button type="submit" name="share_to_other" value="hershive" class="share-to-other">Share to Hershive</button>
+                      </div>
+                  </form>
               </div>
             </div>
           </div>
@@ -553,6 +558,7 @@ function timeAgo($datetime) {
           $query = "
             SELECT
               p.*,
+              u.id,
               u.first_name, u.last_name, u.user_name,
               ud.profile_picture,
               sp.content AS shared_content,
@@ -574,11 +580,11 @@ function timeAgo($datetime) {
           <?php while ($post = $posts->fetch_assoc()): ?>
             <article class="glass post">
               <header class="post-header">
-                <a href="profile.php?user=<?= urlencode($post['user_name']) ?>">
+                <a href="profile.php?user=<?= urlencode($post['user_name']) ?>&user_id=<?= $post['id']?>">
                   <img class="avatar avatar--sm" src="../assets/profile/<?= htmlspecialchars($post['profile_picture'] ?? 'default.png') ?>" alt="">
                 </a>
                 <div class="poster-meta">
-                  <a href="profile.php?user=<?= urlencode($post['user_name']) ?>" class="poster-name" style="display:inline;">
+                  <a href="profile.php?user=<?= urlencode($post['user_name']) ?>&user_id=<?= $post['id']?>" class="poster-name" style="display:inline;">
                     <?= htmlspecialchars($post['first_name'] . ' ' . $post['last_name']) ?>
                   </a>
                   <span title="Posted at: <?= date("F j, Y g:i A", strtotime($post['created_at']))?>" class="post-time" style="color:#aaa; font-size:0.98em; margin-left:8px;">

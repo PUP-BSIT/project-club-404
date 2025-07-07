@@ -207,18 +207,50 @@ $userVideos = array_filter($mediaPosts, function($m) { return $m['media_type'] =
 // For gallery, get only the 9 latest images
 $galleryImages = array_slice($userImages, 0, 10);
 
-// Fetch all users except the current user for the friends tab
+// Fetch all following
 $allUsers = [];
 $usersResult = $conn->query("
   SELECT u.id, u.first_name, u.last_name, u.user_name, ud.profile_picture
-  FROM users u
+  FROM follow f
+  JOIN users u ON f.following_id = u.id
   LEFT JOIN user_details ud ON u.id = ud.id_fk
-  WHERE u.id != " . intval($_SESSION['id'])
+  WHERE f.follower_id = " . intval($_GET['user_id'])
 );
+
 if ($usersResult) {
   while ($row = $usersResult->fetch_assoc()) {
     $allUsers[] = $row;
   }
+}
+
+// Fetch all followers 
+$followers = [];
+$followersResult = $conn->query("
+  SELECT u.id, u.first_name, u.last_name, u.user_name, ud.profile_picture
+  FROM follow f
+  JOIN users u ON f.follower_id = u.id
+  LEFT JOIN user_details ud ON u.id = ud.id_fk
+  WHERE f.following_id = " . intval($_GET['user_id'])
+);
+
+if ($followersResult) {
+  while ($row = $followersResult->fetch_assoc()) {
+    $followers[] = $row;
+  }
+}
+
+// Checks if the user is already following 
+$isFollowing = false;
+
+$target_user_id = $_GET['user_id'];
+
+if ($target_user_id != $_SESSION['id']) {
+    $stmt = $conn->prepare("SELECT 1 FROM follow WHERE follower_id = ? AND following_id = ?");
+    $stmt->bind_param("ii", $_SESSION['id'], $target_user_id); // session user → viewed user
+    $stmt->execute();
+    $stmt->store_result();
+    $isFollowing = $stmt->num_rows > 0;
+    $stmt->close();
 }
 
 // Fetch latest 10 notifications
@@ -303,7 +335,7 @@ function timeAgo($datetime) {
             <span class="sidebar-badge"></span>
           <?php endif; ?>
         </a>
-        <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'active' : '' ?>" href="profile.php" title="Profile">
+        <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'active' : '' ?>" href="profile.php?user_id=<?= $_SESSION['id']?>" title="Profile">
           <i class="ri-user-line"></i>
         </a>
       </nav>
@@ -371,13 +403,29 @@ function timeAgo($datetime) {
               <i class="ri-pencil-line"></i> Edit profile
             </button>
           </div>
+          <?php elseif($isFollowing): ?>
+            <button 
+              type="button" 
+              id="unfollow_btn"
+              onClick="unfollowUser(<?= htmlspecialchars($_GET['user_id']) ?>)" 
+              class="unfollow-btn unfollow-btn--unfollow">Unfollow
+            </button>
+            </div>
+          <?php else: ?>
+            <div class="profile-buttons">
+              <button 
+                type="button" 
+                id="follow_btn"
+                onClick="followUser(<?= htmlspecialchars($_GET['user_id']) ?>)" 
+                class="follow-btn follow-btn--follow">Follow</button>
+            </div>
           <?php endif; ?>
         </div>
       </div>
 
       <nav class="profile-tabs glass" id="profileTabs">
         <a class="tab active" href="#" data-tab="posts">Posts</a>
-        <a class="tab" href="#" data-tab="friends">Users</a>
+        <a class="tab" href="#" data-tab="friends" onClick="showFollowersModal();">Connections</a>
         <a class="tab" href="#" data-tab="photos">Photos</a>
         <a class="tab" href="#" data-tab="videos">Videos</a>
       </nav>
@@ -922,21 +970,60 @@ function timeAgo($datetime) {
       <!-- Friends Tab Content -->
       <div id="tab-friends" class="profile-tab-content" style="display:none;">
         <section class="glass card">
-          <h4 class="card-title">All Users</h4>
-          <ul style="list-style:none; padding:0; margin:0;">
-            <?php foreach ($allUsers as $user): ?>
-              <?php
-                $profilePic = !empty($user['profile_picture']) ? $user['profile_picture'] : 'rawr.png';
-              ?>
-              <li style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-                <img class="avatar avatar--sm" src="../assets/profile/<?= htmlspecialchars($profilePic) ?>" alt="">
-                <div>
-                  <strong><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></strong>
-                  <div style="font-size:0.85em;color:#aaa;">@<?= htmlspecialchars($user['user_name']) ?></div>
-                </div>
-              </li>
-            <?php endforeach; ?>
-          </ul>
+            <div class="ff-buttons">
+              <button 
+                id="followers_button"
+                class="followers-button" 
+                onClick="showFollowers();">
+                  Followers
+              </button>
+              <button 
+                id="following_button"
+                class="following-button" 
+                onClick="showFollowing();">
+                  Following
+              </button>
+            </div>
+
+            <div id="followers_container" class="followers-container show">
+              <ul style="list-style:none; padding:0; margin-top: 20px;">
+                <?php foreach ($followers as $follower): ?>
+                  <?php
+                    $profilePic = !empty($follower['profile_picture']) ? $follower['profile_picture'] : 'default.png';
+                  ?>
+                  <li style="display:flex;align-items:center;gap:12px;margin-bottom:12px;margin-left: 20px;">
+                    <img class="avatar avatar--sm" src="../assets/profile/<?= htmlspecialchars($profilePic) ?>" alt="">
+                    <div>
+                      <a class="poster-name" 
+                        href="profile.php?user=<?=$follower['user_name']?>&user_id=<?=$follower['id']?>">
+                        <?= htmlspecialchars($follower['first_name'] . ' ' . $follower['last_name']) ?>
+                      </a>
+                      <div style="font-size:0.85em;color:#aaa;">@<?= htmlspecialchars($follower['user_name']) ?></div>
+                    </div>
+                  </li>
+                <?php endforeach; ?>
+              </ul>
+            </div>
+
+            <div id="following_container" class="following-container hide">
+              <ul style="list-style:none; padding:0; margin-top: 20px;">
+                <?php foreach ($allUsers as $user): ?>
+                  <?php
+                    $profilePic = !empty($user['profile_picture']) ? $user['profile_picture'] : 'default.png';
+                  ?>
+                  <li style="display:flex;align-items:center;gap:12px;margin-bottom:12px;margin-left: 20px;">
+                    <img class="avatar avatar--sm" src="../assets/profile/<?= htmlspecialchars($profilePic) ?>" alt="">
+                    <div>
+                      <a class="poster-name" 
+                        href="profile.php?user=<?=$user['user_name']?>&user_id=<?=$user['id']?>">
+                        <?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?>
+                      </a>
+                      <div style="font-size:0.85em;color:#aaa;">@<?= htmlspecialchars($user['user_name']) ?></div>
+                    </div>
+                  </li>
+                <?php endforeach; ?>
+              </ul>
+        </div>
         </section>
       </div>
     </main>

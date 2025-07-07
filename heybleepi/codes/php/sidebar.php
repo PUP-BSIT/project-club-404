@@ -25,7 +25,7 @@
         <span class="sidebar-badge"></span>
       <?php endif; ?>
     </a>
-    <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'active' : '' ?>" href="profile.php" title="Profile">
+    <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'active' : '' ?>" href="profile.php?user_id=<?= $_SESSION['id']?>" title="Profile">
       <i class="ri-user-line"></i>
     </a>
 

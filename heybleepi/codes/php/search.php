@@ -75,6 +75,8 @@ $unreadMessages = $unreadMsgResult ? $unreadMsgResult->fetch_assoc()['unread'] :
       list-style: none;
       margin: 0;
       padding: 0;
+      max-height: 300px; /* or try 4 items' height */
+      overflow-y: auto;
     }
     .search-feed-item {
       display: flex;
@@ -159,7 +161,6 @@ $unreadMessages = $unreadMsgResult ? $unreadMsgResult->fetch_assoc()['unread'] :
     </form>
 
     <ul class="search-feed-list"></ul>
-
     <!-- Here -->
 
   <script src="../script/dashboard.js"></script>
@@ -204,15 +205,15 @@ $unreadMessages = $unreadMsgResult ? $unreadMsgResult->fetch_assoc()['unread'] :
     
             for(const user of usersData) {
               const userRow = document.createElement('li');
+              const fullname = user.first_name + ' ' + user.last_name;
               userRow.classList.add('search-feed-item');
               userRow.title = user.first_name + ' ' + user.last_name;
     
               userRow.innerHTML = `<img class="search-avatar" src='../assets/profile/${user.profile_picture}'>
                                 <div class="search-content">
-                                  <div class="search-username"><a class="username-link"href=profile.php?user=${user.user_name}>${user.user_name}</a></div>
-                                  <div class="search-bio">${user.bio}</div>
-                                </div>
-                                <button class="follow-btn">Follow</button>`;
+                                  <div class="search-username"><a class="username-link" href=profile.php?user=${user.user_name}&user_id=${user.id}>${user.user_name}</a></div>
+                                  <div class="search-bio">${fullname}</div>
+                                </div>`;
               userListContainer.append(userRow);
             }
           }, 500);
