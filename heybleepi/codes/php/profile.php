@@ -713,7 +713,7 @@ function timeAgo($datetime) {
                 <img class="avatar avatar--sm" src="../assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>" alt="User Avatar">
                 <div class="poster-meta" style="display: flex; align-items: center; gap: 8px;">
                   <h4 style="margin:0; font-size:1.08em;"><?= htmlspecialchars($post['first_name'] . ' ' . $post['last_name']) ?></h4>
-                  <span class="post-time" style="color:#aaa; font-size:0.98em;">
+                  <span title="Posted at:  <?= date("F j, Y g:i A", strtotime($post['created_at']))?>" class="post-time" style="color:#aaa; font-size:0.98em;">
                     <?= timeAgo($post['created_at']) ?>
                   </span>
                 </div>
