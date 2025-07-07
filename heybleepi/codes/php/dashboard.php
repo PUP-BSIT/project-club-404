@@ -557,7 +557,14 @@ function timeAgo($datetime) {
           <?php
           $query = "
             SELECT
-              p.*,
+              p.id as post_id,
+              p.user_id,
+              p.content,
+              p.created_at,
+              p.shared_post_id,
+              p.image_path,
+              p.video_path,
+              p.location,
               u.id,
               u.first_name, u.last_name, u.user_name,
               ud.profile_picture,
@@ -580,11 +587,11 @@ function timeAgo($datetime) {
           <?php while ($post = $posts->fetch_assoc()): ?>
             <article class="glass post">
               <header class="post-header">
-                <a href="profile.php?user=<?= urlencode($post['user_name']) ?>&user_id=<?= $post['id']?>">
+                <a href="profile.php?user=<?= urlencode($post['user_name']) ?>&user_id=<?= $post['post_id']?>">
                   <img class="avatar avatar--sm" src="../assets/profile/<?= htmlspecialchars($post['profile_picture'] ?? 'default.png') ?>" alt="">
                 </a>
                 <div class="poster-meta">
-                  <a href="profile.php?user=<?= urlencode($post['user_name']) ?>&user_id=<?= $post['id']?>" class="poster-name" style="display:inline;">
+                  <a href="profile.php?user=<?= urlencode($post['user_name']) ?>&user_id=<?= $post['post_id']?>" class="poster-name" style="display:inline;">
                     <?= htmlspecialchars($post['first_name'] . ' ' . $post['last_name']) ?>
                   </a>
                   <span title="Posted at: <?= date("F j, Y g:i A", strtotime($post['created_at']))?>" class="post-time" style="color:#aaa; font-size:0.98em; margin-left:8px;">
@@ -596,10 +603,10 @@ function timeAgo($datetime) {
                   <div class="post-options" style="margin-left: auto;">
                     <button class="icon-btn toggle-options"><i class="ri-more-fill"></i></button>
                     <ul class="dropdown hidden">
-                      <li><button class="btn--sm btn-edit-post" data-id="<?= $post['id'] ?>">Edit Post</button></li>
+                      <li><button class="btn--sm btn-edit-post" data-id="<?= $post['post_id'] ?>">Edit Post</button></li>
                       <li>
                         <form method="POST" action="delete_post_dashboard.php" style="display:inline;">
-                          <input type="hidden" name="post_id" value="<?= $post['id'] ?>">
+                          <input type="hidden" name="post_id" value="<?= $post['post_id'] ?>">
                           <button type="submit" onclick="return confirm('Delete this post?')">Delete Post</button>
                         </form>
                       </li>
@@ -608,12 +615,12 @@ function timeAgo($datetime) {
                 <?php endif; ?>
               </header>
 
-              <div class="post-content" data-post-id="<?= $post['id'] ?>">
+              <div class="post-content" data-post-id="<?= $post['post_id'] ?>">
                 <p class="post-text"><?= $post['content'] ?></p>
 
                 <?php if (!empty($post['location'])): ?>
                   <div class="post-location" style="margin: 8px 0;">
-                    <div id="postMap<?= $post['id'] ?>" style="width:100%;height:220px;border-radius:10px;"></div>
+                    <div id="postMap<?= $post['post_id'] ?>" style="width:100%;height:220px;border-radius:10px;"></div>
                     <div style="font-size:0.9em;color:#aaa;margin-top:4px;">
                       <i class="ri-map-pin-user-line"></i> <?= htmlspecialchars($post['location']) ?>
                     </div>
@@ -623,7 +630,7 @@ function timeAgo($datetime) {
                 <?php if (empty($post['shared_post_id'])): ?>
                   <?php
                     $mediaStmt = $conn->prepare("SELECT file_path, media_type FROM post_media WHERE post_id = ?");
-                    $mediaStmt->bind_param("i", $post['id']);
+                    $mediaStmt->bind_param("i", $post['post_id']);
                     $mediaStmt->execute();
                     $mediaResult = $mediaStmt->get_result();
                     if ($mediaResult->num_rows > 0) {
@@ -649,17 +656,17 @@ function timeAgo($datetime) {
               <?php
                 // Load multiple media for this post
                 $mediaStmt = $conn->prepare("SELECT file_path, media_type FROM post_media WHERE post_id = ?");
-                $mediaStmt->bind_param("i", $post['id']);
+                $mediaStmt->bind_param("i", $post['post_id']);
                 $mediaStmt->execute();
                 $mediaResult = $mediaStmt->get_result();
               ?>
 
               <!-- SHARE COUNT AND USER SHARE STATUS -->
               <?php
-                $shareResult = $conn->query("SELECT COUNT(*) AS total FROM shares WHERE post_id = {$post['id']}");
+                $shareResult = $conn->query("SELECT COUNT(*) AS total FROM shares WHERE post_id = {$post['post_id']}");
                 $countShares = $shareResult ? $shareResult->fetch_assoc() : ['total' => 0];
 
-                $userSharedResult = $conn->query("SELECT 1 FROM shares WHERE post_id = {$post['id']} AND user_id = {$_SESSION['id']}");
+                $userSharedResult = $conn->query("SELECT 1 FROM shares WHERE post_id = {$post['post_id']} AND user_id = {$_SESSION['id']}");
                 $userShared = $userSharedResult && $userSharedResult->num_rows > 0;
               ?>
 
@@ -704,12 +711,12 @@ function timeAgo($datetime) {
                 <div class="post-actions">
                   <!-- LIKE -->
                   <?php
-                  $likes = $conn->query("SELECT COUNT(*) AS total FROM likes WHERE post_id = {$post['id']}")->fetch_assoc();
-                  $liked = $conn->query("SELECT 1 FROM likes WHERE user_id = {$_SESSION['id']} AND post_id = {$post['id']}")->num_rows > 0;
+                  $likes = $conn->query("SELECT COUNT(*) AS total FROM likes WHERE post_id = {$post['post_id']}")->fetch_assoc();
+                  $liked = $conn->query("SELECT 1 FROM likes WHERE user_id = {$_SESSION['id']} AND post_id = {$post['post_id']}")->num_rows > 0;
                   ?>
                   <form method="POST" style="display:inline;" onsubmit="event.preventDefault(); return false;">
-                    <input type="hidden" name="like_post_id" value="<?= $post['id'] ?>">
-                    <button type="button" class="icon-btn like-button <?= $liked ? 'liked' : '' ?>" data-post-id="<?= $post['id'] ?>">
+                    <input type="hidden" name="like_post_id" value="<?= $post['post_id'] ?>">
+                    <button type="button" class="icon-btn like-button <?= $liked ? 'liked' : '' ?>" data-post-id="<?= $post['post_id'] ?>">
                       <i class="<?= $liked ? 'ri-heart-fill' : 'ri-heart-line' ?>"></i>
                       <span><?= $likes['total'] ?></span>
                     </button>
@@ -717,9 +724,9 @@ function timeAgo($datetime) {
 
                   <!-- COMMENT COUNT -->
                   <?php
-                  $comments = $conn->query("SELECT COUNT(*) AS total FROM comments WHERE post_id = {$post['id']}")->fetch_assoc();
+                  $comments = $conn->query("SELECT COUNT(*) AS total FROM comments WHERE post_id = {$post['post_id']}")->fetch_assoc();
                   ?>
-                  <button class="icon-btn" onclick="document.getElementById('comment-form-<?= $post['id'] ?>').classList.toggle('hidden')">
+                  <button class="icon-btn" onclick="document.getElementById('comment-form-<?= $post['post_id'] ?>').classList.toggle('hidden')">
                     <i class="ri-chat-1-line"></i>
                     <span><?= $comments['total'] ?></span>
                   </button>
@@ -727,13 +734,13 @@ function timeAgo($datetime) {
                   <!-- SHARE COUNT -->
                   <?php
                     // Count shares for this post
-                    $shareCountRes = $conn->query("SELECT COUNT(*) AS total FROM posts WHERE shared_post_id = " . intval($post['id']));
+                    $shareCountRes = $conn->query("SELECT COUNT(*) AS total FROM posts WHERE shared_post_id = " . intval($post['post_id']));
                     $shareCount = $shareCountRes ? $shareCountRes->fetch_assoc()['total'] : 0;
                   ?>
 
                   <!-- Get the post creator name -->
                   <?php
-                    $postId = $post['id'];
+                    $postId = $post['post_id'];
                     $stmt = $conn->prepare("
                       SELECT users.first_name, users.last_name
                       FROM posts
@@ -756,7 +763,7 @@ function timeAgo($datetime) {
                   <form style="display:inline;">
                     <button type="button" class="icon-btn"
                       onClick="showSharePostPreview(
-                        <?= $post['id'] ?>,
+                        <?= $post['post_id'] ?>,
                         '<?= htmlspecialchars($postCreator['first_name']) ?>',
                         '<?= htmlspecialchars($postCreator['last_name']) ?>'
                       )">
@@ -768,9 +775,9 @@ function timeAgo($datetime) {
               </footer>
 
               <!-- COMMENT FORM -->
-              <div id="comment-form-<?= $post['id'] ?>" class="hidden" style="margin-top:10px;">
+              <div id="comment-form-<?= $post['post_id'] ?>" class="hidden" style="margin-top:10px;">
                 <form method="POST">
-                  <input type="hidden" name="comment_post_id" value="<?= $post['id'] ?>">
+                  <input type="hidden" name="comment_post_id" value="<?= $post['post_id'] ?>">
                   <input type="text" name="comment_text" placeholder="Write a comment…" required style="width: 100%; padding: 8px;">
                   <button type="submit" class="btn btn--primary btn--sm" style="margin-top:5px;">Comment</button>
                 </form>
@@ -778,7 +785,7 @@ function timeAgo($datetime) {
                 <!-- LOAD COMMENTS -->
                 <div style="margin-top:10px;">
                   <?php
-                    $comments = $conn->query("SELECT comments.*, users.first_name, users.last_name FROM comments JOIN users ON comments.user_id = users.id WHERE post_id = {$post['id']} ORDER BY commented_at ASC");
+                    $comments = $conn->query("SELECT comments.*, users.first_name, users.last_name FROM comments JOIN users ON comments.user_id = users.id WHERE post_id = {$post['post_id']} ORDER BY commented_at ASC");
                     while ($comment = $comments->fetch_assoc()):
                   ?>
                     <div class="comment" data-comment-id="<?= $comment['id'] ?>" style="margin-bottom: 8px;">
