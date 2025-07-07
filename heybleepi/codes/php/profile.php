@@ -360,7 +360,7 @@ function timeAgo($datetime) {
       <div class="profile-top glass">
         <img class="banner-img" src="../assets/profile/<?= htmlspecialchars($user['profile_cover'] ?? 'banner.jpg') ?>" alt="Banner" />
         <div class="profile-info-bar">
-          <img class="avatar avatar--sm2" src="../assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>" alt="">
+          <img class="avatar avatar--sm2" src="../assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'default.png') ?>" alt="">
           <div class="user-basic-info">
             <h2><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></h2>
             <p>@<?= htmlspecialchars($user['user_name']) ?></p>
@@ -437,7 +437,7 @@ function timeAgo($datetime) {
           <div class="glass create-post">
             <form>
               <div class="create-post-header">
-                <img class="avatar avatar--sm" src="../assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>" alt="">
+                <img class="avatar avatar--sm" src="../assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'default.png') ?>" alt="">
                 <div class="poster-info">
                   <a href="profile.php" class="poster-name"><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></a>
                   <p>@<?= htmlspecialchars($user['user_name']); ?></p>
@@ -710,7 +710,7 @@ function timeAgo($datetime) {
 
             <article class="glass post">
               <header class="post-header">
-                <img class="avatar avatar--sm" src="../assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>" alt="User Avatar">
+                <img class="avatar avatar--sm" src="../assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'default.png') ?>" alt="User Avatar">
                 <div class="poster-meta" style="display: flex; align-items: center; gap: 8px;">
                   <h4 style="margin:0; font-size:1.08em;"><?= htmlspecialchars($post['first_name'] . ' ' . $post['last_name']) ?></h4>
                   <span title="Posted at:  <?= date("F j, Y g:i A", strtotime($post['created_at']))?>" class="post-time" style="color:#aaa; font-size:0.98em;">
@@ -926,7 +926,7 @@ function timeAgo($datetime) {
           <ul style="list-style:none; padding:0; margin:0;">
             <?php foreach ($allUsers as $user): ?>
               <?php
-                $profilePic = !empty($user['profile_picture']) ? $user['profile_picture'] : 'rawr.png';
+                $profilePic = !empty($user['profile_picture']) ? $user['profile_picture'] : 'default.png';
               ?>
               <li style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
                 <img class="avatar avatar--sm" src="../assets/profile/<?= htmlspecialchars($profilePic) ?>" alt="">
