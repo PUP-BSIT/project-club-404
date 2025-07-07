@@ -550,7 +550,7 @@ function timeAgo($datetime) {
                   <a href="profile.php?user=<?= urlencode($post['user_name']) ?>" class="poster-name" style="display:inline;">
                     <?= htmlspecialchars($post['first_name'] . ' ' . $post['last_name']) ?>
                   </a>
-                  <span title="Testing  <?= date("F j, Y g:i A", strtotime($post['created_at']))?>" class="post-time" style="color:#aaa; font-size:0.98em; margin-left:8px;">
+                  <span title="Posted at: <?= date("F j, Y g:i A", strtotime($post['created_at']))?>" class="post-time" style="color:#aaa; font-size:0.98em; margin-left:8px;">
                     <?= timeAgo($post['created_at']) ?> 
                   </span>
                 </div>
