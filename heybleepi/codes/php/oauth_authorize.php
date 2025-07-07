@@ -41,6 +41,11 @@ if (isset($_POST['approve'])) {
   exit;
 }
 
+if (isset($_POST['deny'])) {
+  header("Location: $redirect_uri?error=access_denied");  
+  exit;
+}
+
 // Login 
 if (!isset($_SESSION['user_id'])) {
   if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['password'])) {
@@ -143,6 +148,7 @@ if ($client_id === "devhive") {
   $denyRedirect = "https://hershive.com/project-hershell/Hershive/html/login.html";
 }
 
+
 // Consent form
 ?>
 <!DOCTYPE html>
@@ -176,13 +182,17 @@ if ($client_id === "devhive") {
             type="submit"
             name="approve"
             value="1"
-            class="auth-button">Approve</button>
-
-          <a href="<?= htmlspecialchars($denyRedirect) ?>" 
-             class="deny-auth-button" 
+            class="auth-button">
+              Approve
+          </button>
+          <button
+             type="submit"
+             name="deny" 
+             value="1"
+             class="auth-button" 
              style="background:#c00;">
-            Deny
-          </a>
+              Deny
+          </button>
         </div>
       </form>
     </div>
