@@ -719,6 +719,7 @@ function timeAgo($datetime) {
               p.image_path,
               p.video_path,
               p.location,
+              p.post_provider,
               u.id AS user_id,
               u.first_name,
               u.last_name,
@@ -784,6 +785,11 @@ function timeAgo($datetime) {
 
               <!-- POST CONTENT -->
               <div class="post-content" data-post-id="<?= $post['post_id'] ?>">
+                <?php if (!empty($post['post_provider'])): ?>
+                  <p class="post-text">
+                    <strong>Original post from <i><?= htmlspecialchars($post['post_provider']) ?></i></strong>
+                  </p>
+                <?php endif; ?>
                 <p class="post-text"><?= $post['content'] ?></p>
 
                 <?php if (!empty($post['location'])): ?>
