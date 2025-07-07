@@ -25,11 +25,27 @@ document.addEventListener('DOMContentLoaded', function () {
   const closePickerBtn = emojiPicker.querySelector("#closePickerBtn");
 
   const emojiCategories = {
-    Smileys_Emoticons: ["😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇", "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗", "😙", "😚", "😋", "😛", "😝", "😜", "🤪", "🤨", "🧐", "🤓", "😎", "🤩", "🥳", "😏", "😒", "😞", "😔", "😟", "😕", "🙁", "☹️", "😣", "😖", "😫", "😩", "🥺", "😢", "😭", "😤", "😠", "😡", "🤬", "🤯", "😳", "🥵", "🥶", "😱", "😨", "😰", "😥", "😓", "🤗", "🤔", "🤭"],
-    Hearts: ["❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "🤎", "💔", "❣️", "💕", "💞", "💓", "💗", "💖", "💘", "💝", "💟"],
-    Hands: ["👍", "👎", "👌", "🤌", "🤏", "✌️", "🤞", "🤟", "🤘", "🤙", "👈", "👉", "👆", "🖕", "👇", "☝️", "👏", "🙌", "👐", "🤲", "🤝", "🙏"],
-    Objects: ["🔥", "⭐", "✨", "💫", "⚡", "💥", "💢", "💨", "💦", "💧", "🌟", "⚽", "🏀", "🏈", "⚾", "🥎", "🎾", "🏐", "🏉", "🥏", "🎱", "🪀", "🏓", "🏸", "🏒", "🏑", "🥍", "🏏", "🪃", "🥅"],
-    Food: ["🍎", "🍊", "🍋", "🍌", "🍉", "🍇", "🍓", "🫐", "🍈", "🍒", "🍑", "🥭", "🍍", "🥥", "🥝", "🍅", "🍆", "🥑", "🥦", "🥬", "🥒", "🌶️", "🫑", "🌽", "🥕", "🫒", "🧄", "🧅", "🥔", "🍠", "🥐"]
+    Smileys_Emoticons: [
+      "😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇", "🙂",
+      "🙃", "😉", "😌", "😍", "🥰", "😘", "😗", "😙", "😚", "😋", "😛",
+      "😝", "😜", "🤪", "🤨", "🧐", "🤓", "😎", "🤩", "🥳", "😏", "😒",
+      "😞", "😔", "😟", "😕", "🙁", "☹️", "😣", "😖", "😫", "😩", "🥺",
+      "😢", "😭", "😤", "😠", "😡", "🤬", "🤯", "😳", "🥵", "🥶", "😱",
+      "😨", "😰", "😥", "😓", "🤗", "🤔", "🤭"],
+    Hearts: [
+      "❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "🤎", "💔", "❣️",
+      "💕", "💞", "💓", "💗", "💖", "💘", "💝", "💟"],
+    Hands: [
+      "👍", "👎", "👌", "🤌", "🤏", "✌️", "🤞", "🤟", "🤘", "🤙", "👈",
+      "👉", "👆", "🖕", "👇", "☝️", "👏", "🙌", "👐", "🤲", "🤝", "🙏"],
+    Objects: [
+      "🔥", "⭐", "✨", "💫", "⚡", "💥", "💢", "💨", "💦", "💧", "🌟",
+      "⚽", "🏀", "🏈", "⚾", "🥎", "🎾", "🏐", "🏉", "🥏", "🎱", "🪀",
+      "🏓", "🏸", "🏒", "🏑", "🥍", "🏏", "🪃", "🥅"],
+    Food: [
+      "🍎", "🍊", "🍋", "🍌", "🍉", "🍇", "🍓", "🫐", "🍈", "🍒", "🍑",
+      "🥭", "🍍", "🥥", "🥝", "🍅", "🍆", "🥑", "🥦", "🥬", "🥒", "🌶️",
+      "🫑", "🌽", "🥕", "🫒", "🧄", "🧅", "🥔", "🍠", "🥐"]
   };
 
   for (const [category, emojis] of Object.entries(emojiCategories)) {
@@ -37,7 +53,8 @@ document.addEventListener('DOMContentLoaded', function () {
       <div class="emoji-category">
         <div class="emoji-category-title">${category.replace('_', ' ')}</div>
         <div class="emoji-grid">
-          ${emojis.map(emoji => `<span class="emoji-item" data-emoji="${emoji}">${emoji}</span>`).join("")}
+          ${emojis.map(emoji => `<span class="emoji-item" 
+            data-emoji="${emoji}">${emoji}</span>`).join("")}
         </div>
       </div>
     `;
@@ -192,8 +209,9 @@ document.addEventListener('DOMContentLoaded', function () {
       .then(response => response.json())
       .then(data => {
         if (data.success) {
-          const messageBox = deleteTargetBtn.closest('.message-preview');
-          if (messageBox) messageBox.remove();
+          // Remove the parent div wrapping the comment-box, not the container
+          const messageDiv = deleteTargetBtn.closest('.comment-box').parentElement;
+          if (messageDiv) messageDiv.remove();
         } else {
           alert("Failed to delete message.");
         }
@@ -306,7 +324,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
  // --- Add new message at the top of the list ---
  function addNewMessageToDOM(messageData) {
-  const container = document.querySelector('.container');
+  const container = document.querySelector('.message-preview');
   const noMessagesElement = document.querySelector('.no-messages');
   if (noMessagesElement) noMessagesElement.remove();
 
@@ -325,13 +343,13 @@ document.addEventListener('DOMContentLoaded', function () {
   const time = `${hours}:${minutes} ${ampm}`;
   const formattedTime = `${date} ${time}`;
 
-
   const newMessage = document.createElement('div');
-  newMessage.className = 'message-preview';
+  newMessage.className = '';
   newMessage.innerHTML = `
       <div class="comment-box">
           <div class="comment-header">
-              <img src="../assets/profile/${messageData.profile_picture || 'rawr.png'}"
+              <img src="../assets/profile/${messageData.profile_picture ||
+                'rawr.png'}"
                   alt="Avatar" class="avatar avatar--sm" />
               <div class="preview-text">
                   <h4>${messageData.user_name}</h4>
@@ -340,7 +358,10 @@ document.addEventListener('DOMContentLoaded', function () {
           </div>
           <span class="timestamp">${formattedTime}</span>
           <span class="comment-actions">
-              <button type="button" class="action-menu-btn" data-id="${messageData.id}">
+              <button
+                type="button"
+                class="action-menu-btn"
+                data-id="${messageData.id}">
                   <i class="ri-more-2-fill"></i>
               </button>
               <div class="action-menu" style="display: none;">
@@ -355,14 +376,16 @@ document.addEventListener('DOMContentLoaded', function () {
       </div>
   `;
 
-
     // Insert at the top of the messages list
-    const firstMessage = container.querySelector('.message-preview');
+    const firstMessage = container.firstChild;
     if (firstMessage) {
       container.insertBefore(newMessage, firstMessage);
     } else {
       container.appendChild(newMessage);
     }
+
+    // Scroll to top to show the new message
+    container.scrollTop = 0;
   }
 });
 
@@ -409,6 +432,46 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Hide menu when clicking outside
     document.addEventListener('click', function (e) {
+      if (!moreMenu.contains(e.target) && !moreBtn.contains(e.target)) {
+        moreMenu.classList.add('hidden');
+      }
+    });
+  }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  const messagePreview = document.querySelector('.message-preview');
+  if (messagePreview) {
+    messagePreview.scrollTop = 0;
+  }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Notification Dropdown
+  const notifBtn = document.getElementById('notificationBtnSidebar');
+  const notifDropdown = document.getElementById('notification_dropdown');
+  if (notifBtn && notifDropdown) {
+    notifBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      notifDropdown.classList.toggle('show');
+    });
+    // Optional: Hide dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!notifDropdown.contains(e.target) && !notifBtn.contains(e.target)) {
+        notifDropdown.classList.remove('show');
+      }
+    });
+  }
+
+  // More Menu Popup
+  const moreBtn = document.getElementById('sidebarMoreBtn');
+  const moreMenu = document.getElementById('sidebarMoreMenu');
+  if (moreBtn && moreMenu) {
+    moreBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      moreMenu.classList.toggle('hidden');
+    });
+    document.addEventListener('click', function(e) {
       if (!moreMenu.contains(e.target) && !moreBtn.contains(e.target)) {
         moreMenu.classList.add('hidden');
       }
