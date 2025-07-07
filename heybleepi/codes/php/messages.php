@@ -300,8 +300,9 @@ $conn->close();
     </form>
 
     <?php if (count($messages) > 0): ?>
+      <div class="message-preview">
       <?php foreach ($messages as $row): ?>
-        <div class="message-preview">
+        <div>
           <div class="comment-box">
             <div class="comment-header">
               <img src="../assets/profile/<?= htmlspecialchars($row['profile_picture'] ?? 'rawr.png') ?>"
@@ -334,6 +335,7 @@ $conn->close();
           </div>
         </div>
       <?php endforeach; ?>
+      </div>
     <?php else: ?>
       <p class="no-messages">No messages found.</p>
     <?php endif; ?>
@@ -351,40 +353,5 @@ $conn->close();
   </div>
 
   <script src="../script/messages.js"></script>
-  </script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Notification Dropdown
-      const notifBtn = document.getElementById('notificationBtnSidebar');
-      const notifDropdown = document.getElementById('notification_dropdown');
-      if (notifBtn && notifDropdown) {
-        notifBtn.addEventListener('click', function(e) {
-          e.preventDefault();
-          notifDropdown.classList.toggle('show');
-        });
-        // Optional: Hide dropdown when clicking outside
-        document.addEventListener('click', function(e) {
-          if (!notifDropdown.contains(e.target) && !notifBtn.contains(e.target)) {
-            notifDropdown.classList.remove('show');
-          }
-        });
-      }
-
-      // More Menu Popup
-      const moreBtn = document.getElementById('sidebarMoreBtn');
-      const moreMenu = document.getElementById('sidebarMoreMenu');
-      if (moreBtn && moreMenu) {
-        moreBtn.addEventListener('click', function(e) {
-          e.preventDefault();
-          moreMenu.classList.toggle('hidden');
-        });
-        document.addEventListener('click', function(e) {
-          if (!moreMenu.contains(e.target) && !moreBtn.contains(e.target)) {
-            moreMenu.classList.add('hidden');
-          }
-        });
-      }
-    });
-  </script>
 </body>
 </html>
