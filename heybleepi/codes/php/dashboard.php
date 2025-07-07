@@ -492,7 +492,7 @@ function timeAgo($datetime) {
                   id="close_shared_preview_btn"
                   class="material-symbols-outlined"
                   onClick="closeSharePostPreview()">close</span>
-                <form method="POST" action="dashboard.php" class="preview-form">
+                <form method="POST" action="share_post.php" class="preview-form">
                   <h1>Share Post</h1>
                   <div
                     id="share_post_input"
@@ -502,7 +502,7 @@ function timeAgo($datetime) {
                     data-placeholder="What's happening in your galaxy?"></div>
 
                   <input type="hidden" name="share_post_content" id="share_post_content_hidden">
-                  <input type="hidden" name="share_post_id" id="share_post_id_modal">
+                  <input type="hidden" name="share_post_id" id="share_post_id_internal">
                   <input type="hidden" name="location" id="shareLocationInput">
 
                   <!-- WYSWYG -->
@@ -529,6 +529,7 @@ function timeAgo($datetime) {
                     <h4>You are sharing a post by <span id="sharedFullname"></span></h4>
                   </div>
 
+                  <!-- Internal Sharing -->
                   <button
                       type="submit"
                       class="btn btn--primary"
@@ -537,13 +538,17 @@ function timeAgo($datetime) {
                     </button>
 
                   <div class="styled-hr"></div>
-
-                  <!-- Other social media -->
-                  <div class="share-options">
-                    <a href="#" class="share-to-other">Share to DevHive</a>
-                    <a href="#" class="share-to-other">Share to Hershive</a>
-                  </div>
                 </form>
+
+                <!-- EXTERNAL SHARING -->
+                  <form action="create-post.php" method="POST">
+                      <input type="hidden" name="share_post_id" id="share_post_id_external">
+                    
+                      <div class="share-options">
+                        <button type="submit" name="share_to_other" value="devhive" class="share-to-other">Share to DevHive</button>
+                        <button type="submit" name="share_to_other" value="hershive" class="share-to-other">Share to Hershive</button>
+                      </div>
+                  </form>
               </div>
             </div>
           </div>
