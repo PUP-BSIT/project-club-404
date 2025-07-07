@@ -163,6 +163,41 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   }
 }
 
+// SHARE A POST
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['share_post_id'], $_POST['share_post_content'])) {
+  $original_post_id = intval($_POST['share_post_id']);
+  $share_caption = trim($_POST['share_post_content']);
+  $user_id = $_SESSION['id'];
+
+  // Insert new post with shared_post_id pointing to the original
+  $location = $_POST['location'] ?? null;
+  $stmt = $conn->prepare("INSERT INTO posts (user_id, content, shared_post_id, location) VALUES (?, ?, ?, ?)");
+  $stmt->bind_param("isis", $user_id, $share_caption, $original_post_id, $location);
+  $stmt->execute();
+  $new_post_id = $stmt->insert_id;
+  $stmt->close();
+
+  // Get owner of original post
+  $ownerStmt = $conn->prepare("SELECT user_id FROM posts WHERE id = ?");
+  $ownerStmt->bind_param("i", $original_post_id);
+  $ownerStmt->execute();
+  $ownerStmt->bind_result($postOwnerId);
+  $ownerStmt->fetch();
+  $ownerStmt->close();
+
+  // Notify if not sharing own post
+  if ($postOwnerId && $postOwnerId != $user_id) {
+    $type = 'share';
+    $notifStmt = $conn->prepare("INSERT INTO notifications (user_id, actor_id, post_id, type, is_read, created_at) VALUES (?, ?, ?, ?, 0, NOW())");
+    $notifStmt->bind_param("iiis", $postOwnerId, $user_id, $original_post_id, $type);
+    $notifStmt->execute();
+    $notifStmt->close();
+  }
+
+  header("Location: profile.php");
+  exit();
+}
+
 // Fetch all media for the user's posts from post_media table
 $mediaStmt = $conn->prepare("
   SELECT pm.file_path, pm.media_type
@@ -191,7 +226,6 @@ $albumResult = $albumStmt->get_result();
 $albums = $albumResult->fetch_all(MYSQLI_ASSOC);
 
 function getAlbumCover($albumId, $conn) {
-  $path = null;
   $stmt = $conn->prepare("SELECT file_path FROM album_photos WHERE album_id = ? ORDER BY id ASC LIMIT 1");
   $stmt->bind_param("i", $albumId);
   $stmt->execute();
@@ -267,6 +301,8 @@ function timeAgo($datetime) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="../stylesheet/dashboard.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=close" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -353,7 +389,6 @@ function timeAgo($datetime) {
       </ul>
     </div>
 
-
     <!-- Main Layout -->
     <main class="profile-container">
       <!-- Banner + Profile info -->
@@ -434,58 +469,32 @@ function timeAgo($datetime) {
         <!-- Create Post -->
         <section class="right-column">
           <?php if ($userId == $_SESSION['id']): ?>
-          <div class="glass create-post">
-            <form>
-              <div class="create-post-header">
-                <img class="avatar avatar--sm" src="../assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>" alt="">
-                <div class="poster-info">
-                  <a href="profile.php" class="poster-name"><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></a>
-                  <p>@<?= htmlspecialchars($user['user_name']); ?></p>
-                </div>
-              </div>
-
-              <textarea
-                class="create-post-input"
-                name="post_content"
-                placeholder="What's happening in your galaxy?"
-                onClick="showCreatePostPreview();"
-              ></textarea>
-
-              <!-- Media Preview Grid -->
-              <div class="create-post-actions">
-                <div class="media-actions">
-                  <button
-                    type="button"
-                    class="media-upload-btn photo"
-                    onclick="showCreatePostPreview();">
-                      + Photo
-                  </button>
-                  <button
-                    type="button"
-                    class="media-upload-btn video"
-                    onclick="showCreatePostPreview();">
-                      + Video
-                  </button>
-                </div>
-                <div class="minor-actions">
-                  <button
-                    class="icon-btn"
-                    type="button"
-                    id="getLocationBtn"
-                    title="Add location"
-                    onClick="showCreatePostPreview();">
-                    <i class="ri-map-pin-line"></i>
-                  </button>
-                </div>
-                <button
-                  class="btn btn--action"
-                  onClick="showCreatePostPreview();";
-                  type="button">
-                    Post
-                </button>
-              </div>
-            </form>
-          </div>
+          <!-- Create Post -->
+          <form class="simple-create-post" autocomplete="off" onsubmit="return false;">
+            <div class="simple-create-post-inner">
+              <?php
+                $postAvatarPath = '../assets/profile/' . ($_SESSION['avatar'] ?? 'default.png');
+                if (!file_exists($postAvatarPath)) {
+                  $postAvatarPath = '../assets/profile/default.png';
+                }
+              ?>
+              <img class="avatar avatar--sm" src="<?= $postAvatarPath ?>" alt="Profile">
+              <input
+                type="text"
+                class="simple-create-post-input"
+                placeholder="What's new?"
+                autocomplete="off"
+                readonly
+                onclick="openCreatePostPreview();"
+                style="cursor:pointer;"
+              >
+              <button
+                type="button"
+                class="btn btn--primary simple-post-btn"
+                onclick="openCreatePostPreview();"
+              >Post</button>
+            </div>
+          </form>
 
           <!-- Map Location Modal -->
           <div id="mapModal" class="map-modal" style="display:none;">
@@ -600,7 +609,7 @@ function timeAgo($datetime) {
                   id="close_shared_preview_btn"
                   class="material-symbols-outlined"
                   onClick="closeSharePostPreview()">close</span>
-                <form method="POST" action="share_post.php" class="preview-form">
+                <form method="POST" action="profile.php" class="preview-form">
                   <h1>Share Post</h1>
                   <div
                     id="share_post_input"
@@ -608,8 +617,10 @@ function timeAgo($datetime) {
                     contenteditable="true"
                     onInput="updateHiddenInputShare();"
                     data-placeholder="What's happening in your galaxy?"></div>
+
                   <input type="hidden" name="share_post_content" id="share_post_content_hidden">
                   <input type="hidden" name="share_post_id" id="share_post_id_modal">
+                  <input type="hidden" name="location" id="shareLocationInput">
 
                   <!-- WYSWYG -->
                   <div>
@@ -635,25 +646,20 @@ function timeAgo($datetime) {
                     <h4>You are sharing a post by <span id="sharedFullname"></span></h4>
                   </div>
 
-                  <!-- INTERNAL SHARING -->
-                  <button 
-                    type="submit" 
-                    class="btn btn--primary"
-                    id="post_preview_submit_btn">
-                      Share Now
-                  </button>
+                  <button
+                      type="submit"
+                      class="btn btn--primary"
+                      id="post_preview_submit_btn">
+                        Share Now
+                    </button>
 
                   <div class="styled-hr"></div>
-                </form>
 
-                <!-- EXTERNAL SHARING -->
-                <form action="create-post.php" method="POST">
-                    <input type="hidden" name="share_post_id" id="share_post_id_external">
-                  
-                    <div class="share-options">
-                      <button type="submit" name="share_to_other" value="devhive" class="share-to-other">Share to DevHive</button>
-                      <button type="submit" name="share_to_other" value="hershive" class="share-to-other">Share to Hershive</button>
-                    </div>
+                  <!-- Other social media -->
+                  <div class="share-options">
+                    <a href="#" class="share-to-other">Share to DevHive</a>
+                    <a href="#" class="share-to-other">Share to Hershive</a>
+                  </div>
                 </form>
               </div>
             </div>
@@ -676,6 +682,7 @@ function timeAgo($datetime) {
               sp.content AS shared_content,
               sp.video_path AS shared_video_path,
               sp.image_path AS shared_image_path,
+              sp.location AS shared_location,
               su.first_name AS shared_first_name,
               su.last_name AS shared_last_name
             FROM posts p
@@ -772,13 +779,7 @@ function timeAgo($datetime) {
               <?php if ($post['shared_post_id']): ?>
                 <div class="shared-post glass" style="padding: 10px; background-color: rgba(255, 255, 255, 0.05); border-left: 3px solid var(--primary); border-radius: 10px; margin-bottom: 10px;">
                   <small>Shared from <strong><?= htmlspecialchars($post['shared_first_name'] . ' ' . $post['shared_last_name']) ?></strong></small>
-
-                  <?php
-                    // Show shared post caption above media grid
-                    if (!empty($post['shared_content'])) {
-                      echo '<p>' . $post['shared_content'] . '</p>';
-                    }
-                  ?>
+                  <p><?= $post['shared_content'] ?></p>
 
                   <?php if (!empty($post['shared_location'])): ?>
                     <div class="post-location" style="margin: 8px 0;">

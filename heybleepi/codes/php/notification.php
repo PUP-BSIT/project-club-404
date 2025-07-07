@@ -185,7 +185,7 @@ $stmt->close();
                       }
                   ?>
                   <div class="notif-meta">
-                    <span class="notif-time"><?= date("M d, g:i A", strtotime($notif['created_at'])) ?></span>
+                    <small><?= date("M d, g:i A", strtotime($notif['created_at'])) ?></small>
                     <?php if ($notif['is_read']): ?>
                       <button class="mark-unread-btn" onclick="markAsUnread(event, <?= $notif['id'] ?>)">Mark as unread</button>
                     <?php endif; ?>
