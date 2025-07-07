@@ -214,7 +214,7 @@ $usersResult = $conn->query("
   FROM follow f
   JOIN users u ON f.following_id = u.id
   LEFT JOIN user_details ud ON u.id = ud.id_fk
-  WHERE f.follower_id = " . intval($_GET['user_id'])
+  WHERE f.follower_id = " . intval(isset($_GET['user_id']) ? $_GET['user_id'] : $userId)
 );
 
 if ($usersResult) {
@@ -230,7 +230,7 @@ $followersResult = $conn->query("
   FROM follow f
   JOIN users u ON f.follower_id = u.id
   LEFT JOIN user_details ud ON u.id = ud.id_fk
-  WHERE f.following_id = " . intval($_GET['user_id'])
+  WHERE f.following_id = " . intval(isset($_GET['user_id']) ? $_GET['user_id'] : $userId)
 );
 
 if ($followersResult) {
@@ -242,7 +242,7 @@ if ($followersResult) {
 // Checks if the user is already following 
 $isFollowing = false;
 
-$target_user_id = $_GET['user_id'];
+$target_user_id = isset($_GET['user_id']) ? $_GET['user_id'] : $userId;
 
 if ($target_user_id != $_SESSION['id']) {
     $stmt = $conn->prepare("SELECT 1 FROM follow WHERE follower_id = ? AND following_id = ?");
@@ -657,7 +657,8 @@ function timeAgo($datetime) {
                     onInput="updateHiddenInputShare();"
                     data-placeholder="What's happening in your galaxy?"></div>
                   <input type="hidden" name="share_post_content" id="share_post_content_hidden">
-                  <input type="hidden" name="share_post_id" id="share_post_id_modal">
+                  <input type="hidden" name="share_post_id" id="share_post_id_internal">
+                  <input type="hidden" name="location" id="shareLocationInput">
 
                   <!-- WYSWYG -->
                   <div>
@@ -718,6 +719,7 @@ function timeAgo($datetime) {
               p.image_path,
               p.video_path,
               p.location,
+              u.id AS user_id,
               u.first_name,
               u.last_name,
               u.user_name,
@@ -876,6 +878,28 @@ function timeAgo($datetime) {
                     <i class="ri-chat-1-line"></i>
                     <span><?= $countComments['total'] ?></span>
                   </button>
+
+                  <!-- Get the post creator name -->
+                  <?php
+                    $postId = $post['post_id'];
+                    $stmt = $conn->prepare("
+                      SELECT users.first_name, users.last_name
+                      FROM posts
+                      JOIN users ON posts.user_id = users.id
+                      WHERE posts.id = ?
+                    ");
+
+                    $stmt->bind_param("i", $postId);
+                    $stmt->execute();
+                    $stmt->bind_result($firstName, $lastName);
+                    $stmt->fetch();
+                    $stmt->close();
+
+                    $postCreator = [
+                      'first_name' => $firstName,
+                      'last_name' => $lastName
+                    ];
+                  ?>
 
                   <!-- Share -->
                   <form style="display:inline;">

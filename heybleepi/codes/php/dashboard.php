@@ -764,8 +764,8 @@ function timeAgo($datetime) {
                     <button type="button" class="icon-btn"
                       onClick="showSharePostPreview(
                         <?= $post['post_id'] ?>,
-                        '<?= htmlspecialchars($postCreator['first_name']) ?>',
-                        '<?= htmlspecialchars($postCreator['last_name']) ?>'
+                        '<?= htmlspecialchars($postCreator['first_name'] ?? $post['shared_first_name']) ?>',
+                        '<?= htmlspecialchars($postCreator['last_name'] ?? $post['shared_last_name']) ?>'
                       )">
                       <i class="ri-share-forward-line"></i>
                       <span><?= $shareCount ?></span>
