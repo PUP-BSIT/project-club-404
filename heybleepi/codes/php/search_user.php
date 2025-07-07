@@ -8,19 +8,16 @@ if (!isset($_SESSION['username'])) {
 }
 
 $user_id = $_SESSION['id'];
-
 $search = trim($_GET['q'] ?? '');
 $results = [];
 
-// Handle Search
 if ($search !== '') {
     $searchParam = "%" . $search . "%";
-    $stmt = $conn->prepare("SELECT user_name, first_name, last_name, bio, profile_picture 
+    $stmt = $conn->prepare("SELECT users.id, user_name, first_name, last_name, bio, profile_picture 
                             FROM users 
                             LEFT JOIN user_details ON users.id = user_details.id_fk 
-                            WHERE user_name LIKE ? 
-                               OR first_name LIKE ? 
-                               OR last_name LIKE ? 
+                            WHERE (user_name LIKE ? OR first_name LIKE ? OR last_name LIKE ?)
+                            AND users.id != ?
                             LIMIT 20");
 
     if (!$stmt) {
@@ -29,14 +26,28 @@ if ($search !== '') {
         exit();
     }
 
-    $stmt->bind_param("sss", $searchParam, $searchParam, $searchParam);
+    $stmt->bind_param("sssi", $searchParam, $searchParam, $searchParam, $user_id);
     $stmt->execute();
     $res = $stmt->get_result();
-    $results = $res->fetch_all(MYSQLI_ASSOC);
 
+    while ($row = $res->fetch_assoc()) {
+        $searchedUserId = $row['id'];
+
+        // Check if current user is following this user
+        $checkStmt = $conn->prepare("SELECT 1 FROM follow WHERE follower_id = ? AND following_id = ?");
+        $checkStmt->bind_param("ii", $user_id, $searchedUserId);
+        $checkStmt->execute();
+        $followRes = $checkStmt->get_result();
+        $isFollowing = $followRes->num_rows > 0;
+        $checkStmt->close();
+
+        $row['is_following'] = $isFollowing;
+        $results[] = $row;
+    }
+
+    $stmt->close();
     header('Content-Type: application/json');
     echo json_encode($results);
-    $stmt->close();
     exit();
 }
 ?>

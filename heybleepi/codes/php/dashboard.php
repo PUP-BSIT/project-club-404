@@ -266,7 +266,7 @@ function timeAgo($datetime) {
                 <span class="sidebar-badge"></span>
               <?php endif; ?>
             </a>
-            <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'active' : '' ?>" href="profile.php" title="Profile">
+            <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'active' : '' ?>" href="profile.php?user_id=<?= $_SESSION['id']?>" title="Profile">
               <i class="ri-user-line"></i>
             </a>
           </nav>
@@ -332,7 +332,7 @@ function timeAgo($datetime) {
               <input
                 type="text"
                 class="simple-create-post-input"
-                placeholder="What's new?"
+                placeholder="What's new, <?= $_SESSION['first_name']?>?"
                 autocomplete="off"
                 readonly
                 onclick="openCreatePostPreview();"
@@ -522,6 +522,7 @@ function timeAgo($datetime) {
           $query = "
             SELECT
               p.*,
+              u.id,
               u.first_name, u.last_name, u.user_name,
               ud.profile_picture,
               sp.content AS shared_content,
@@ -543,11 +544,11 @@ function timeAgo($datetime) {
           <?php while ($post = $posts->fetch_assoc()): ?>
             <article class="glass post">
               <header class="post-header">
-                <a href="profile.php?user=<?= urlencode($post['user_name']) ?>">
+                <a href="profile.php?user=<?= urlencode($post['user_name']) ?>&user_id=<?= $post['id']?>">
                   <img class="avatar avatar--sm" src="../assets/profile/<?= htmlspecialchars($post['profile_picture'] ?? 'default.png') ?>" alt="">
                 </a>
                 <div class="poster-meta">
-                  <a href="profile.php?user=<?= urlencode($post['user_name']) ?>" class="poster-name" style="display:inline;">
+                  <a href="profile.php?user=<?= urlencode($post['user_name']) ?>&user_id=<?= $post['id']?>" class="poster-name" style="display:inline;">
                     <?= htmlspecialchars($post['first_name'] . ' ' . $post['last_name']) ?>
                   </a>
                   <span class="post-time" style="color:#aaa; font-size:0.98em; margin-left:8px;">

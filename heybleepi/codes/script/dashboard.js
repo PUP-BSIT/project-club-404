@@ -1204,3 +1204,103 @@ function openCreatePostPreview() {
 function closeCreatePostPreview() {
   document.getElementById('post_preview_overlay').classList.add('hidden');
 }
+
+// Functon for follow user
+function followUser(targetUserId) {
+  const followBtn = document.querySelector('#follow_btn');
+  const followEndpoint = 'follow_user.php';
+
+  fetch(followEndpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: `user_id=${encodeURIComponent(targetUserId)}`
+  })
+  .then((response) => response.json())
+  .then(data => {
+    if(data.status === 'success') {
+    followBtn.innerHTML = 'Unfollow';
+    followBtn.style.backgroundColor = "#3b82f6";
+    followBtn.removeAttribute('onclick');
+    followBtn.onclick = () => unfollowUser(targetUserId);
+    followBtn.id = 'unfollow_btn';
+    } else {
+      alert(data.message);
+    }
+  })
+  .catch(err => {
+    console.error('Follow failed:', err);
+    alert("Something went wrong.");
+  });
+}
+
+// Function for unfollow user.
+function unfollowUser(targetUserId) {
+  const unfollowBtn = document.querySelector('#unfollow_btn');
+  const unfollowEndpoint = 'unfollow_user.php';
+
+  fetch(unfollowEndpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: `user_id=${encodeURIComponent(targetUserId)}`
+  })
+  .then((response) => response.json())
+  .then(data => {
+    if(data.status === 'success') {
+      unfollowBtn.innerHTML = 'Follow';
+      unfollowBtn.style.backgroundColor = '#484a4d';
+      unfollowBtn.onclick = () => followUser(targetUserId);
+      unfollowBtn.id = 'follow_btn';
+    } else {
+      alert(data.message);
+    }
+  })
+  .catch(err => {
+    console.error('Unfollow failed:', err);
+    alert("Something went wrong.");
+  });
+}
+
+const followModal = document.querySelector('#ff_modal_overlay');
+
+followModal.addEventListener("click", (e) => {
+  if (e.target === followModal) {
+    followModal.classList.add('hide');
+  }
+});
+
+function showFollowersModal() {
+  followModal.classList.remove('hide');
+}
+
+// Toggle followers and following.
+function showFollowers() {
+  const followersContainer = document.querySelector('#followers_container');
+  const followingContainer = document.querySelector('#following_container');
+  const followersBtn = document.querySelector('#followers_button');
+  const followingBtn = document.querySelector('#following_button');
+
+  followersContainer.classList.add('show');
+  followersContainer.classList.remove('hide');
+  followersBtn.classList.add('focus');
+  followingBtn.classList.remove('focus');
+  followingContainer.classList.remove('show');
+  followingContainer.classList.add('hide');
+}
+
+function showFollowing() {
+  const followersContainer = document.querySelector('#followers_container');
+  const followingContainer = document.querySelector('#following_container');
+  const followersBtn = document.querySelector('#followers_button');
+  const followingBtn = document.querySelector('#following_button');
+
+  followersContainer.classList.add('hide');
+  followersContainer.classList.remove('show');
+  followingContainer.classList.add('show');
+  followingContainer.classList.remove('hide');
+  followersBtn.classList.remove('focus');
+  followingBtn.classList.add('focus');
+}
