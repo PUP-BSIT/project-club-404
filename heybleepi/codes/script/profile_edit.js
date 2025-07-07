@@ -32,9 +32,25 @@ function changeCover() {
   };
 }
 
-// AJAX submit
+// Create loading overlay if not already created
+function createLoadingOverlay() {
+  if (!document.getElementById('loadingOverlay')) {
+    const overlay = document.createElement('div');
+    overlay.id = 'loadingOverlay';
+    overlay.className = 'loading-overlay';
+    overlay.innerHTML = `
+      <div class="loading-box">Saving changes...</div>
+    `;
+    document.body.appendChild(overlay);
+  }
+}
+
+// AJAX submit with loading
 document.getElementById('profile_form').addEventListener('submit', function (e) {
   e.preventDefault();
+
+  createLoadingOverlay();
+  document.getElementById('loadingOverlay').style.display = 'flex';
 
   const formData = new FormData(this);
 
@@ -47,6 +63,8 @@ document.getElementById('profile_form').addEventListener('submit', function (e) 
   })
     .then(response => response.json())
     .then(data => {
+      document.getElementById('loadingOverlay').style.display = 'none';
+
       if (data.success) {
         const toast = document.getElementById('successToast');
         toast.style.display = 'block';
@@ -58,6 +76,7 @@ document.getElementById('profile_form').addEventListener('submit', function (e) 
       }
     })
     .catch(err => {
+      document.getElementById('loadingOverlay').style.display = 'none';
       console.error(err);
       alert("An error occurred.");
     });
