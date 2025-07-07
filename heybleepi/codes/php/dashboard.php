@@ -97,6 +97,41 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['post_content'])) {
   exit();
 }
 
+// SHARE A POST
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['share_post_id'], $_POST['share_post_content'])) {
+  $original_post_id = intval($_POST['share_post_id']);
+  $share_caption = trim($_POST['share_post_content']);
+  $user_id = $_SESSION['id'];
+
+  // Insert new post with shared_post_id pointing to the original
+  $location = $_POST['location'] ?? null;
+  $stmt = $conn->prepare("INSERT INTO posts (user_id, content, shared_post_id, location) VALUES (?, ?, ?, ?)");
+  $stmt->bind_param("isis", $user_id, $share_caption, $original_post_id, $location);
+  $stmt->execute();
+  $new_post_id = $stmt->insert_id;
+  $stmt->close();
+
+  // Get owner of original post
+  $ownerStmt = $conn->prepare("SELECT user_id FROM posts WHERE id = ?");
+  $ownerStmt->bind_param("i", $original_post_id);
+  $ownerStmt->execute();
+  $ownerStmt->bind_result($postOwnerId);
+  $ownerStmt->fetch();
+  $ownerStmt->close();
+
+  // Notify if not sharing own post
+  if ($postOwnerId && $postOwnerId != $user_id) {
+    $type = 'share';
+    $notifStmt = $conn->prepare("INSERT INTO notifications (user_id, actor_id, post_id, type, is_read, created_at) VALUES (?, ?, ?, ?, 0, NOW())");
+    $notifStmt->bind_param("iiis", $postOwnerId, $user_id, $original_post_id, $type);
+    $notifStmt->execute();
+    $notifStmt->close();
+  }
+
+  header("Location: dashboard.php");
+  exit();
+}
+
 function getMediaClass($path) {
     $size = @getimagesize($path);
     if (!$size) return 'landscape'; // fallback
@@ -214,7 +249,6 @@ function timeAgo($datetime) {
         return floor($diff / 604800) . "w";
     }
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -458,7 +492,7 @@ function timeAgo($datetime) {
                   id="close_shared_preview_btn"
                   class="material-symbols-outlined"
                   onClick="closeSharePostPreview()">close</span>
-                <form method="POST" action="share_post.php" class="preview-form">
+                <form method="POST" action="dashboard.php" class="preview-form">
                   <h1>Share Post</h1>
                   <div
                     id="share_post_input"
@@ -466,8 +500,10 @@ function timeAgo($datetime) {
                     contenteditable="true"
                     onInput="updateHiddenInputShare();"
                     data-placeholder="What's happening in your galaxy?"></div>
+
                   <input type="hidden" name="share_post_content" id="share_post_content_hidden">
-                  <input type="hidden" name="share_post_id" id="share_post_id_internal">
+                  <input type="hidden" name="share_post_id" id="share_post_id_modal">
+                  <input type="hidden" name="location" id="shareLocationInput">
 
                   <!-- WYSWYG -->
                   <div>
@@ -493,7 +529,6 @@ function timeAgo($datetime) {
                     <h4>You are sharing a post by <span id="sharedFullname"></span></h4>
                   </div>
 
-                  <!-- Internal Sharing -->
                   <button
                       type="submit"
                       class="btn btn--primary"
@@ -502,17 +537,13 @@ function timeAgo($datetime) {
                     </button>
 
                   <div class="styled-hr"></div>
-                </form>
 
-                <!-- EXTERNAL SHARING -->
-                  <form action="create-post.php" method="POST">
-                      <input type="hidden" name="share_post_id" id="share_post_id_external">
-                    
-                      <div class="share-options">
-                        <button type="submit" name="share_to_other" value="devhive" class="share-to-other">Share to DevHive</button>
-                        <button type="submit" name="share_to_other" value="hershive" class="share-to-other">Share to Hershive</button>
-                      </div>
-                  </form>
+                  <!-- Other social media -->
+                  <div class="share-options">
+                    <a href="#" class="share-to-other">Share to DevHive</a>
+                    <a href="#" class="share-to-other">Share to Hershive</a>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
@@ -551,8 +582,8 @@ function timeAgo($datetime) {
                   <a href="profile.php?user=<?= urlencode($post['user_name']) ?>&user_id=<?= $post['id']?>" class="poster-name" style="display:inline;">
                     <?= htmlspecialchars($post['first_name'] . ' ' . $post['last_name']) ?>
                   </a>
-                  <span class="post-time" style="color:#aaa; font-size:0.98em; margin-left:8px;">
-                    <?= timeAgo($post['created_at']) ?>
+                  <span title="Posted at: <?= date("F j, Y g:i A", strtotime($post['created_at']))?>" class="post-time" style="color:#aaa; font-size:0.98em; margin-left:8px;">
+                    <?= timeAgo($post['created_at']) ?> 
                   </span>
                 </div>
 

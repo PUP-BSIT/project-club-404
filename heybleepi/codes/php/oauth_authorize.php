@@ -41,6 +41,11 @@ if (isset($_POST['approve'])) {
   exit;
 }
 
+if (isset($_POST['deny'])) {
+  header("Location: $redirect_uri?error=access_denied");  
+  exit;
+}
+
 // Login 
 if (!isset($_SESSION['user_id'])) {
   if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['password'])) {
@@ -117,7 +122,32 @@ if (!isset($_SESSION['user_id'])) {
   </html>
   <?php
   exit;
+
+  // Determine redirect link based on client_id
+  $denyRedirect = "#"; // default fallback
+  if ($client_id === "devhive") {
+    $denyRedirect = "https://devhivespace.com/login/index.html";
+  } elseif ($client_id === "hershive") {
+    $denyRedirect = "https://hershive.com/project-hershell/Hershive/html/login.html";
+  }
 }
+
+// Determine redirect link based on client_id
+$denyRedirect = "#"; // default fallback
+if ($client_id === "devhive") {
+  $denyRedirect = "https://devhivespace.com/login/index.html";
+} elseif ($client_id === "hershive") {
+  $denyRedirect = "https://hershive.com/project-hershell/Hershive/html/login.html";
+}
+
+// Determine redirect link based on client_id
+$denyRedirect = "#"; // default fallback
+if ($client_id === "devhive") {
+  $denyRedirect = "https://devhivespace.com/login/index.html";
+} elseif ($client_id === "hershive") {
+  $denyRedirect = "https://hershive.com/project-hershell/Hershive/html/login.html";
+}
+
 
 // Consent form
 ?>
@@ -139,10 +169,31 @@ if (!isset($_SESSION['user_id'])) {
       <p>Application "<b><?= htmlspecialchars($client_id) ?></b>" is requesting
         access to your HeyBleepi profile.</p>
       <form method="POST">
-        <input type="hidden" name="client_id" value="<?= htmlspecialchars($client_id) ?>">
-        <input type="hidden" name="redirect_uri" value="<?= htmlspecialchars($redirect_uri) ?>">
-        <button type="submit" name="approve" value="1" class="auth-button">Approve</button>
-        <button type="submit" name="deny" value="1" class="auth-button" style="background:#c00;" onclick="window.location.href='../php/index.php;">Deny</button>
+        <input 
+          type="hidden"
+          name="client_id"
+          value="<?= htmlspecialchars($client_id) ?>">
+        <input 
+          type="hidden"
+          name="redirect_uri"
+          value="<?= htmlspecialchars($redirect_uri) ?>">
+        <div class="button-group">
+          <button 
+            type="submit"
+            name="approve"
+            value="1"
+            class="auth-button">
+              Approve
+          </button>
+          <button
+             type="submit"
+             name="deny" 
+             value="1"
+             class="auth-button" 
+             style="background:#c00;">
+              Deny
+          </button>
+        </div>
       </form>
     </div>
   </div>
