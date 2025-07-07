@@ -135,6 +135,14 @@ if ($client_id === "devhive") {
   $denyRedirect = "https://hershive.com/project-hershell/Hershive/html/login.html";
 }
 
+// Determine redirect link based on client_id
+$denyRedirect = "#"; // default fallback
+if ($client_id === "devhive") {
+  $denyRedirect = "https://devhivespace.com/login/index.html";
+} elseif ($client_id === "hershive") {
+  $denyRedirect = "https://hershive.com/project-hershell/Hershive/html/login.html";
+}
+
 // Consent form
 ?>
 <!DOCTYPE html>
