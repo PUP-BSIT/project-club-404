@@ -116,7 +116,6 @@ body {
 /* Main Container */
 .container {
   max-width: 600px;
-  height: 96vh;
   margin: 2px auto 2px auto;
   padding: 2rem;
   background: rgba(255, 255, 255, 0.03);
