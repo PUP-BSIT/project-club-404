@@ -209,7 +209,7 @@ $unreadMessages = $unreadMsgResult ? $unreadMsgResult->fetch_assoc()['unread'] :
               userRow.classList.add('search-feed-item');
               userRow.title = user.first_name + ' ' + user.last_name;
     
-              userRow.innerHTML = `<img class="search-avatar" src='../assets/profile/${user.profile_picture}'>
+              userRow.innerHTML = `<img class="search-avatar" src='../assets/profile/${user.profile_picture || 'default.png'}'>
                                 <div class="search-content">
                                   <div class="search-username"><a class="username-link" href=profile.php?user=${user.user_name}&user_id=${user.id}>${user.user_name}</a></div>
                                   <div class="search-bio">${fullname}</div>
