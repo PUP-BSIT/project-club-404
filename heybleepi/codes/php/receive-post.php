@@ -6,7 +6,7 @@ $input = json_decode(file_get_contents("php://input"), true);
 
 // Token from the sent JSON.
 $incoming_token = $input['token'];
-$provider = $input['provider']; // "devhive" or "hershive"
+$provider = $input['provider'] ?? 'hershive'; // "devhive" or "hershive"
 $shared_post_id = $input['shared_post_id'];
 $media_url = $input['media_url'];
 $content = $input['shared_content'];
@@ -32,8 +32,8 @@ switch (strtolower($provider)) {
         }
 
         // DevHive: Save post
-        $stmt = $conn->prepare("INSERT INTO posts (user_id, content) VALUES (?, ?)");
-        $stmt->bind_param("is", $local_user_id, $content);
+        $stmt = $conn->prepare("INSERT INTO posts (user_id, content, post_provider) VALUES (?, ?, ?)");
+        $stmt->bind_param("iss", $local_user_id, $content, $provider);
         $stmt->execute();
         $new_post_id = $stmt->insert_id;
         $stmt->close();
@@ -51,7 +51,7 @@ switch (strtolower($provider)) {
         break;
 
     case 'hershive':
-default:
+    default:
     $media_url = $input['media_url'] ?? '';
     $content = $input['shared_content'];
 
@@ -70,8 +70,8 @@ default:
     }
 
     // Save post
-    $stmt = $conn->prepare("INSERT INTO posts (user_id, content) VALUES (?, ?)");
-    $stmt->bind_param("is", $local_user_id, $content);
+    $stmt = $conn->prepare("INSERT INTO posts (user_id, content, post_provider) VALUES (?, ?, ?)");
+    $stmt->bind_param("is", $local_user_id, $content, $provider);
     $stmt->execute();
     $new_post_id = $stmt->insert_id;
     $stmt->close();
@@ -112,11 +112,19 @@ default:
         $media_stmt->close();
     }
 
+    $data = [
+            'token'=>$incoming_token,
+            'provider'=>$provider,
+            'media_url'=>$media_url,
+            'content'=>$content            
+        ];
+
     break;
 }
 
 http_response_code(200);
-echo json_encode(['message' => 'Post received and saved successfully.']);
+echo json_encode(['message' => 'Post received and saved successfully.',
+                'data'=> $data]);
 
 error_log(print_r($input, true));
 ?>

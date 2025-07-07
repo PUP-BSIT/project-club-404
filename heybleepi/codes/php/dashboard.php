@@ -565,6 +565,7 @@ function timeAgo($datetime) {
               p.image_path,
               p.video_path,
               p.location,
+              p.post_provider,
               u.id,
               u.first_name, u.last_name, u.user_name,
               ud.profile_picture,
@@ -616,6 +617,11 @@ function timeAgo($datetime) {
               </header>
 
               <div class="post-content" data-post-id="<?= $post['post_id'] ?>">
+                <?php if (!empty($post['post_provider'])): ?>
+                  <p class="post-text">
+                    <strong>Original post from <i><?= htmlspecialchars($post['post_provider']) ?></i></strong>
+                  </p>
+                <?php endif; ?>
                 <p class="post-text"><?= $post['content'] ?></p>
 
                 <?php if (!empty($post['location'])): ?>
@@ -673,7 +679,7 @@ function timeAgo($datetime) {
               <!-- If shared, show shared content block -->
               <?php if ($post['shared_post_id']): ?>
                 <div class="shared-post glass" style="padding: 10px; background-color: rgba(255, 255, 255, 0.05); border-left: 3px solid var(--primary); border-radius: 10px; margin-bottom: 10px;">
-                  <small>Shared from <strong><?= htmlspecialchars($post['shared_first_name'] . ' ' . $post['shared_last_name']) ?></strong></small>
+                  <small>Shared from <strong><?= htmlspecialchars($post['shared_first_name'] . ' ' . $post['shared_last_name'])?></strong></small>
                   <p><?= $post['shared_content'] ?></p>
 
                   <?php if (!empty($post['shared_location'])): ?>
