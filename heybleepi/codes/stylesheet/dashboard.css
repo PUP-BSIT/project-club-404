@@ -1029,8 +1029,6 @@ html {
   text-decoration: none;
   font-size: 0.85rem;
   transition: color 0.2s ease;
-  background: none;
-  border: none;
 }
 
 .share-to-other:hover {
@@ -1962,14 +1960,6 @@ html {
     gap: 0.75rem;
   }
 
-  .top-actions .search {
-    width: 100%;
-  }
-
-  .top-actions .notification-wrapper {
-    margin-left: auto;
-  }
-
   .sidebar--left {
     transform: translateX(-100%);
     transition: transform 0.3s ease;
@@ -2799,7 +2789,8 @@ body.page {
 /* Create Post */
 .simple-create-post {
   padding: 1rem 1.25rem;
-  /*border: 1px solid rgba(255, 255, 255, 0.08); */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
 }
 
 .simple-create-post-inner {
