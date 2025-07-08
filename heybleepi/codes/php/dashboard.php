@@ -519,6 +519,10 @@ function timeAgo($datetime) {
             </div>
           </div>
 
+          <div class="popup-modal hidden">
+            <h4>Shared Success to Hershive</h4>
+          </div>
+
           <!-- Share post to other social media modal -->
           <div id="share_preview_overlay" class="post-preview-overlay hidden">
             <!-- Share post container -->

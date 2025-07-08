@@ -1305,6 +1305,10 @@ function showFollowing() {
   followingBtn.classList.add('focus');
 }
 
+// function sharePost(sharePostId, shareToOther, userId) {
+//   const 
+// }
+
 // Universal Delete Modal (Dashboard and Profile)
 function openDeleteModal(postId) {
   const form = document.getElementById('deleteForm');
