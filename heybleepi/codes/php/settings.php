@@ -275,7 +275,8 @@ if ($result->num_rows > 0) {
       <button 
         type="button"
         id="delete_account_btn"
-        onClick="showDeleteAccountPrompt()">
+        onClick="showDeleteAccountPrompt()"
+        <?php if (isset($_SESSION['oauth_provider'])) echo 'disabled style="background-color: #8f9585; cursor: not-allowed; pointer-event: none;"'; ?>>
           Delete Account
       </button>
     </div>
