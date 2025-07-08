@@ -357,7 +357,16 @@ function timeAgo($datetime) {
           <form class="simple-create-post" autocomplete="off" onsubmit="return false;">
             <div class="simple-create-post-inner">
               <?php
-                $postAvatarPath = '../assets/profile/' . ($_SESSION['avatar'] ?? 'default.png');
+                $currentUserId = $_SESSION['id'];
+              
+                $query = $conn->prepare("SELECT profile_picture from user_details WHERE id_fk = ?");
+                $query->bind_param("i", $currentUserId);
+                $query->execute();
+                $query->bind_result($profilePicture);
+                $query->fetch();
+                $query->close();
+              
+                $postAvatarPath = '../assets/profile/' . ($profilePicture ?? 'default.png');
                 if (!file_exists($postAvatarPath)) {
                   $postAvatarPath = '../assets/profile/default.png';
                 }
