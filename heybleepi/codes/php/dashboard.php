@@ -618,7 +618,7 @@ function timeAgo($datetime) {
 
               <div class="post-content" data-post-id="<?= $post['post_id'] ?>">
                 <?php if (!empty($post['post_provider'])): ?>
-                  <p class="post-text">
+                  <p class="post-text-auth">
                     <strong>Original post from <i><?= htmlspecialchars($post['post_provider']) ?></i></strong>
                   </p>
                 <?php endif; ?>

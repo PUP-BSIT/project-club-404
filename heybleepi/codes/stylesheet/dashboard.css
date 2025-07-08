@@ -1753,11 +1753,11 @@ html {
   padding-right: 10px;
 }
 
-.post-text {
+.post-text-auth {
   color: #95b8d7;
 }
 
-.post-text strong {
+.post-text-auth strong {
   color: #95b8d7;
 }
 
