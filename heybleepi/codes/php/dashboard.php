@@ -268,6 +268,20 @@ function timeAgo($datetime) {
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body class="page">
+    <div id="deleteConfirmModal" class="modal hidden">
+      <div class="modal-content glass">
+        <h3>Delete Post?</h3>
+        <p>Are you sure you want to delete this post? This action cannot be undone.</p>
+        <form id="deleteForm" method="POST">
+          <input type="hidden" name="post_id" id="deletePostId">
+          <div class="modal-actions">
+            <button type="submit" class="btn-danger">Delete</button>
+            <button type="button" class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <!-- Main Layout -->
     <main class="layout" style="padding-top:0;">
         <!-- LEFT SIDEBAR -->
@@ -615,10 +629,7 @@ function timeAgo($datetime) {
                     <ul class="dropdown hidden">
                       <li><button class="btn--sm btn-edit-post" data-id="<?= $post['post_id'] ?>">Edit Post</button></li>
                       <li>
-                        <form method="POST" action="delete_post_dashboard.php" style="display:inline;">
-                          <input type="hidden" name="post_id" value="<?= $post['post_id'] ?>">
-                          <button type="submit" onclick="return confirm('Delete this post?')">Delete Post</button>
-                        </form>
+                        <button type="button" class="btn-delete-post" data-id="<?= $post['id'] ?>">Delete Post</button>
                       </li>
                     </ul>
                   </div>
