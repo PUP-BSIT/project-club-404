@@ -51,7 +51,7 @@ while ($stmt->fetch()) {
         'created_at' => $created_at,
         'shared_post_id' => $shared_post_id,
         'location' => $location,
-        'file_path' => $file_path ? "https://heybleepi.site/PROJECT-CLUB-404/heybleepi/codes/php/" . $file_path : null,
+        'file_path' => $file_path ? "https://heybleepi.site/PROJECT-CLUB-404/heybleepi/codes/php/uploads/" . rawurlencode(basename($file_path)) : null,
         'media_type' => $media_type,
         'client' => $client,
     ];
