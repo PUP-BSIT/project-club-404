@@ -71,7 +71,7 @@ switch (strtolower($provider)) {
 
     // Save post
     $stmt = $conn->prepare("INSERT INTO posts (user_id, content, post_provider) VALUES (?, ?, ?)");
-    $stmt->bind_param("is", $local_user_id, $content, $provider);
+    $stmt->bind_param("iss", $local_user_id, $content, $provider);
     $stmt->execute();
     $new_post_id = $stmt->insert_id;
     $stmt->close();
@@ -112,19 +112,11 @@ switch (strtolower($provider)) {
         $media_stmt->close();
     }
 
-    $data = [
-            'token'=>$incoming_token,
-            'provider'=>$provider,
-            'media_url'=>$media_url,
-            'content'=>$content            
-        ];
-
     break;
 }
 
 http_response_code(200);
-echo json_encode(['message' => 'Post received and saved successfully.',
-                'data'=> $data]);
+echo json_encode(['message' => 'Post received and saved successfully.']);
 
 error_log(print_r($input, true));
 ?>
