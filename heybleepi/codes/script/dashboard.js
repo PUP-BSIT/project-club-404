@@ -1319,7 +1319,9 @@ function openDeleteModal(postId) {
 
   // Automatically detect page and set correct form action
   const isProfile = window.location.pathname.includes("profile");
-  form.action = isProfile ? "delete_post_profile.php" : "delete_post_dashboard.php";
+  form.action = isProfile
+    ? "/codes/php/delete_post_profile.php"
+    : "/codes/php/delete_post_dashboard.php";
 
   modal.classList.remove('hidden');
 }
