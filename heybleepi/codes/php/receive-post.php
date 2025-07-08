@@ -13,9 +13,9 @@ $content = $input['shared_content'];
 
 switch (strtolower($provider)) {
     case 'devhive': // In progress
-        $image_url = $input['posts'][0]['image_url'];
-        $video_url = $input['posts'][0]['video_url'];
-        $content = $input['posts'][0]['content'];
+        $image_url = $input['image_url'] ?? null;
+        $video_url = $input['video_url'] ?? null;
+        $content = $input['content'] ?? null;
         
         // Token verification for DevHive
         $stmt = $conn->prepare("SELECT user_id FROM oauth_tokens WHERE token = ?");
