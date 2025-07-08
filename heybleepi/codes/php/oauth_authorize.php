@@ -57,7 +57,8 @@ if (!isset($_SESSION['user_id'])) {
     $stmt->bind_result($user_id, $hashed_password);
     if ($stmt->fetch() && password_verify($password, $hashed_password)) {
         $_SESSION['user_id'] = $user_id;
-        header("Location: oauth_authorize.php?client_id=$client_id&redirect_uri=" . urlencode($redirect_uri));
+        // changes
+        header("Location: /PROJECT-CLUB-404/heybleepi/codes/php/oauth_authorize.php?client_id=$client_id&redirect_uri=" . urlencode($redirect_uri));
         exit;
     } else {
         $error = "Invalid credentials.";
