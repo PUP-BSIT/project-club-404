@@ -1217,22 +1217,22 @@ function followUser(targetUserId) {
     },
     body: `user_id=${encodeURIComponent(targetUserId)}`
   })
-  .then((response) => response.json())
-  .then(data => {
-    if(data.status === 'success') {
-    followBtn.innerHTML = 'Unfollow';
-    followBtn.style.backgroundColor = "#3b82f6";
-    followBtn.removeAttribute('onclick');
-    followBtn.onclick = () => unfollowUser(targetUserId);
-    followBtn.id = 'unfollow_btn';
-    } else {
-      alert(data.message);
-    }
-  })
-  .catch(err => {
-    console.error('Follow failed:', err);
-    alert("Something went wrong.");
-  });
+    .then((response) => response.json())
+    .then(data => {
+      if (data.status === 'success') {
+        followBtn.innerHTML = 'Unfollow';
+        followBtn.style.backgroundColor = "#3b82f6";
+        followBtn.removeAttribute('onclick');
+        followBtn.onclick = () => unfollowUser(targetUserId);
+        followBtn.id = 'unfollow_btn';
+      } else {
+        alert(data.message);
+      }
+    })
+    .catch(err => {
+      console.error('Follow failed:', err);
+      alert("Something went wrong.");
+    });
 }
 
 // Function for unfollow user.
@@ -1247,21 +1247,21 @@ function unfollowUser(targetUserId) {
     },
     body: `user_id=${encodeURIComponent(targetUserId)}`
   })
-  .then((response) => response.json())
-  .then(data => {
-    if(data.status === 'success') {
-      unfollowBtn.innerHTML = 'Follow';
-      unfollowBtn.style.backgroundColor = '#484a4d';
-      unfollowBtn.onclick = () => followUser(targetUserId);
-      unfollowBtn.id = 'follow_btn';
-    } else {
-      alert(data.message);
-    }
-  })
-  .catch(err => {
-    console.error('Unfollow failed:', err);
-    alert("Something went wrong.");
-  });
+    .then((response) => response.json())
+    .then(data => {
+      if (data.status === 'success') {
+        unfollowBtn.innerHTML = 'Follow';
+        unfollowBtn.style.backgroundColor = '#484a4d';
+        unfollowBtn.onclick = () => followUser(targetUserId);
+        unfollowBtn.id = 'follow_btn';
+      } else {
+        alert(data.message);
+      }
+    })
+    .catch(err => {
+      console.error('Unfollow failed:', err);
+      alert("Something went wrong.");
+    });
 }
 
 const followModal = document.querySelector('#ff_modal_overlay');
@@ -1303,4 +1303,40 @@ function showFollowing() {
   followingContainer.classList.remove('hide');
   followersBtn.classList.remove('focus');
   followingBtn.classList.add('focus');
+}
+
+// Universal Delete Modal (Dashboard and Profile)
+function openDeleteModal(postId) {
+  const form = document.getElementById('deleteForm');
+  const deleteInput = document.getElementById('deletePostId');
+  const modal = document.getElementById('deleteConfirmModal');
+
+  deleteInput.value = postId;
+
+  // Automatically detect page and set correct form action
+  const isProfile = window.location.pathname.includes("profile");
+  form.action = isProfile ? "delete_post_profile.php" : "delete_post_dashboard.php";
+
+  modal.classList.remove('hidden');
+}
+
+function closeDeleteModal() {
+  document.getElementById('deleteConfirmModal').classList.add('hidden');
+}
+
+// Attach to all delete buttons
+document.querySelectorAll('.btn-delete-post').forEach(button => {
+  button.addEventListener('click', () => {
+    const postId = button.dataset.id;
+    openDeleteModal(postId);
+  });
+});
+
+// Logout confirmation modal
+function openLogoutModal() {
+  document.getElementById('logoutConfirmModal').classList.remove('hidden');
+}
+
+function closeLogoutModal() {
+  document.getElementById('logoutConfirmModal').classList.add('hidden');
 }

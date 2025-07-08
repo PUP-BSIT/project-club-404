@@ -305,6 +305,31 @@ function timeAgo($datetime) {
   </head>
 
   <body class="page profile-page">
+    <div id="deleteConfirmModal" class="modal hidden">
+      <div class="modal-content glass">
+        <h3>Delete Post?</h3>
+        <p>Are you sure you want to delete this post? This action cannot be undone.</p>
+        <form id="deleteForm" method="POST">
+          <input type="hidden" name="post_id" id="deletePostId">
+          <div class="modal-actions">
+            <button type="submit" class="btn-danger">Delete</button>
+            <button type="button" class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="logoutConfirmModal" class="modal hidden">
+      <div class="modal-content glass">
+        <h3>Log out</h3>
+        <p>Are you sure you want to logout?</p>
+        <div class="modal-actions">
+          <a href="logout.php" class="btn-danger" style="text-decoration: none;">Log out</a>
+          <button type="button" class="btn-cancel" onclick="closeLogoutModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Sidebar Navigation -->
     <aside class="sidebar sidebar--icononly">
       <!-- Logo at the top -->
@@ -380,7 +405,9 @@ function timeAgo($datetime) {
           <a href="settings.php"><i class="ri-settings-4-line"></i> Settings</a>
         </li>
         <li>
-          <a href="logout.php" style="color:#ff4d4f;"><i class="ri-logout-box-line"></i> Log out</a>
+          <button onclick="openLogoutModal()" class="sidebar-more-menu-btn logout">
+            <i class="ri-logout-box-line"></i> Log out
+          </button>
         </li>
       </ul>
     </div>
@@ -774,10 +801,7 @@ function timeAgo($datetime) {
                   <ul class="dropdown hidden">
                     <li><button class="btn--sm btn-edit-post" data-id="<?= $post['post_id'] ?>">Edit Post</button></li>
                     <li>
-                      <form method="POST" action="delete_post_profile.php" style="display:inline;">
-                        <input type="hidden" name="post_id" value="<?= $post['post_id'] ?>">
-                        <button type="submit" onclick="return confirm('Delete this post?')">Delete Post</button>
-                      </form>
+                      <button type="button" class="btn-delete-post" data-id="<?= $post['post_id'] ?>">Delete Post</button>
                     </li>
                   </ul>
                 </div>
