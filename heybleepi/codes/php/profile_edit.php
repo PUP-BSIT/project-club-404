@@ -189,86 +189,99 @@ $update->close();
     </style>
   </head>
 
-<body>
-        <!-- Main Layout -->
-        <main class="layout" style="padding-top:0;">
-        <!-- LEFT SIDEBAR -->
-        <aside class="sidebar sidebar--icononly">
-          <!-- Logo at the top -->
-          <div class="sidebar-logo">
-            <img src="../assets/logo-hb.png" alt="HEYBLEEPI Logo" style="width:36px;height:36px;">
-          </div>
+  <body>
+    <div id="logoutConfirmModal" class="modal hidden">
+      <div class="modal-content glass">
+        <h3>Log out</h3>
+        <p>Are you sure you want to logout?</p>
+        <div class="modal-actions">
+          <a href="logout.php" class="btn-danger" style="text-decoration: none;">Log out</a>
+          <button type="button" class="btn-cancel" onclick="closeLogoutModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
 
-          <nav class="sidebar-nav">
-            <a class="sidebar-icon-link" href="search.php" title="Search">
-              <i class="ri-search-line"></i>
-            </a>
-            <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'notification.php' ? 'active' : '' ?>"
-              href="notification.php"
-              title="Notifications">
-              <i class="ri-notification-3-line"></i>
-              <?php if ($unread_count > 0): ?>
-                <span class="badge" id="notification_count"><?= $unread_count ?></span>
-              <?php endif; ?>
-            </a>
-            <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'dashboard.php' ? 'active' : '' ?>" href="dashboard.php" title="Home">
-              <i class="ri-home-4-line"></i>
-            </a>
-            <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'messages.php' ? 'active' : '' ?>" href="messages.php" title="Messages">
-              <i class="ri-message-3-line"></i>
-              <?php if ($unreadMessages > 0): ?>
-                <span class="sidebar-badge"></span>
-              <?php endif; ?>
-            </a>
-            <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'active' : '' ?>" href="profile.php" title="Profile">
-              <i class="ri-user-line"></i>
-            </a>
-          </nav>
+    <!-- Main Layout -->
+    <main class="layout" style="padding-top:0;">
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar sidebar--icononly">
+      <!-- Logo at the top -->
+      <div class="sidebar-logo">
+        <img src="../assets/logo-hb.png" alt="HEYBLEEPI Logo" style="width:36px;height:36px;">
+      </div>
 
-          <button class="sidebar-more-btn" id="sidebarMoreBtn" title="More">
-            <i class="ri-menu-line"></i>
+      <nav class="sidebar-nav">
+        <a class="sidebar-icon-link" href="search.php" title="Search">
+          <i class="ri-search-line"></i>
+        </a>
+        <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'notification.php' ? 'active' : '' ?>"
+          href="notification.php"
+          title="Notifications">
+          <i class="ri-notification-3-line"></i>
+          <?php if ($unread_count > 0): ?>
+            <span class="badge" id="notification_count"><?= $unread_count ?></span>
+          <?php endif; ?>
+        </a>
+        <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'dashboard.php' ? 'active' : '' ?>" href="dashboard.php" title="Home">
+          <i class="ri-home-4-line"></i>
+        </a>
+        <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'messages.php' ? 'active' : '' ?>" href="messages.php" title="Messages">
+          <i class="ri-message-3-line"></i>
+          <?php if ($unreadMessages > 0): ?>
+            <span class="sidebar-badge"></span>
+          <?php endif; ?>
+        </a>
+        <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'active' : '' ?>" href="profile.php" title="Profile">
+          <i class="ri-user-line"></i>
+        </a>
+      </nav>
+
+      <button class="sidebar-more-btn" id="sidebarMoreBtn" title="More">
+        <i class="ri-menu-line"></i>
+      </button>
+    </aside>
+
+    <div class="notification-dropdown" id="notification_dropdown">
+      <h4>Notifications</h4>
+      <ul>
+        <?php if (empty($notifications)): ?>
+          <li>No new notifications.</li>
+        <?php else: ?>
+          <?php foreach ($notifications as $notification): ?>
+            <li>
+              <strong><?= htmlspecialchars($notification['first_name'] . ' ' . $notification['last_name']) ?></strong>
+              <?php if ($notification['type'] === 'like'): ?>
+                liked your post.
+              <?php elseif ($notification['type'] === 'comment'): ?>
+                commented on your post.
+              <?php elseif ($notification['type'] === 'share'): ?>
+                shared your post.
+              <?php else: ?>
+                <?= htmlspecialchars($notification['type']) ?> your post.
+              <?php endif; ?>
+              <br><small><?= date("M d, g:i A", strtotime($notification['created_at'])) ?></small>
+            </li>
+          <?php endforeach; ?>
+        <?php endif; ?>
+      </ul>
+      <form method="POST" action="mark_notifications_read.php">
+        <button class="mark-read" type="submit" name="mark_read" id="markAllReadBtn">Mark all as read</button>
+      </form>
+    </div>
+
+    <!-- More Menu Popup -->
+    <div id="sidebarMoreMenu" class="sidebar-more-menu hidden">
+      <ul>
+        <li>
+          <a href="settings.php"><i class="ri-settings-4-line"></i> Settings</a>
+        </li>
+        <li>
+          <button onclick="openLogoutModal()" class="sidebar-more-menu-btn logout">
+            <i class="ri-logout-box-line"></i> Log out
           </button>
-        </aside>
-
-        <div class="notification-dropdown" id="notification_dropdown">
-          <h4>Notifications</h4>
-          <ul>
-            <?php if (empty($notifications)): ?>
-              <li>No new notifications.</li>
-            <?php else: ?>
-              <?php foreach ($notifications as $notification): ?>
-                <li>
-                  <strong><?= htmlspecialchars($notification['first_name'] . ' ' . $notification['last_name']) ?></strong>
-                  <?php if ($notification['type'] === 'like'): ?>
-                    liked your post.
-                  <?php elseif ($notification['type'] === 'comment'): ?>
-                    commented on your post.
-                  <?php elseif ($notification['type'] === 'share'): ?>
-                    shared your post.
-                  <?php else: ?>
-                    <?= htmlspecialchars($notification['type']) ?> your post.
-                  <?php endif; ?>
-                  <br><small><?= date("M d, g:i A", strtotime($notification['created_at'])) ?></small>
-                </li>
-              <?php endforeach; ?>
-            <?php endif; ?>
-          </ul>
-          <form method="POST" action="mark_notifications_read.php">
-            <button class="mark-read" type="submit" name="mark_read" id="markAllReadBtn">Mark all as read</button>
-          </form>
-        </div>
-
-        <!-- More Menu Popup -->
-        <div id="sidebarMoreMenu" class="sidebar-more-menu hidden">
-          <ul>
-            <li>
-              <a href="settings.php"><i class="ri-settings-4-line"></i> Settings</a>
-            </li>
-            <li>
-              <a href="logout.php" style="color:#ff4d4f;"><i class="ri-logout-box-line"></i> Log out</a>
-            </li>
-          </ul>
-        </div>
+        </li>
+      </ul>
+    </div>
 
     <div class="success-toast" id="successToast">
       Changes saved successfully!

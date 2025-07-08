@@ -319,6 +319,17 @@ function timeAgo($datetime) {
       </div>
     </div>
 
+    <div id="logoutConfirmModal" class="modal hidden">
+      <div class="modal-content glass">
+        <h3>Log out</h3>
+        <p>Are you sure you want to logout?</p>
+        <div class="modal-actions">
+          <a href="logout.php" class="btn-danger" style="text-decoration: none;">Log out</a>
+          <button type="button" class="btn-cancel" onclick="closeLogoutModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Sidebar Navigation -->
     <aside class="sidebar sidebar--icononly">
       <!-- Logo at the top -->
@@ -394,7 +405,9 @@ function timeAgo($datetime) {
           <a href="settings.php"><i class="ri-settings-4-line"></i> Settings</a>
         </li>
         <li>
-          <a href="logout.php" style="color:#ff4d4f;"><i class="ri-logout-box-line"></i> Log out</a>
+          <button onclick="openLogoutModal()" class="sidebar-more-menu-btn logout">
+            <i class="ri-logout-box-line"></i> Log out
+          </button>
         </li>
       </ul>
     </div>

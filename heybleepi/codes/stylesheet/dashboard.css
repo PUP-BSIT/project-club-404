@@ -717,6 +717,30 @@ html {
   background: #23242a;
 }
 
+.sidebar-more-menu-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #fff;
+  text-decoration: none;
+  padding: 12px 24px;
+  font-size: 1rem;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  transition: background 0.15s;
+  cursor: pointer;
+}
+
+.sidebar-more-menu-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.sidebar-more-menu-btn.logout {
+  color: #ff4d4f;
+}
+
 .sidebar-more-menu .ri-logout-box-line {
   color: #ff4d4f;
 }
@@ -2915,7 +2939,7 @@ body.page {
 .btn-danger {
   background: #ff4d4f;
   border: none;
-  padding: 10px 16px;
+  padding: 10px 20px;
   border-radius: 6px;
   color: #fff;
   cursor: pointer;

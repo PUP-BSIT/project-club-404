@@ -1331,3 +1331,12 @@ document.querySelectorAll('.btn-delete-post').forEach(button => {
     openDeleteModal(postId);
   });
 });
+
+// Logout confirmation modal
+function openLogoutModal() {
+  document.getElementById('logoutConfirmModal').classList.remove('hidden');
+}
+
+function closeLogoutModal() {
+  document.getElementById('logoutConfirmModal').classList.add('hidden');
+}
