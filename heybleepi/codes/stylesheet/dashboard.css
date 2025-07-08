@@ -942,7 +942,7 @@ html {
   margin-left: 1em;
   margin-top: 2em;
   backdrop-filter: blur(30px);
-  height: 27em;
+  height: 37em;
 }
 
 .create-post-preview h1 {
@@ -1044,6 +1044,7 @@ html {
   display: flex;
   flex-wrap: wrap;
   gap: 1.5rem;
+  margin-top: 52px;
 }
 
 .share-to-other {
