@@ -154,39 +154,37 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  // --- Edit button logic ---
-  document.addEventListener('click', function (e) {
-    if (e.target.closest('.comment-edit')) {
-      e.preventDefault();
-      const editBtn = e.target.closest('.comment-edit');
-      const mainForm = document.getElementById("commentForm");
-      const textarea = document.getElementById("comment");
-      const messageBox = editBtn.closest('.message-preview');
-      const messageId = editBtn.getAttribute('data-id');
-      const messageText = messageBox.querySelector('.preview-text p').textContent;
+// --- Edit button logic ---
+document.addEventListener('click', function (e) {
+  if (e.target.closest('.comment-edit')) {
+    e.preventDefault();
+    const editBtn = e.target.closest('.comment-edit');
+    const commentBox = editBtn.closest('.comment-box'); // Get the specific comment box
+    const messageId = editBtn.getAttribute('data-id');
+    const messageText = commentBox.querySelector('.preview-text p').textContent;
 
-      // Set textarea value to message
-      textarea.value = messageText;
+    // Set textarea value to message
+    document.getElementById("comment").value = messageText;
 
-      // Remove any existing update_id input
-      const existingUpdateInput = mainForm.querySelector('input[name="update_id"]');
-      if (existingUpdateInput) existingUpdateInput.remove();
+    // Remove any existing update_id input
+    const existingUpdateInput = document.querySelector('input[name="update_id"]');
+    if (existingUpdateInput) existingUpdateInput.remove();
 
-      // Add new update_id input
-      const updateIdInput = document.createElement('input');
-      updateIdInput.type = 'hidden';
-      updateIdInput.name = 'update_id';
-      updateIdInput.value = messageId;
-      mainForm.appendChild(updateIdInput);
+    // Add new update_id input
+    const updateIdInput = document.createElement('input');
+    updateIdInput.type = 'hidden';
+    updateIdInput.name = 'update_id';
+    updateIdInput.value = messageId;
+    document.getElementById("commentForm").appendChild(updateIdInput);
 
-      // Show update/cancel, hide send
-      document.getElementById("addBtn").style.display = "none";
-      document.getElementById("updateBtn").style.display = "inline-block";
-      document.getElementById("cancelBtn").style.display = "inline-block";
+    // Show update/cancel, hide send
+    document.getElementById("addBtn").style.display = "none";
+    document.getElementById("updateBtn").style.display = "inline-block";
+    document.getElementById("cancelBtn").style.display = "inline-block";
 
-      textarea.focus();
-    }
-  });
+    document.getElementById("comment").focus();
+  }
+});
 
   // --- Delete button logic with modal ---
   let deleteTargetBtn = null;
@@ -269,20 +267,24 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch("messages.php", {
           method: "POST",
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: "update_id=" + encodeURIComponent(update_id) +
-            "&comment=" + encodeURIComponent(comment) +
-            "&ajax=1",
+          body: new URLSearchParams({
+                update_id: update_id,
+                comment: comment,
+                ajax: "1"
+            })
         })
-          .then(response => response.json())
-          .then(data => {
+        .then(response => {
+          if (!response.ok) throw new Error('Network error');
+          return response.json();
+        })
+        .then(data => {
+            console.log("Update response:", data);
             if (data.success) {
-              // Update message in DOM
-              document.querySelectorAll('.message-preview').forEach(box => {
-                const editBtn = box.querySelector('.comment-edit');
-                if (editBtn && editBtn.getAttribute('data-id') == update_id) {
-                  box.querySelector('.preview-text p').textContent = comment;
-                }
-              });
+              // Find the exact message element to update
+              const messageElement = document.querySelector(`.comment-edit[data-id="${update_id}"]`)
+                                  .closest('.comment-box')
+                                  .querySelector('.preview-text p');
+              messageElement.textContent = comment;
 
               // Reset form and buttons
               form.reset();
@@ -387,40 +389,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // Scroll to top to show the new message
     container.scrollTop = 0;
   }
-});
 
-// Notification dropdown toggle
-document.getElementById('notificationBtnSidebar').addEventListener('click', function(e) {
-  e.stopPropagation();
-  const dropdown = document.getElementById('notification_dropdown');
-  dropdown.classList.toggle('hidden');
-  
-  // Close other open dropdowns if any
-  document.querySelectorAll('.notification-dropdown:not(#notification_dropdown)').forEach(d => {
-    d.classList.add('hidden');
-  });
-});
-
-// Close dropdown when clicking outside
-document.addEventListener('click', function(e) {
-  const dropdown = document.getElementById('notification_dropdown');
-  const button = document.getElementById('notificationBtnSidebar');
-  
-  if (!dropdown.contains(e.target) && !button.contains(e.target)) {
-    dropdown.classList.add('hidden');
-  }
-});
-
-// Mark all as read
-document.getElementById('markAllReadBtn')?.addEventListener('click', function() {
-  const badge = document.getElementById('notification_count');
-  if (badge) {
-    badge.style.display = 'none';
-  }
-});
-
-// Sidebar menu for settings and logout
-document.addEventListener('DOMContentLoaded', function () {
+  // --- Sidebar More Menu ---
   const moreBtn = document.getElementById('sidebarMoreBtn');
   const moreMenu = document.getElementById('sidebarMoreMenu');
 
@@ -436,6 +406,39 @@ document.addEventListener('DOMContentLoaded', function () {
         moreMenu.classList.add('hidden');
       }
     });
+  }
+});
+
+// Notification dropdown toggle
+document.getElementById('notificationBtnSidebar').addEventListener('click',
+  function(e) {
+  e.stopPropagation();
+  const dropdown = document.getElementById('notification_dropdown');
+  dropdown.classList.toggle('hidden');
+  
+  // Close other open dropdowns if any
+  document.querySelectorAll('.notification-dropdown:not(#notification_dropdown)'
+  ).forEach(d => {
+    d.classList.add('hidden');
+  });
+});
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+  const dropdown = document.getElementById('notification_dropdown');
+  const button = document.getElementById('notificationBtnSidebar');
+  
+  if (!dropdown.contains(e.target) && !button.contains(e.target)) {
+    dropdown.classList.add('hidden');
+  }
+});
+
+// Mark all as read
+document.getElementById('markAllReadBtn')?.addEventListener('click', function()
+{
+  const badge = document.getElementById('notification_count');
+  if (badge) {
+    badge.style.display = 'none';
   }
 });
 
@@ -462,19 +465,13 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
-
-  // More Menu Popup
-  const moreBtn = document.getElementById('sidebarMoreBtn');
-  const moreMenu = document.getElementById('sidebarMoreMenu');
-  if (moreBtn && moreMenu) {
-    moreBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      moreMenu.classList.toggle('hidden');
-    });
-    document.addEventListener('click', function(e) {
-      if (!moreMenu.contains(e.target) && !moreBtn.contains(e.target)) {
-        moreMenu.classList.add('hidden');
-      }
-    });
-  }
 });
+
+// Logout confirmation modal
+function openLogoutModal() {
+  document.getElementById('logoutConfirmModal').classList.remove('hidden');
+}
+
+function closeLogoutModal() {
+  document.getElementById('logoutConfirmModal').classList.add('hidden');
+}

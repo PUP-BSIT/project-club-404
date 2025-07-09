@@ -5,6 +5,10 @@ require_once 'users.php';
 $message = '';
 $messageType = '';
 $activeTab = 'login'; // Default tab
+if(isset($_SESSION['isloginok']) && $_SESSION['isloginok'] === true) {
+    header('Location: loading.php');
+    exit();
+}
 
 // Check for success parameter in URL
 if (isset($_GET['registration']) && $_GET['registration'] === 'success') {
