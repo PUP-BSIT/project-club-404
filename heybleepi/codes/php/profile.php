@@ -296,6 +296,7 @@ function timeAgo($datetime) {
   <head>
     <meta charset="UTF-8" />
     <title>Heybleepi • <?php echo htmlspecialchars($user['user_name']); ?>'s Profile</title>
+    <link rel="icon" href="../assets/logo.png" type="image/png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="../stylesheet/dashboard.css" />
@@ -305,20 +306,6 @@ function timeAgo($datetime) {
   </head>
 
   <body class="page profile-page">
-    <div id="deleteConfirmModal" class="modal hidden">
-      <div class="modal-content glass">
-        <h3>Delete Post?</h3>
-        <p>Are you sure you want to delete this post? This action cannot be undone.</p>
-        <form id="deleteForm" method="POST">
-          <input type="hidden" name="post_id" id="deletePostId">
-          <div class="modal-actions">
-            <button type="submit" class="btn-danger">Delete</button>
-            <button type="button" class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
-          </div>
-        </form>
-      </div>
-    </div>
-
     <div id="logoutConfirmModal" class="modal hidden">
       <div class="modal-content glass">
         <h3>Log out</h3>
@@ -766,7 +753,7 @@ function timeAgo($datetime) {
               $commentRes = $conn->query("SELECT COUNT(*) AS total FROM comments WHERE post_id = {$post['post_id']}");
               $countComments = $commentRes ? $commentRes->fetch_assoc() : ['total' => 0];
 
-              $shareRes = $conn->query("SELECT COUNT(*) AS total FROM posts WHERE shared_post_id = {$post['post_id']}");
+              $shareRes = $conn->query("SELECT COUNT(*) AS total FROM shares WHERE post_id = {$post['post_id']}");
               $countShares = $shareRes ? $shareRes->fetch_assoc() : ['total' => 0];
             ?>
 
@@ -1080,6 +1067,35 @@ function timeAgo($datetime) {
       <div class="lightbox-content" id="lightboxContent"></div>
     </div>
 
+    <div id="deleteConfirmModal" class="modal hidden">
+      <div class="modal-content glass">
+        <h3>Delete Post?</h3>
+        <p>Are you sure you want to delete this post? This action cannot be undone.</p>
+        <form id="deleteForm" method="POST">
+          <input type="hidden" name="post_id" id="deletePostId">
+          <div class="modal-actions">
+            <button type="submit" class="btn-danger">Delete</button>
+            <button type="button" class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- DELETE CONFIRMATION MODAL -->
+    <div id="deleteConfirmModal" class="modal hidden">
+      <div class="modal-content glass">
+        <h3>Delete Post?</h3>
+        <p>Are you sure you want to delete this post? This action cannot be undone.</p>
+        <form id="deleteForm" method="POST" action="delete_post_dashboard.php">
+          <input type="hidden" name="post_id" id="deletePostId">
+          <div class="modal-actions">
+            <button type="submit" class="btn-danger">Delete</button>
+            <button type="button" class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <script>
       // Tab switching logic
       const tabs = document.querySelectorAll('#profileTabs .tab');
@@ -1104,6 +1120,23 @@ function timeAgo($datetime) {
           }
         });
       });
+
+      document.querySelectorAll('.btn-delete-post').forEach(button => {
+          button.addEventListener('click', () => {
+            const postId = button.dataset.id;
+            console.log(" Deleting post ID:", postId);
+
+            const form = document.getElementById('deleteForm');
+            const input = document.getElementById('deletePostId');
+            const modal = document.getElementById('deleteConfirmModal');
+
+            input.value = postId;
+
+            form.action = "delete_post_profile.php";
+
+            modal.classList.remove('hidden');
+          });
+        });
     </script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="../script/dashboard.js"></script>

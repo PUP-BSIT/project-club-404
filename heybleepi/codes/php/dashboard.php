@@ -257,7 +257,7 @@ function timeAgo($datetime) {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Home • Heybleepi</title>
-
+    <link rel="icon" href="../assets/logo.png" type="image/png" />
     <link rel="stylesheet" href="../stylesheet/dashboard.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -268,20 +268,6 @@ function timeAgo($datetime) {
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body class="page">
-    <div id="deleteConfirmModal" class="modal hidden">
-      <div class="modal-content glass">
-        <h3>Delete Post?</h3>
-        <p>Are you sure you want to delete this post? This action cannot be undone.</p>
-        <form id="deleteForm" method="POST">
-          <input type="hidden" name="post_id" id="deletePostId">
-          <div class="modal-actions">
-            <button type="submit" class="btn-danger">Delete</button>
-            <button type="button" class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
-          </div>
-        </form>
-      </div>
-    </div>
-
     <div id="logoutConfirmModal" class="modal hidden">
       <div class="modal-content glass">
         <h3>Log out</h3>
@@ -774,10 +760,10 @@ function timeAgo($datetime) {
                     <span><?= $comments['total'] ?></span>
                   </button>
 
-                  <!-- SHARE COUNT -->
+                   <!-- SHARE COUNT -->
                   <?php
                     // Count shares for this post
-                    $shareCountRes = $conn->query("SELECT COUNT(*) AS total FROM posts WHERE shared_post_id = " . intval($post['post_id']));
+                    $shareCountRes = $conn->query("SELECT COUNT(*) AS total FROM shares WHERE post_id = " . intval($post['post_id']));
                     $shareCount = $shareCountRes ? $shareCountRes->fetch_assoc()['total'] : 0;
                   ?>
 
@@ -870,6 +856,40 @@ function timeAgo($datetime) {
       <span class="lightbox-close" onclick="closeLightbox()">×</span>
       <div class="lightbox-content" id="lightboxContent"></div>
     </div>
+
+    <!-- DELETE CONFIRMATION MODAL -->
+    <div id="deleteConfirmModal" class="modal hidden">
+      <div class="modal-content glass">
+        <h3>Delete Post?</h3>
+        <p>Are you sure you want to delete this post? This action cannot be undone.</p>
+        <form id="deleteForm" method="POST" action="delete_post_dashboard.php">
+          <input type="hidden" name="post_id" id="deletePostId">
+          <div class="modal-actions">
+            <button type="submit" class="btn-danger">Delete</button>
+            <button type="button" class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      document.querySelectorAll('.btn-delete-post').forEach(button => {
+        button.addEventListener('click', () => {
+          const postId = button.dataset.id;
+          console.log(" Deleting post ID:", postId);
+
+          const form = document.getElementById('deleteForm');
+          const input = document.getElementById('deletePostId');
+          const modal = document.getElementById('deleteConfirmModal');
+
+          input.value = postId;
+
+          form.action = "delete_post_dashboard.php";
+
+          modal.classList.remove('hidden');
+        });
+      });
+    </script>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="../script/dashboard.js"></script>
