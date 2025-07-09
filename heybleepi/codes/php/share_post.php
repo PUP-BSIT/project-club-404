@@ -9,6 +9,7 @@ if (!isset($_SESSION['id']) || $_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($
 
 $user_id = $_SESSION['id'];
 $shared_post_id = intval($_POST['share_post_id']);
+$content = $_POST['share_post_content'] ?? '';
 $location = isset($_POST['location']) ? trim($_POST['location']) : null; // Get the location input
 
 // Prevent duplicate shares
@@ -19,8 +20,8 @@ $check->store_result();
 
 if ($check->num_rows === 0) {
   // Include location in the insert query
-  $insert = $conn->prepare("INSERT INTO posts (user_id, content, shared_post_id, location) VALUES (?, '', ?, ?)");
-  $insert->bind_param("iis", $user_id, $shared_post_id, $location);
+  $insert = $conn->prepare("INSERT INTO posts (user_id, content, shared_post_id, location) VALUES (?, ?, ?, ?)");
+  $insert->bind_param("isis", $user_id, $content, $shared_post_id, $location);
   $insert->execute();
   $new_post_id = $insert->insert_id;
   $insert->close();

@@ -214,7 +214,7 @@ $usersResult = $conn->query("
   FROM follow f
   JOIN users u ON f.following_id = u.id
   LEFT JOIN user_details ud ON u.id = ud.id_fk
-  WHERE f.follower_id = " . intval($_GET['user_id'])
+  WHERE f.follower_id = " . intval(isset($_GET['user_id']) ? $_GET['user_id'] : $userId)
 );
 
 if ($usersResult) {
@@ -230,7 +230,7 @@ $followersResult = $conn->query("
   FROM follow f
   JOIN users u ON f.follower_id = u.id
   LEFT JOIN user_details ud ON u.id = ud.id_fk
-  WHERE f.following_id = " . intval($_GET['user_id'])
+  WHERE f.following_id = " . intval(isset($_GET['user_id']) ? $_GET['user_id'] : $userId)
 );
 
 if ($followersResult) {
@@ -242,7 +242,7 @@ if ($followersResult) {
 // Checks if the user is already following 
 $isFollowing = false;
 
-$target_user_id = $_GET['user_id'];
+$target_user_id = isset($_GET['user_id']) ? $_GET['user_id'] : $userId;
 
 if ($target_user_id != $_SESSION['id']) {
     $stmt = $conn->prepare("SELECT 1 FROM follow WHERE follower_id = ? AND following_id = ?");
@@ -305,6 +305,31 @@ function timeAgo($datetime) {
   </head>
 
   <body class="page profile-page">
+    <div id="deleteConfirmModal" class="modal hidden">
+      <div class="modal-content glass">
+        <h3>Delete Post?</h3>
+        <p>Are you sure you want to delete this post? This action cannot be undone.</p>
+        <form id="deleteForm" method="POST">
+          <input type="hidden" name="post_id" id="deletePostId">
+          <div class="modal-actions">
+            <button type="submit" class="btn-danger">Delete</button>
+            <button type="button" class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="logoutConfirmModal" class="modal hidden">
+      <div class="modal-content glass">
+        <h3>Log out</h3>
+        <p>Are you sure you want to logout?</p>
+        <div class="modal-actions">
+          <a href="logout.php" class="btn-danger" style="text-decoration: none;">Log out</a>
+          <button type="button" class="btn-cancel" onclick="closeLogoutModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Sidebar Navigation -->
     <aside class="sidebar sidebar--icononly">
       <!-- Logo at the top -->
@@ -380,7 +405,9 @@ function timeAgo($datetime) {
           <a href="settings.php"><i class="ri-settings-4-line"></i> Settings</a>
         </li>
         <li>
-          <a href="logout.php" style="color:#ff4d4f;"><i class="ri-logout-box-line"></i> Log out</a>
+          <button onclick="openLogoutModal()" class="sidebar-more-menu-btn logout">
+            <i class="ri-logout-box-line"></i> Log out
+          </button>
         </li>
       </ul>
     </div>
@@ -482,58 +509,41 @@ function timeAgo($datetime) {
         <!-- Create Post -->
         <section class="right-column">
           <?php if ($userId == $_SESSION['id']): ?>
-          <div class="glass create-post">
-            <form>
-              <div class="create-post-header">
-                <img class="avatar avatar--sm" src="../assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'default.png') ?>" alt="">
-                <div class="poster-info">
-                  <a href="profile.php" class="poster-name"><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></a>
-                  <p>@<?= htmlspecialchars($user['user_name']); ?></p>
-                </div>
-              </div>
+          <!-- Create Post -->
+          <form class="simple-create-post" autocomplete="off" onsubmit="return false;">
+            <div class="simple-create-post-inner">
+              <?php
+                $currentUserId = $_SESSION['id'];
 
-              <textarea
-                class="create-post-input"
-                name="post_content"
-                placeholder="What's happening in your galaxy?"
-                onClick="showCreatePostPreview();"
-              ></textarea>
+                $query = $conn->prepare("SELECT profile_picture from user_details WHERE id_fk = ?");
+                $query->bind_param("i", $currentUserId);
+                $query->execute();
+                $query->bind_result($profilePicture);
+                $query->fetch();
+                $query->close();
 
-              <!-- Media Preview Grid -->
-              <div class="create-post-actions">
-                <div class="media-actions">
-                  <button
-                    type="button"
-                    class="media-upload-btn photo"
-                    onclick="showCreatePostPreview();">
-                      + Photo
-                  </button>
-                  <button
-                    type="button"
-                    class="media-upload-btn video"
-                    onclick="showCreatePostPreview();">
-                      + Video
-                  </button>
-                </div>
-                <div class="minor-actions">
-                  <button
-                    class="icon-btn"
-                    type="button"
-                    id="getLocationBtn"
-                    title="Add location"
-                    onClick="showCreatePostPreview();">
-                    <i class="ri-map-pin-line"></i>
-                  </button>
-                </div>
-                <button
-                  class="btn btn--action"
-                  onClick="showCreatePostPreview();";
-                  type="button">
-                    Post
-                </button>
-              </div>
-            </form>
-          </div>
+                $postAvatarPath = '../assets/profile/' . ($profilePicture ?? 'default.png');
+                if (!file_exists($postAvatarPath)) {
+                  $postAvatarPath = '../assets/profile/default.png';
+                }
+              ?>
+              <img class="avatar avatar--sm" src="<?= $postAvatarPath ?>" alt="Profile">
+              <input
+                type="text"
+                class="simple-create-post-input"
+                placeholder="What's new, <?= $_SESSION['first_name']?>?"
+                autocomplete="off"
+                readonly
+                onclick="openCreatePostPreview();"
+                style="cursor:pointer;"
+              >
+              <button
+                type="button"
+                class="btn btn--primary simple-post-btn"
+                onclick="openCreatePostPreview();"
+              >Post</button>
+            </div>
+          </form>
 
           <!-- Map Location Modal -->
           <div id="mapModal" class="map-modal" style="display:none;">
@@ -657,7 +667,8 @@ function timeAgo($datetime) {
                     onInput="updateHiddenInputShare();"
                     data-placeholder="What's happening in your galaxy?"></div>
                   <input type="hidden" name="share_post_content" id="share_post_content_hidden">
-                  <input type="hidden" name="share_post_id" id="share_post_id_modal">
+                  <input type="hidden" name="share_post_id" id="share_post_id_internal">
+                  <input type="hidden" name="location" id="shareLocationInput">
 
                   <!-- WYSWYG -->
                   <div>
@@ -712,12 +723,15 @@ function timeAgo($datetime) {
           $query = "
             SELECT
               p.id AS post_id,
+              p.user_id,
               p.content,
               p.created_at,
               p.shared_post_id,
               p.image_path,
               p.video_path,
               p.location,
+              p.post_provider,
+              u.id AS user_id,
               u.first_name,
               u.last_name,
               u.user_name,
@@ -766,22 +780,32 @@ function timeAgo($datetime) {
                   </span>
                 </div>
 
-                <div class="post-options" style="margin-left: auto;">
-                  <button class="icon-btn toggle-options"><i class="ri-more-fill"></i></button>
-                  <ul class="dropdown hidden">
-                    <li><button class="btn--sm btn-edit-post" data-id="<?= $post['post_id'] ?>">Edit Post</button></li>
-                    <li>
-                      <form method="POST" action="delete_post_profile.php" style="display:inline;">
-                        <input type="hidden" name="post_id" value="<?= $post['post_id'] ?>">
-                        <button type="submit" onclick="return confirm('Delete this post?')">Delete Post</button>
-                      </form>
-                    </li>
-                  </ul>
-                </div>
+                <?php if ($_SESSION['id'] == $post['user_id']): ?>
+                  <div class="post-options" style="margin-left: auto;">
+                    <button class="icon-btn toggle-options"><i class="ri-more-fill"></i></button>
+                    <ul class="dropdown hidden">
+                      <li>
+                        <button class="dropdown-action btn-edit-post" data-id="<?= $post['post_id'] ?>">
+                          Edit Post
+                        </button>
+                      </li>
+                      <li>
+                        <button type="button" class="dropdown-action btn-delete-post" data-id="<?= $post['post_id'] ?>">
+                          Delete Post
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                <?php endif; ?>
               </header>
 
               <!-- POST CONTENT -->
               <div class="post-content" data-post-id="<?= $post['post_id'] ?>">
+                <?php if (!empty($post['post_provider'])): ?>
+                  <p class="post-text-auth">
+                    <strong>Original post from <i><?= htmlspecialchars($post['post_provider']) ?></i></strong>
+                  </p>
+                <?php endif; ?>
                 <p class="post-text"><?= $post['content'] ?></p>
 
                 <?php if (!empty($post['location'])): ?>
@@ -876,6 +900,28 @@ function timeAgo($datetime) {
                     <i class="ri-chat-1-line"></i>
                     <span><?= $countComments['total'] ?></span>
                   </button>
+
+                  <!-- Get the post creator name -->
+                  <?php
+                    $postId = $post['post_id'];
+                    $stmt = $conn->prepare("
+                      SELECT users.first_name, users.last_name
+                      FROM posts
+                      JOIN users ON posts.user_id = users.id
+                      WHERE posts.id = ?
+                    ");
+
+                    $stmt->bind_param("i", $postId);
+                    $stmt->execute();
+                    $stmt->bind_result($firstName, $lastName);
+                    $stmt->fetch();
+                    $stmt->close();
+
+                    $postCreator = [
+                      'first_name' => $firstName,
+                      'last_name' => $lastName
+                    ];
+                  ?>
 
                   <!-- Share -->
                   <form style="display:inline;">

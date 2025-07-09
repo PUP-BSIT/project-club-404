@@ -13,7 +13,7 @@ $user_id = $_SESSION['user_id'];
 $client = $_POST['share_to_other']; 
 $shared_post_id = intval($_POST['share_post_id']);
 // for devhive receiver client
-$devhive_endpoint = "https://devhivespace.com/api/posts/receive-post.php"; 
+$devhive_endpoint = "https://devhivespace.com/api/posts/share-receive.php"; 
 // for hershive receiver client
 $hershive_endpoint ="https://hershive.com/project-hershell/Hershive/php/receive-post.php"; 
 
@@ -51,7 +51,7 @@ while ($stmt->fetch()) {
         'created_at' => $created_at,
         'shared_post_id' => $shared_post_id,
         'location' => $location,
-        'file_path' => $file_path ? "https://heybleepi.site/PROJECT-CLUB-404/heybleepi/codes/php/" . $file_path : null,
+        'file_path' => $file_path ? "https://heybleepi.site/PROJECT-CLUB-404/heybleepi/codes/php/uploads/" . rawurlencode(basename($file_path)) : null,
         'media_type' => $media_type,
         'client' => $client,
     ];
@@ -62,28 +62,21 @@ $stmt->close();
 switch ($client) {
   case 'devhive': // In-Progress 
     $isAllowed = $_SESSION['isAllowed'];
-    $user_token = $_SESSION['oauth_token_' . $client];
 
     // Checks if the session has a token.
     if(!isset($_SESSION['oauth_token_' . $client])) {
         echo "Account not from devhive.";
         return;
     }
+    
+    $user_token = $_SESSION['oauth_token_' . $client];
 
     // Handles JSON post data temporarily.
     $data = [
-    'status'=>'in-progress',
-    'message'=>'sharing post for devhive',
-    'data'=>[
         'token'=>$user_token,
-        'posts'=>$posts
-        ]
+        'posts'=>$posts,
+        'provider'=>'heybleepi'
     ];
-
-    // Stops the user because the share post for devhive is in-progress.
-    Header('Content-Type: application/json');
-    echo json_encode($data);
-    exit;  
     
     // Checks if the user has a session that is allowed to share post to other soc med.
     if($isAllowed === 'allowed_to_share') {      

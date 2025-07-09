@@ -7,6 +7,30 @@ $client_id = $_GET['client_id'] ?? $_POST['client_id'] ?? '';
 $redirect_uri = $_GET['redirect_uri'] ?? $_POST['redirect_uri'] ?? '';
 $error = '';
 
+//If user used Oauth once:
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+    
+    $stmt = $conn->prepare("
+    SELECT token 
+    FROM oauth_tokens 
+    WHERE user_id = ? AND client_id = ? AND expires_at > NOW()
+    ORDER BY created_at DESC 
+    LIMIT 1
+    ");
+    $stmt->bind_param("is", $user_id, $client_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($row = $result->fetch_assoc()) {
+        // Reuse existing token
+        $token = $row['token'];
+        // Redirect back to client with token
+        header("Location: $redirect_uri&token=$token");
+        exit;
+    }
+}
+
 // Approve/Deny 
 if (isset($_POST['approve'])) {
   $user_id = $_SESSION['user_id'];
@@ -57,7 +81,8 @@ if (!isset($_SESSION['user_id'])) {
     $stmt->bind_result($user_id, $hashed_password);
     if ($stmt->fetch() && password_verify($password, $hashed_password)) {
         $_SESSION['user_id'] = $user_id;
-        header("Location: oauth_authorize.php?client_id=$client_id&redirect_uri=" . urlencode($redirect_uri));
+        // changes
+        header("Location: /PROJECT-CLUB-404/heybleepi/codes/php/oauth_authorize.php?client_id=$client_id&redirect_uri=" . urlencode($redirect_uri));
         exit;
     } else {
         $error = "Invalid credentials.";
@@ -122,30 +147,6 @@ if (!isset($_SESSION['user_id'])) {
   </html>
   <?php
   exit;
-
-  // Determine redirect link based on client_id
-  $denyRedirect = "#"; // default fallback
-  if ($client_id === "devhive") {
-    $denyRedirect = "https://devhivespace.com/login/index.html";
-  } elseif ($client_id === "hershive") {
-    $denyRedirect = "https://hershive.com/project-hershell/Hershive/html/login.html";
-  }
-}
-
-// Determine redirect link based on client_id
-$denyRedirect = "#"; // default fallback
-if ($client_id === "devhive") {
-  $denyRedirect = "https://devhivespace.com/login/index.html";
-} elseif ($client_id === "hershive") {
-  $denyRedirect = "https://hershive.com/project-hershell/Hershive/html/login.html";
-}
-
-// Determine redirect link based on client_id
-$denyRedirect = "#"; // default fallback
-if ($client_id === "devhive") {
-  $denyRedirect = "https://devhivespace.com/login/index.html";
-} elseif ($client_id === "hershive") {
-  $denyRedirect = "https://hershive.com/project-hershell/Hershive/html/login.html";
 }
 
 

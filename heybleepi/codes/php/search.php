@@ -139,12 +139,27 @@ $unreadMessages = $unreadMsgResult ? $unreadMsgResult->fetch_assoc()['unread'] :
   </style>
 </head>
 <body class="page">
+  <div id="logoutConfirmModal" class="modal hidden">
+    <div class="modal-content glass">
+      <h3>Log out</h3>
+      <p>Are you sure you want to logout?</p>
+      <div class="modal-actions">
+        <a href="logout.php" class="btn-danger" style="text-decoration: none;">Log out</a>
+        <button type="button" class="btn-cancel" onclick="closeLogoutModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <?php include 'sidebar.php'; ?>
 
   <div id="sidebarMoreMenu" class="sidebar-more-menu hidden">
     <ul>
       <li><a href="settings.php"><i class="ri-settings-4-line"></i> Settings</a></li>
-      <li><a href="logout.php" style="color:#ff4d4f;"><i class="ri-logout-box-line"></i> Log out</a></li>
+      <li>
+        <button onclick="openLogoutModal()" class="sidebar-more-menu-btn logout">
+          <i class="ri-logout-box-line"></i> Log out
+        </button>
+      </li>
     </ul>
   </div>
 
@@ -209,7 +224,7 @@ $unreadMessages = $unreadMsgResult ? $unreadMsgResult->fetch_assoc()['unread'] :
               userRow.classList.add('search-feed-item');
               userRow.title = user.first_name + ' ' + user.last_name;
     
-              userRow.innerHTML = `<img class="search-avatar" src='../assets/profile/${user.profile_picture}'>
+              userRow.innerHTML = `<img class="search-avatar" src='../assets/profile/${user.profile_picture || 'default.png'}'>
                                 <div class="search-content">
                                   <div class="search-username"><a class="username-link" href=profile.php?user=${user.user_name}&user_id=${user.id}>${user.user_name}</a></div>
                                   <div class="search-bio">${fullname}</div>

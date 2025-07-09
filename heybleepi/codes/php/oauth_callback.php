@@ -34,7 +34,7 @@ $provider_url = rtrim($provider_url, '/');
 
 // Get user data from provider
 $user_data_url = match ($provider) {
-    'heybleepi' => $provider_url . '/get-user-data.php',
+    'heybleepi' => $provider_url . '/PROJECT-CLUB-404/heybleepi/codes/php/get-user-data.php',
     'hershive'  => $provider_url . '/project-hershell/Hershive/php/get_user_data.php',
     'devhive'   => $provider_url . '/api/users/get-user-data.php',
     default     => null,

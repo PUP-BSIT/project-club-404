@@ -268,6 +268,31 @@ function timeAgo($datetime) {
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body class="page">
+    <div id="deleteConfirmModal" class="modal hidden">
+      <div class="modal-content glass">
+        <h3>Delete Post?</h3>
+        <p>Are you sure you want to delete this post? This action cannot be undone.</p>
+        <form id="deleteForm" method="POST">
+          <input type="hidden" name="post_id" id="deletePostId">
+          <div class="modal-actions">
+            <button type="submit" class="btn-danger">Delete</button>
+            <button type="button" class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="logoutConfirmModal" class="modal hidden">
+      <div class="modal-content glass">
+        <h3>Log out</h3>
+        <p>Are you sure you want to logout?</p>
+        <div class="modal-actions">
+          <a href="logout.php" class="btn-danger" style="text-decoration: none;">Log out</a>
+          <button type="button" class="btn-cancel" onclick="closeLogoutModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Main Layout -->
     <main class="layout" style="padding-top:0;">
         <!-- LEFT SIDEBAR -->
@@ -345,7 +370,9 @@ function timeAgo($datetime) {
               <a href="settings.php"><i class="ri-settings-4-line"></i> Settings</a>
             </li>
             <li>
-              <a href="logout.php" style="color:#ff4d4f;"><i class="ri-logout-box-line"></i> Log out</a>
+              <button onclick="openLogoutModal()" class="sidebar-more-menu-btn logout">
+                <i class="ri-logout-box-line"></i> Log out
+              </button>
             </li>
           </ul>
         </div>
@@ -357,7 +384,16 @@ function timeAgo($datetime) {
           <form class="simple-create-post" autocomplete="off" onsubmit="return false;">
             <div class="simple-create-post-inner">
               <?php
-                $postAvatarPath = '../assets/profile/' . ($_SESSION['avatar'] ?? 'default.png');
+                $currentUserId = $_SESSION['id'];
+              
+                $query = $conn->prepare("SELECT profile_picture from user_details WHERE id_fk = ?");
+                $query->bind_param("i", $currentUserId);
+                $query->execute();
+                $query->bind_result($profilePicture);
+                $query->fetch();
+                $query->close();
+              
+                $postAvatarPath = '../assets/profile/' . ($profilePicture ?? 'default.png');
                 if (!file_exists($postAvatarPath)) {
                   $postAvatarPath = '../assets/profile/default.png';
                 }
@@ -483,6 +519,10 @@ function timeAgo($datetime) {
             </div>
           </div>
 
+          <div class="popup-modal hidden">
+            <h4>Shared Success to Hershive</h4>
+          </div>
+
           <!-- Share post to other social media modal -->
           <div id="share_preview_overlay" class="post-preview-overlay hidden">
             <!-- Share post container -->
@@ -557,7 +597,15 @@ function timeAgo($datetime) {
           <?php
           $query = "
             SELECT
-              p.*,
+              p.id as post_id,
+              p.user_id,
+              p.content,
+              p.created_at,
+              p.shared_post_id,
+              p.image_path,
+              p.video_path,
+              p.location,
+              p.post_provider,
               u.id,
               u.first_name, u.last_name, u.user_name,
               ud.profile_picture,
@@ -596,24 +644,26 @@ function timeAgo($datetime) {
                   <div class="post-options" style="margin-left: auto;">
                     <button class="icon-btn toggle-options"><i class="ri-more-fill"></i></button>
                     <ul class="dropdown hidden">
-                      <li><button class="btn--sm btn-edit-post" data-id="<?= $post['id'] ?>">Edit Post</button></li>
+                      <li><button class="btn--sm btn-edit-post" data-id="<?= $post['post_id'] ?>">Edit Post</button></li>
                       <li>
-                        <form method="POST" action="delete_post_dashboard.php" style="display:inline;">
-                          <input type="hidden" name="post_id" value="<?= $post['id'] ?>">
-                          <button type="submit" onclick="return confirm('Delete this post?')">Delete Post</button>
-                        </form>
+                        <button type="button" class="btn-delete-post" data-id="<?= $post['id'] ?>">Delete Post</button>
                       </li>
                     </ul>
                   </div>
                 <?php endif; ?>
               </header>
 
-              <div class="post-content" data-post-id="<?= $post['id'] ?>">
+              <div class="post-content" data-post-id="<?= $post['post_id'] ?>">
+                <?php if (!empty($post['post_provider'])): ?>
+                  <p class="post-text-auth">
+                    <strong>Original post from <i><?= htmlspecialchars($post['post_provider']) ?></i></strong>
+                  </p>
+                <?php endif; ?>
                 <p class="post-text"><?= $post['content'] ?></p>
 
                 <?php if (!empty($post['location'])): ?>
                   <div class="post-location" style="margin: 8px 0;">
-                    <div id="postMap<?= $post['id'] ?>" style="width:100%;height:220px;border-radius:10px;"></div>
+                    <div id="postMap<?= $post['post_id'] ?>" style="width:100%;height:220px;border-radius:10px;"></div>
                     <div style="font-size:0.9em;color:#aaa;margin-top:4px;">
                       <i class="ri-map-pin-user-line"></i> <?= htmlspecialchars($post['location']) ?>
                     </div>
@@ -623,7 +673,7 @@ function timeAgo($datetime) {
                 <?php if (empty($post['shared_post_id'])): ?>
                   <?php
                     $mediaStmt = $conn->prepare("SELECT file_path, media_type FROM post_media WHERE post_id = ?");
-                    $mediaStmt->bind_param("i", $post['id']);
+                    $mediaStmt->bind_param("i", $post['post_id']);
                     $mediaStmt->execute();
                     $mediaResult = $mediaStmt->get_result();
                     if ($mediaResult->num_rows > 0) {
@@ -649,24 +699,24 @@ function timeAgo($datetime) {
               <?php
                 // Load multiple media for this post
                 $mediaStmt = $conn->prepare("SELECT file_path, media_type FROM post_media WHERE post_id = ?");
-                $mediaStmt->bind_param("i", $post['id']);
+                $mediaStmt->bind_param("i", $post['post_id']);
                 $mediaStmt->execute();
                 $mediaResult = $mediaStmt->get_result();
               ?>
 
               <!-- SHARE COUNT AND USER SHARE STATUS -->
               <?php
-                $shareResult = $conn->query("SELECT COUNT(*) AS total FROM shares WHERE post_id = {$post['id']}");
+                $shareResult = $conn->query("SELECT COUNT(*) AS total FROM shares WHERE post_id = {$post['post_id']}");
                 $countShares = $shareResult ? $shareResult->fetch_assoc() : ['total' => 0];
 
-                $userSharedResult = $conn->query("SELECT 1 FROM shares WHERE post_id = {$post['id']} AND user_id = {$_SESSION['id']}");
+                $userSharedResult = $conn->query("SELECT 1 FROM shares WHERE post_id = {$post['post_id']} AND user_id = {$_SESSION['id']}");
                 $userShared = $userSharedResult && $userSharedResult->num_rows > 0;
               ?>
 
               <!-- If shared, show shared content block -->
               <?php if ($post['shared_post_id']): ?>
                 <div class="shared-post glass" style="padding: 10px; background-color: rgba(255, 255, 255, 0.05); border-left: 3px solid var(--primary); border-radius: 10px; margin-bottom: 10px;">
-                  <small>Shared from <strong><?= htmlspecialchars($post['shared_first_name'] . ' ' . $post['shared_last_name']) ?></strong></small>
+                  <small>Shared from <strong><?= htmlspecialchars($post['shared_first_name'] . ' ' . $post['shared_last_name'])?></strong></small>
                   <p><?= $post['shared_content'] ?></p>
 
                   <?php if (!empty($post['shared_location'])): ?>
@@ -704,12 +754,12 @@ function timeAgo($datetime) {
                 <div class="post-actions">
                   <!-- LIKE -->
                   <?php
-                  $likes = $conn->query("SELECT COUNT(*) AS total FROM likes WHERE post_id = {$post['id']}")->fetch_assoc();
-                  $liked = $conn->query("SELECT 1 FROM likes WHERE user_id = {$_SESSION['id']} AND post_id = {$post['id']}")->num_rows > 0;
+                  $likes = $conn->query("SELECT COUNT(*) AS total FROM likes WHERE post_id = {$post['post_id']}")->fetch_assoc();
+                  $liked = $conn->query("SELECT 1 FROM likes WHERE user_id = {$_SESSION['id']} AND post_id = {$post['post_id']}")->num_rows > 0;
                   ?>
                   <form method="POST" style="display:inline;" onsubmit="event.preventDefault(); return false;">
-                    <input type="hidden" name="like_post_id" value="<?= $post['id'] ?>">
-                    <button type="button" class="icon-btn like-button <?= $liked ? 'liked' : '' ?>" data-post-id="<?= $post['id'] ?>">
+                    <input type="hidden" name="like_post_id" value="<?= $post['post_id'] ?>">
+                    <button type="button" class="icon-btn like-button <?= $liked ? 'liked' : '' ?>" data-post-id="<?= $post['post_id'] ?>">
                       <i class="<?= $liked ? 'ri-heart-fill' : 'ri-heart-line' ?>"></i>
                       <span><?= $likes['total'] ?></span>
                     </button>
@@ -717,9 +767,9 @@ function timeAgo($datetime) {
 
                   <!-- COMMENT COUNT -->
                   <?php
-                  $comments = $conn->query("SELECT COUNT(*) AS total FROM comments WHERE post_id = {$post['id']}")->fetch_assoc();
+                  $comments = $conn->query("SELECT COUNT(*) AS total FROM comments WHERE post_id = {$post['post_id']}")->fetch_assoc();
                   ?>
-                  <button class="icon-btn" onclick="document.getElementById('comment-form-<?= $post['id'] ?>').classList.toggle('hidden')">
+                  <button class="icon-btn" onclick="document.getElementById('comment-form-<?= $post['post_id'] ?>').classList.toggle('hidden')">
                     <i class="ri-chat-1-line"></i>
                     <span><?= $comments['total'] ?></span>
                   </button>
@@ -727,13 +777,13 @@ function timeAgo($datetime) {
                   <!-- SHARE COUNT -->
                   <?php
                     // Count shares for this post
-                    $shareCountRes = $conn->query("SELECT COUNT(*) AS total FROM posts WHERE shared_post_id = " . intval($post['id']));
+                    $shareCountRes = $conn->query("SELECT COUNT(*) AS total FROM posts WHERE shared_post_id = " . intval($post['post_id']));
                     $shareCount = $shareCountRes ? $shareCountRes->fetch_assoc()['total'] : 0;
                   ?>
 
                   <!-- Get the post creator name -->
                   <?php
-                    $postId = $post['id'];
+                    $postId = $post['post_id'];
                     $stmt = $conn->prepare("
                       SELECT users.first_name, users.last_name
                       FROM posts
@@ -756,9 +806,9 @@ function timeAgo($datetime) {
                   <form style="display:inline;">
                     <button type="button" class="icon-btn"
                       onClick="showSharePostPreview(
-                        <?= $post['id'] ?>,
-                        '<?= htmlspecialchars($postCreator['first_name']) ?>',
-                        '<?= htmlspecialchars($postCreator['last_name']) ?>'
+                        <?= $post['post_id'] ?>,
+                        '<?= htmlspecialchars($postCreator['first_name'] ?? $post['shared_first_name']) ?>',
+                        '<?= htmlspecialchars($postCreator['last_name'] ?? $post['shared_last_name']) ?>'
                       )">
                       <i class="ri-share-forward-line"></i>
                       <span><?= $shareCount ?></span>
@@ -768,9 +818,9 @@ function timeAgo($datetime) {
               </footer>
 
               <!-- COMMENT FORM -->
-              <div id="comment-form-<?= $post['id'] ?>" class="hidden" style="margin-top:10px;">
+              <div id="comment-form-<?= $post['post_id'] ?>" class="hidden" style="margin-top:10px;">
                 <form method="POST">
-                  <input type="hidden" name="comment_post_id" value="<?= $post['id'] ?>">
+                  <input type="hidden" name="comment_post_id" value="<?= $post['post_id'] ?>">
                   <input type="text" name="comment_text" placeholder="Write a comment…" required style="width: 100%; padding: 8px;">
                   <button type="submit" class="btn btn--primary btn--sm" style="margin-top:5px;">Comment</button>
                 </form>
@@ -778,7 +828,7 @@ function timeAgo($datetime) {
                 <!-- LOAD COMMENTS -->
                 <div style="margin-top:10px;">
                   <?php
-                    $comments = $conn->query("SELECT comments.*, users.first_name, users.last_name FROM comments JOIN users ON comments.user_id = users.id WHERE post_id = {$post['id']} ORDER BY commented_at ASC");
+                    $comments = $conn->query("SELECT comments.*, users.first_name, users.last_name FROM comments JOIN users ON comments.user_id = users.id WHERE post_id = {$post['post_id']} ORDER BY commented_at ASC");
                     while ($comment = $comments->fetch_assoc()):
                   ?>
                     <div class="comment" data-comment-id="<?= $comment['id'] ?>" style="margin-bottom: 8px;">

@@ -146,6 +146,17 @@ $stmt->close();
   </style>
 </head>
 <body class="page">
+  <div id="logoutConfirmModal" class="modal hidden">
+    <div class="modal-content glass">
+      <h3>Log out</h3>
+      <p>Are you sure you want to logout?</p>
+      <div class="modal-actions">
+        <a href="logout.php" class="btn-danger" style="text-decoration: none;">Log out</a>
+        <button type="button" class="btn-cancel" onclick="closeLogoutModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <?php
   // Make sure these are set before including sidebar.php
   if (!isset($unread_count)) $unread_count = 0;
@@ -156,7 +167,11 @@ $stmt->close();
   <div id="sidebarMoreMenu" class="sidebar-more-menu hidden">
     <ul>
       <li><a href="settings.php"><i class="ri-settings-4-line"></i> Settings</a></li>
-      <li><a href="logout.php" style="color:#ff4d4f;"><i class="ri-logout-box-line"></i> Log out</a></li>
+      <li>
+        <button onclick="openLogoutModal()" class="sidebar-more-menu-btn logout">
+          <i class="ri-logout-box-line"></i> Log out
+        </button>
+      </li>
     </ul>
   </div>
 

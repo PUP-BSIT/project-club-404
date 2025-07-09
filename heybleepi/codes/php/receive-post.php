@@ -6,16 +6,16 @@ $input = json_decode(file_get_contents("php://input"), true);
 
 // Token from the sent JSON.
 $incoming_token = $input['token'];
-$provider = $input['provider']; // "devhive" or "hershive"
+$provider = $input['provider'] ?? ''; // "devhive" or "hershive"
 $shared_post_id = $input['shared_post_id'];
 $media_url = $input['media_url'];
 $content = $input['shared_content'];
 
 switch (strtolower($provider)) {
     case 'devhive': // In progress
-        $image_url = $input['image_url'];
-        $video_url = $input['video_url'];
-        $content = $input['content'];
+        $image_url = $input['image_url'] ?? null;
+        $video_url = $input['video_url'] ?? null;
+        $content = $input['content'] ?? null;
         
         // Token verification for DevHive
         $stmt = $conn->prepare("SELECT user_id FROM oauth_tokens WHERE token = ?");
@@ -32,26 +32,63 @@ switch (strtolower($provider)) {
         }
 
         // DevHive: Save post
-        $stmt = $conn->prepare("INSERT INTO posts (user_id, content) VALUES (?, ?)");
-        $stmt->bind_param("is", $local_user_id, $content);
+        $stmt = $conn->prepare("INSERT INTO posts (user_id, content, post_provider) VALUES (?, ?, ?)");
+        $stmt->bind_param("iss", $local_user_id, $content, $provider);
         $stmt->execute();
         $new_post_id = $stmt->insert_id;
         $stmt->close();
 
-        if (!empty($media_url)) {
-            $extension = pathinfo($media_url, PATHINFO_EXTENSION);
-            $media_type = in_array(strtolower($extension), ['mp4', 'mov', 'avi']) ? 'video' : 'image';
-
-            $media_stmt = $conn->prepare("INSERT INTO post_media (post_id, file_path, media_type) VALUES (?, ?, ?)");
-            $media_stmt->bind_param("iss", $new_post_id, $media_url, $media_type);
-            $media_stmt->execute();
-            $media_stmt->close();
+        $video_exts = ['mp4', 'mov', 'avi', 'webm', 'mkv'];
+        $image_exts = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
+        $uploads_dir = 'uploads/';
+        
+        $media_sources = [
+            ['url' => $image_url ?? '', 'type' => 'image'],
+            ['url' => $video_url ?? '', 'type' => 'video'],
+        ];
+        
+        foreach ($media_sources as $media) {
+            $media_url = $media['url'];
+            $expected_type = $media['type'];
+        
+            if (!empty($media_url)) {
+                $extension = strtolower(pathinfo($media_url, PATHINFO_EXTENSION));
+        
+                // Validate extension
+                if (
+                    ($expected_type === 'video' && !in_array($extension, $video_exts)) ||
+                    ($expected_type === 'image' && !in_array($extension, $image_exts))
+                ) {
+                    echo json_encode(['error' => "Unsupported $expected_type format: $extension"]);
+                    exit;
+                }
+        
+                // Generate unique filename
+                $filename = uniqid('media_', true) . '.' . $extension;
+                $local_path = $uploads_dir . $filename;
+        
+                // Download media from DevHive
+                $file_contents = @file_get_contents($media_url);
+                if ($file_contents === false) {
+                    echo json_encode(['error' => "Failed to download $expected_type from $media_url"]);
+                    exit;
+                }
+        
+                // Save to local uploads/
+                file_put_contents($local_path, $file_contents);
+        
+                // Insert into DB
+                $media_stmt = $conn->prepare("INSERT INTO post_media (post_id, file_path, media_type) VALUES (?, ?, ?)");
+                $media_stmt->bind_param("iss", $new_post_id, $local_path, $expected_type);
+                $media_stmt->execute();
+                $media_stmt->close();
+            }
         }
 
         break;
 
     case 'hershive':
-default:
+    default:
     $media_url = $input['media_url'] ?? '';
     $content = $input['shared_content'];
 
@@ -70,8 +107,8 @@ default:
     }
 
     // Save post
-    $stmt = $conn->prepare("INSERT INTO posts (user_id, content) VALUES (?, ?)");
-    $stmt->bind_param("is", $local_user_id, $content);
+    $stmt = $conn->prepare("INSERT INTO posts (user_id, content, post_provider) VALUES (?, ?, ?)");
+    $stmt->bind_param("iss", $local_user_id, $content, $provider);
     $stmt->execute();
     $new_post_id = $stmt->insert_id;
     $stmt->close();
