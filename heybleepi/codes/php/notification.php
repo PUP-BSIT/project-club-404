@@ -170,7 +170,7 @@ $stmt->close();
           <?php else: ?>
             <?php foreach ($notifications as $notif): ?>
               <li class="notif-feed-item<?= $notif['is_read'] ? '' : ' unread' ?>" data-id="<?= $notif['id'] ?>">
-                <img class="notif-avatar" src="../assets/profile/<?= htmlspecialchars($notif['profile_picture'] ?? 'rawr.png') ?>" alt="Avatar">
+                <img class="notif-avatar" src="../assets/profile/<?= htmlspecialchars($notif['profile_picture'] ?? 'default.png') ?>" alt="Avatar">
                 <div class="notif-content">
                   <span class="notif-actor"><?= htmlspecialchars($notif['first_name'] . ' ' . $notif['last_name']) ?></span>
                   <?php

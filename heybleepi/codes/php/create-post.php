@@ -102,7 +102,23 @@ switch ($client) {
         
         // Debug output
         if ($httpCode === 200) {
-            echo "<h1>Post shared to DevHive successfully.</h1><p>Response: {$response}</p>";
+            // echo "<h1>Post shared to DevHive successfully.</h1><p>Response: {$response}</p>";
+            // Get owner of original post
+            $ownerStmt = $conn->prepare("SELECT user_id FROM posts WHERE id = ?");
+            $ownerStmt->bind_param("i", $shared_post_id);
+            $ownerStmt->execute();
+            $ownerStmt->bind_result($postOwnerId);
+            $ownerStmt->fetch();
+            $ownerStmt->close();
+
+            // Notify if not sharing own post
+            if ($postOwnerId && $postOwnerId != $user_id) {
+                $type = 'share';
+                $notifStmt = $conn->prepare("INSERT INTO notifications (user_id, actor_id, post_id, type, is_read, created_at) VALUES (?, ?, ?, ?, 0, NOW())");
+                $notifStmt->bind_param("iiis", $postOwnerId, $user_id, $original_post_id, $type);
+                $notifStmt->execute();
+                $notifStmt->close();
+            }
         } else {
             echo "<h1>Failed to share post to DevHive.</h1><p>HTTP Code: {$httpCode}</p><p>Response: {$response}</p>";
         }
