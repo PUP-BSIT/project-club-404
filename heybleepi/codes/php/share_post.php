@@ -11,6 +11,7 @@ $user_id = $_SESSION['id'];
 $shared_post_id = intval($_POST['share_post_id']);
 $content = $_POST['share_post_content'] ?? '';
 $location = isset($_POST['location']) ? trim($_POST['location']) : null; // Get the location input
+$target = "internal";
 
 // Prevent duplicate shares
 $check = $conn->prepare("SELECT id FROM posts WHERE user_id = ? AND shared_post_id = ?");
@@ -38,6 +39,30 @@ if ($check->num_rows === 0) {
     $insertMedia->close();
   }
   $mediaQuery->close();
+ 
+  // Get owner of original post
+  $ownerStmt = $conn->prepare("SELECT user_id FROM posts WHERE id = ?");
+  $ownerStmt->bind_param("i", $shared_post_id);
+  $ownerStmt->execute();
+  $ownerStmt->bind_result($postOwnerId);
+  $ownerStmt->fetch();
+  $ownerStmt->close();
+
+  // Notify if not sharing own post
+  if ($postOwnerId && $postOwnerId != $user_id) {
+   $type = 'share';
+   $notifStmt = $conn->prepare("INSERT INTO notifications (user_id, actor_id, post_id, type, is_read, created_at) VALUES (?, ?, ?, ?, 0, NOW())");
+   $notifStmt->bind_param("iiis", $postOwnerId, $user_id, $shared_post_id, $type);
+   $notifStmt->execute();
+   $notifStmt->close();
+  }
+ 
+  // Log the share in shares table
+  $logShare = $conn->prepare("INSERT INTO shares (post_id, user_id, target) VALUES (?, ?, ?)");
+  $target = 'internal';
+  $logShare->bind_param("iis", $shared_post_id, $user_id, $target);
+  $logShare->execute();
+  $logShare->close();
 }
 
 $check->close();

@@ -1,4 +1,4 @@
-<?php 
+<?php
   session_start();
   require_once 'configuration.php';
 
@@ -36,6 +36,13 @@
   $query->execute();  
 
   if ($query->affected_rows > 0) {
+   // Notify the followed user.
+   $type = 'follow';
+   $notifStmt = $conn->prepare("INSERT INTO notifications (user_id, actor_id, type, is_read, created_at) VALUES (?, ?, ?, 0, NOW())");
+   $notifStmt->bind_param("iis", $target_user_id, $user_id, $type);
+   $notifStmt->execute();
+   $notifStmt->close();
+   
     echo json_encode(['status' => 'success', 'message' => 'Followed successfully']);
   } else {
     echo json_encode(['status' => 'error', 'message' => 'Already following or failed.']);
@@ -43,3 +50,4 @@
 
   $query->close();
 ?>
+

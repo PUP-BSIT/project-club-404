@@ -185,7 +185,7 @@ $stmt->close();
           <?php else: ?>
             <?php foreach ($notifications as $notif): ?>
               <li class="notif-feed-item<?= $notif['is_read'] ? '' : ' unread' ?>" data-id="<?= $notif['id'] ?>">
-                <img class="notif-avatar" src="../assets/profile/<?= htmlspecialchars($notif['profile_picture'] ?? 'rawr.png') ?>" alt="Avatar">
+                <img class="notif-avatar" src="../assets/profile/<?= htmlspecialchars($notif['profile_picture'] ?? 'default.png') ?>" alt="Avatar">
                 <div class="notif-content">
                   <span class="notif-actor"><?= htmlspecialchars($notif['first_name'] . ' ' . $notif['last_name']) ?></span>
                   <?php
@@ -195,6 +195,12 @@ $stmt->close();
                           echo " commented on your post.";
                       } elseif ($notif['type'] === 'share') {
                           echo " shared your post.";
+                      } elseif ($notif['type'] === 'shared_to_devhive') {
+                        echo "shared your post to <strong>Devhive</strong>.";
+                      } elseif ($notif['type'] === 'shared_to_hershive') {
+                        echo "shared your post to <strong>Hershive</strong>.";
+                      } elseif ($notif['type'] === 'follow') {
+                        echo "followed you.";
                       } else {
                           echo " " . htmlspecialchars($notif['type']);
                       }
@@ -255,3 +261,4 @@ $stmt->close();
   </script>
 </body>
 </html>
+
