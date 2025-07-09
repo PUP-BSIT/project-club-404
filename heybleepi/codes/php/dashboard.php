@@ -774,10 +774,10 @@ function timeAgo($datetime) {
                     <span><?= $comments['total'] ?></span>
                   </button>
 
-                  <!-- SHARE COUNT -->
+                   <!-- SHARE COUNT -->
                   <?php
                     // Count shares for this post
-                    $shareCountRes = $conn->query("SELECT COUNT(*) AS total FROM posts WHERE shared_post_id = " . intval($post['post_id']));
+                    $shareCountRes = $conn->query("SELECT COUNT(*) AS total FROM shares WHERE post_id = " . intval($post['post_id']));
                     $shareCount = $shareCountRes ? $shareCountRes->fetch_assoc()['total'] : 0;
                   ?>
 
