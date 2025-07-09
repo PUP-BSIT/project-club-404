@@ -389,40 +389,8 @@ document.addEventListener('click', function (e) {
     // Scroll to top to show the new message
     container.scrollTop = 0;
   }
-});
 
-// Notification dropdown toggle
-document.getElementById('notificationBtnSidebar').addEventListener('click', function(e) {
-  e.stopPropagation();
-  const dropdown = document.getElementById('notification_dropdown');
-  dropdown.classList.toggle('hidden');
-  
-  // Close other open dropdowns if any
-  document.querySelectorAll('.notification-dropdown:not(#notification_dropdown)').forEach(d => {
-    d.classList.add('hidden');
-  });
-});
-
-// Close dropdown when clicking outside
-document.addEventListener('click', function(e) {
-  const dropdown = document.getElementById('notification_dropdown');
-  const button = document.getElementById('notificationBtnSidebar');
-  
-  if (!dropdown.contains(e.target) && !button.contains(e.target)) {
-    dropdown.classList.add('hidden');
-  }
-});
-
-// Mark all as read
-document.getElementById('markAllReadBtn')?.addEventListener('click', function() {
-  const badge = document.getElementById('notification_count');
-  if (badge) {
-    badge.style.display = 'none';
-  }
-});
-
-// Sidebar menu for settings and logout
-document.addEventListener('DOMContentLoaded', function () {
+  // --- Sidebar More Menu ---
   const moreBtn = document.getElementById('sidebarMoreBtn');
   const moreMenu = document.getElementById('sidebarMoreMenu');
 
@@ -438,6 +406,39 @@ document.addEventListener('DOMContentLoaded', function () {
         moreMenu.classList.add('hidden');
       }
     });
+  }
+});
+
+// Notification dropdown toggle
+document.getElementById('notificationBtnSidebar').addEventListener('click',
+  function(e) {
+  e.stopPropagation();
+  const dropdown = document.getElementById('notification_dropdown');
+  dropdown.classList.toggle('hidden');
+  
+  // Close other open dropdowns if any
+  document.querySelectorAll('.notification-dropdown:not(#notification_dropdown)'
+  ).forEach(d => {
+    d.classList.add('hidden');
+  });
+});
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+  const dropdown = document.getElementById('notification_dropdown');
+  const button = document.getElementById('notificationBtnSidebar');
+  
+  if (!dropdown.contains(e.target) && !button.contains(e.target)) {
+    dropdown.classList.add('hidden');
+  }
+});
+
+// Mark all as read
+document.getElementById('markAllReadBtn')?.addEventListener('click', function()
+{
+  const badge = document.getElementById('notification_count');
+  if (badge) {
+    badge.style.display = 'none';
   }
 });
 
@@ -464,19 +465,13 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
-
-  // More Menu Popup
-  const moreBtn = document.getElementById('sidebarMoreBtn');
-  const moreMenu = document.getElementById('sidebarMoreMenu');
-  if (moreBtn && moreMenu) {
-    moreBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      moreMenu.classList.toggle('hidden');
-    });
-    document.addEventListener('click', function(e) {
-      if (!moreMenu.contains(e.target) && !moreBtn.contains(e.target)) {
-        moreMenu.classList.add('hidden');
-      }
-    });
-  }
 });
+
+// Logout confirmation modal
+function openLogoutModal() {
+  document.getElementById('logoutConfirmModal').classList.remove('hidden');
+}
+
+function closeLogoutModal() {
+  document.getElementById('logoutConfirmModal').classList.add('hidden');
+}
