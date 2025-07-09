@@ -509,58 +509,41 @@ function timeAgo($datetime) {
         <!-- Create Post -->
         <section class="right-column">
           <?php if ($userId == $_SESSION['id']): ?>
-          <div class="glass create-post">
-            <form>
-              <div class="create-post-header">
-                <img class="avatar avatar--sm" src="../assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'default.png') ?>" alt="">
-                <div class="poster-info">
-                  <a href="profile.php" class="poster-name"><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></a>
-                  <p>@<?= htmlspecialchars($user['user_name']); ?></p>
-                </div>
-              </div>
+          <!-- Create Post -->
+          <form class="simple-create-post" autocomplete="off" onsubmit="return false;">
+            <div class="simple-create-post-inner">
+              <?php
+                $currentUserId = $_SESSION['id'];
 
-              <textarea
-                class="create-post-input"
-                name="post_content"
-                placeholder="What's happening in your galaxy?"
-                onClick="showCreatePostPreview();"
-              ></textarea>
+                $query = $conn->prepare("SELECT profile_picture from user_details WHERE id_fk = ?");
+                $query->bind_param("i", $currentUserId);
+                $query->execute();
+                $query->bind_result($profilePicture);
+                $query->fetch();
+                $query->close();
 
-              <!-- Media Preview Grid -->
-              <div class="create-post-actions">
-                <div class="media-actions">
-                  <button
-                    type="button"
-                    class="media-upload-btn photo"
-                    onclick="showCreatePostPreview();">
-                      + Photo
-                  </button>
-                  <button
-                    type="button"
-                    class="media-upload-btn video"
-                    onclick="showCreatePostPreview();">
-                      + Video
-                  </button>
-                </div>
-                <div class="minor-actions">
-                  <button
-                    class="icon-btn"
-                    type="button"
-                    id="getLocationBtn"
-                    title="Add location"
-                    onClick="showCreatePostPreview();">
-                    <i class="ri-map-pin-line"></i>
-                  </button>
-                </div>
-                <button
-                  class="btn btn--action"
-                  onClick="showCreatePostPreview();";
-                  type="button">
-                    Post
-                </button>
-              </div>
-            </form>
-          </div>
+                $postAvatarPath = '../assets/profile/' . ($profilePicture ?? 'default.png');
+                if (!file_exists($postAvatarPath)) {
+                  $postAvatarPath = '../assets/profile/default.png';
+                }
+              ?>
+              <img class="avatar avatar--sm" src="<?= $postAvatarPath ?>" alt="Profile">
+              <input
+                type="text"
+                class="simple-create-post-input"
+                placeholder="What's new, <?= $_SESSION['first_name']?>?"
+                autocomplete="off"
+                readonly
+                onclick="openCreatePostPreview();"
+                style="cursor:pointer;"
+              >
+              <button
+                type="button"
+                class="btn btn--primary simple-post-btn"
+                onclick="openCreatePostPreview();"
+              >Post</button>
+            </div>
+          </form>
 
           <!-- Map Location Modal -->
           <div id="mapModal" class="map-modal" style="display:none;">
@@ -740,6 +723,7 @@ function timeAgo($datetime) {
           $query = "
             SELECT
               p.id AS post_id,
+              p.user_id,
               p.content,
               p.created_at,
               p.shared_post_id,
@@ -796,15 +780,23 @@ function timeAgo($datetime) {
                   </span>
                 </div>
 
-                <div class="post-options" style="margin-left: auto;">
-                  <button class="icon-btn toggle-options"><i class="ri-more-fill"></i></button>
-                  <ul class="dropdown hidden">
-                    <li><button class="btn--sm btn-edit-post" data-id="<?= $post['post_id'] ?>">Edit Post</button></li>
-                    <li>
-                      <button type="button" class="btn-delete-post" data-id="<?= $post['post_id'] ?>">Delete Post</button>
-                    </li>
-                  </ul>
-                </div>
+                <?php if ($_SESSION['id'] == $post['user_id']): ?>
+                  <div class="post-options" style="margin-left: auto;">
+                    <button class="icon-btn toggle-options"><i class="ri-more-fill"></i></button>
+                    <ul class="dropdown hidden">
+                      <li>
+                        <button class="dropdown-action btn-edit-post" data-id="<?= $post['post_id'] ?>">
+                          Edit Post
+                        </button>
+                      </li>
+                      <li>
+                        <button type="button" class="dropdown-action btn-delete-post" data-id="<?= $post['post_id'] ?>">
+                          Delete Post
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                <?php endif; ?>
               </header>
 
               <!-- POST CONTENT -->
