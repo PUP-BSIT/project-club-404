@@ -71,7 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
             $_SESSION['avatar'] = $user['profile_picture'] ?? 'default.png';
             $_SESSION['isloginok'] = true;
 
-            header("Location: dashboard.php");
+            header("Location: loading.php");
             exit();
         } else {
             redirectWithMessage("Invalid password.");
