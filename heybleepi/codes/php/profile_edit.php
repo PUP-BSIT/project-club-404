@@ -365,21 +365,5 @@ $update->close();
       </div>
     </div>
     <script src="../script/profile_edit.js"></script>
-    <!-- <script src="../script/dashboard.js"></script> -->
-    <script>
-      const moreBtn = document.getElementById('sidebarMoreBtn');
-        const moreMenu = document.getElementById('sidebarMoreMenu');
-        if (moreBtn && moreMenu) {
-          moreBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            moreMenu.classList.toggle('hidden');
-          });
-          document.addEventListener('click', function(e) {
-            if (!moreMenu.contains(e.target) && !moreBtn.contains(e.target)) {
-              moreMenu.classList.add('hidden');
-            }
-          });
-        }
-    </script>
   </body>
 </html>
