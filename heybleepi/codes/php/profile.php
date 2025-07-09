@@ -766,7 +766,7 @@ function timeAgo($datetime) {
               $commentRes = $conn->query("SELECT COUNT(*) AS total FROM comments WHERE post_id = {$post['post_id']}");
               $countComments = $commentRes ? $commentRes->fetch_assoc() : ['total' => 0];
 
-              $shareRes = $conn->query("SELECT COUNT(*) AS total FROM posts WHERE shared_post_id = {$post['post_id']}");
+              $shareRes = $conn->query("SELECT COUNT(*) AS total FROM shares WHERE post_id = {$post['post_id']}");
               $countShares = $shareRes ? $shareRes->fetch_assoc() : ['total' => 0];
             ?>
 
