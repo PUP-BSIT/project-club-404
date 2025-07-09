@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' &&
   isset($_POST['ajax']) && $_POST['ajax'] == '1') {
   // Delete
   if (isset($_POST['delete_id'])) {
-    $id = intval($_POST['delete_id']);
+    $id = intval($_POST['delete_id']);  
     $stmt = $conn->prepare("DELETE FROM messages
                             WHERE id = ?
                             AND user_id = ?");

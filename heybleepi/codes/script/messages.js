@@ -154,39 +154,37 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  // --- Edit button logic ---
-  document.addEventListener('click', function (e) {
-    if (e.target.closest('.comment-edit')) {
-      e.preventDefault();
-      const editBtn = e.target.closest('.comment-edit');
-      const mainForm = document.getElementById("commentForm");
-      const textarea = document.getElementById("comment");
-      const messageBox = editBtn.closest('.message-preview');
-      const messageId = editBtn.getAttribute('data-id');
-      const messageText = messageBox.querySelector('.preview-text p').textContent;
+// --- Edit button logic ---
+document.addEventListener('click', function (e) {
+  if (e.target.closest('.comment-edit')) {
+    e.preventDefault();
+    const editBtn = e.target.closest('.comment-edit');
+    const commentBox = editBtn.closest('.comment-box'); // Get the specific comment box
+    const messageId = editBtn.getAttribute('data-id');
+    const messageText = commentBox.querySelector('.preview-text p').textContent;
 
-      // Set textarea value to message
-      textarea.value = messageText;
+    // Set textarea value to message
+    document.getElementById("comment").value = messageText;
 
-      // Remove any existing update_id input
-      const existingUpdateInput = mainForm.querySelector('input[name="update_id"]');
-      if (existingUpdateInput) existingUpdateInput.remove();
+    // Remove any existing update_id input
+    const existingUpdateInput = document.querySelector('input[name="update_id"]');
+    if (existingUpdateInput) existingUpdateInput.remove();
 
-      // Add new update_id input
-      const updateIdInput = document.createElement('input');
-      updateIdInput.type = 'hidden';
-      updateIdInput.name = 'update_id';
-      updateIdInput.value = messageId;
-      mainForm.appendChild(updateIdInput);
+    // Add new update_id input
+    const updateIdInput = document.createElement('input');
+    updateIdInput.type = 'hidden';
+    updateIdInput.name = 'update_id';
+    updateIdInput.value = messageId;
+    document.getElementById("commentForm").appendChild(updateIdInput);
 
-      // Show update/cancel, hide send
-      document.getElementById("addBtn").style.display = "none";
-      document.getElementById("updateBtn").style.display = "inline-block";
-      document.getElementById("cancelBtn").style.display = "inline-block";
+    // Show update/cancel, hide send
+    document.getElementById("addBtn").style.display = "none";
+    document.getElementById("updateBtn").style.display = "inline-block";
+    document.getElementById("cancelBtn").style.display = "inline-block";
 
-      textarea.focus();
-    }
-  });
+    document.getElementById("comment").focus();
+  }
+});
 
   // --- Delete button logic with modal ---
   let deleteTargetBtn = null;
@@ -269,20 +267,24 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch("messages.php", {
           method: "POST",
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: "update_id=" + encodeURIComponent(update_id) +
-            "&comment=" + encodeURIComponent(comment) +
-            "&ajax=1",
+          body: new URLSearchParams({
+                update_id: update_id,
+                comment: comment,
+                ajax: "1"
+            })
         })
-          .then(response => response.json())
-          .then(data => {
+        .then(response => {
+          if (!response.ok) throw new Error('Network error');
+          return response.json();
+        })
+        .then(data => {
+            console.log("Update response:", data);
             if (data.success) {
-              // Update message in DOM
-              document.querySelectorAll('.message-preview').forEach(box => {
-                const editBtn = box.querySelector('.comment-edit');
-                if (editBtn && editBtn.getAttribute('data-id') == update_id) {
-                  box.querySelector('.preview-text p').textContent = comment;
-                }
-              });
+              // Find the exact message element to update
+              const messageElement = document.querySelector(`.comment-edit[data-id="${update_id}"]`)
+                                  .closest('.comment-box')
+                                  .querySelector('.preview-text p');
+              messageElement.textContent = comment;
 
               // Reset form and buttons
               form.reset();
