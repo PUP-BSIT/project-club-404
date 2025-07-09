@@ -81,3 +81,29 @@ document.getElementById('profile_form').addEventListener('submit', function (e) 
       alert("An error occurred.");
     });
 });
+
+const moreBtn = document.getElementById('sidebarMoreBtn');
+const moreMenu = document.getElementById('sidebarMoreMenu');
+
+if (moreBtn && moreMenu) {
+  moreBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    moreMenu.classList.toggle('hidden');
+  });
+
+  // Hide menu when clicking outside
+  document.addEventListener('click', function (e) {
+    if (!moreMenu.contains(e.target) && !moreBtn.contains(e.target)) {
+      moreMenu.classList.add('hidden');
+    }
+  });
+}
+
+// Logout confirmation modal
+function openLogoutModal() {
+  document.getElementById('logoutConfirmModal').classList.remove('hidden');
+}
+
+function closeLogoutModal() {
+  document.getElementById('logoutConfirmModal').classList.add('hidden');
+}
