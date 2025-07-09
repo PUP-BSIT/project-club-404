@@ -1310,31 +1310,35 @@ function showFollowing() {
 // }
 
 // Universal Delete Modal (Dashboard and Profile)
-function openDeleteModal(postId) {
-  const form = document.getElementById('deleteForm');
-  const deleteInput = document.getElementById('deletePostId');
+document.addEventListener('DOMContentLoaded', () => {
+  const deleteButtons = document.querySelectorAll('.btn-delete-post');
   const modal = document.getElementById('deleteConfirmModal');
+  const deleteInput = document.getElementById('deletePostId');
+  const form = document.getElementById('deleteForm');
 
-  deleteInput.value = postId;
+  if (!modal || !form || !deleteInput) {
+    console.error("Required modal elements are missing.");
+    return;
+  }
 
-  // Automatically detect page and set correct form action
-  const isProfile = window.location.pathname.includes("profile");
-  form.action = isProfile
-    ? "/codes/php/delete_post_profile.php"
-    : "/codes/php/delete_post_dashboard.php";
+  deleteButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const postId = button.dataset.id;
+      deleteInput.value = postId;
 
-  modal.classList.remove('hidden');
-}
+      form.action = "delete_post_dashboard.php";
 
-function closeDeleteModal() {
-  document.getElementById('deleteConfirmModal').classList.add('hidden');
-}
+      // Show the modal
+      modal.classList.remove('hidden');
 
-// Attach to all delete buttons
-document.querySelectorAll('.btn-delete-post').forEach(button => {
-  button.addEventListener('click', () => {
-    const postId = button.dataset.id;
-    openDeleteModal(postId);
+      console.log("Modal opened for post ID:", postId);
+    });
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      modal.classList.add('hidden');
+    }
   });
 });
 

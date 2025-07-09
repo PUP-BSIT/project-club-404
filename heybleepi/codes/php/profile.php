@@ -306,20 +306,6 @@ function timeAgo($datetime) {
   </head>
 
   <body class="page profile-page">
-    <div id="deleteConfirmModal" class="modal hidden">
-      <div class="modal-content glass">
-        <h3>Delete Post?</h3>
-        <p>Are you sure you want to delete this post? This action cannot be undone.</p>
-        <form id="deleteForm" method="POST">
-          <input type="hidden" name="post_id" id="deletePostId">
-          <div class="modal-actions">
-            <button type="submit" class="btn-danger">Delete</button>
-            <button type="button" class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
-          </div>
-        </form>
-      </div>
-    </div>
-
     <div id="logoutConfirmModal" class="modal hidden">
       <div class="modal-content glass">
         <h3>Log out</h3>
@@ -1081,6 +1067,35 @@ function timeAgo($datetime) {
       <div class="lightbox-content" id="lightboxContent"></div>
     </div>
 
+    <div id="deleteConfirmModal" class="modal hidden">
+      <div class="modal-content glass">
+        <h3>Delete Post?</h3>
+        <p>Are you sure you want to delete this post? This action cannot be undone.</p>
+        <form id="deleteForm" method="POST">
+          <input type="hidden" name="post_id" id="deletePostId">
+          <div class="modal-actions">
+            <button type="submit" class="btn-danger">Delete</button>
+            <button type="button" class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- DELETE CONFIRMATION MODAL -->
+    <div id="deleteConfirmModal" class="modal hidden">
+      <div class="modal-content glass">
+        <h3>Delete Post?</h3>
+        <p>Are you sure you want to delete this post? This action cannot be undone.</p>
+        <form id="deleteForm" method="POST" action="delete_post_dashboard.php">
+          <input type="hidden" name="post_id" id="deletePostId">
+          <div class="modal-actions">
+            <button type="submit" class="btn-danger">Delete</button>
+            <button type="button" class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <script>
       // Tab switching logic
       const tabs = document.querySelectorAll('#profileTabs .tab');
@@ -1105,6 +1120,23 @@ function timeAgo($datetime) {
           }
         });
       });
+
+      document.querySelectorAll('.btn-delete-post').forEach(button => {
+          button.addEventListener('click', () => {
+            const postId = button.dataset.id;
+            console.log(" Deleting post ID:", postId);
+
+            const form = document.getElementById('deleteForm');
+            const input = document.getElementById('deletePostId');
+            const modal = document.getElementById('deleteConfirmModal');
+
+            input.value = postId;
+
+            form.action = "delete_post_profile.php";
+
+            modal.classList.remove('hidden');
+          });
+        });
     </script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="../script/dashboard.js"></script>
