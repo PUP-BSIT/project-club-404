@@ -296,6 +296,7 @@ function timeAgo($datetime) {
   <head>
     <meta charset="UTF-8" />
     <title>Heybleepi • <?php echo htmlspecialchars($user['user_name']); ?>'s Profile</title>
+    <link rel="icon" href="../assets/logo.png" type="image/png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="../stylesheet/dashboard.css" />

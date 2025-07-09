@@ -51,6 +51,7 @@ $stmt->close();
 <head>
   <meta charset="UTF-8">
   <title>Activity • Heybleepi</title>
+  <link rel="icon" href="../assets/logo.png" type="image/png" />
   <link rel="stylesheet" href="../stylesheet/dashboard.css" />
   <link rel="stylesheet" href="../stylesheet/messages.css" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet" />

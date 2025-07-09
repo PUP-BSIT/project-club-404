@@ -54,9 +54,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Forgot Password</title>
+  <title>Heybleepi • Forgot Password</title>
   <link rel="stylesheet" href="../stylesheet/forgot_password.css" />
-  <link rel="icon" href="../assets/heybleepi-mascot.jpg" type="image/png" />
+  <link rel="icon" href="../assets/logo.png" type="image/png" />
 </head>
 <body>
   <div id="stars-container">

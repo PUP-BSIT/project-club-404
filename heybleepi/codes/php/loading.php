@@ -13,6 +13,7 @@ if (!isset($_SESSION['id'])) {
 <head>
   <meta charset="UTF-8">
   <title>Heybleepi</title>
+  <link rel="icon" href="../assets/logo.png" type="image/png" />
   <link rel="stylesheet" href="../stylesheet/dashboard.css">
   <style>
        body {

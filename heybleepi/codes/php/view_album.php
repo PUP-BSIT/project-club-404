@@ -34,8 +34,10 @@ $mediaItems = $mediaResult->fetch_all(MYSQLI_ASSOC);
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title><?= htmlspecialchars($album['title']) ?> | Album</title>
+  <title>Heybleepi •<?= htmlspecialchars($album['title']) ?>  Album</title>
+  <link rel="icon" href="../assets/logo.png" type="image/png" />
   <link rel="stylesheet" href="stylesheet/dashboard.css">
+  
   <style>
     .album-container {
       padding: 20px;
