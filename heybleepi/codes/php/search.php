@@ -29,7 +29,7 @@ $unreadMessages = $unreadMsgResult ? $unreadMsgResult->fetch_assoc()['unread'] :
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Search - HEYBLEEPI</title>
+  <title>Search • Heybleepi</title>
   <link rel="stylesheet" href="../stylesheet/dashboard.css" />
   <link rel="stylesheet" href="../stylesheet/messages.css" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet" />
