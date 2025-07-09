@@ -96,6 +96,7 @@ if (!isset($_SESSION['user_id'])) {
   <head>
     <meta charset="UTF-8">
     <title>Login to HeyBleepi</title>
+    <link rel="icon" href="../assets/logo.png" type="image/png" />
     <link rel="stylesheet" href="../stylesheet/oauth_authorize.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
   </head>
