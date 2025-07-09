@@ -31,6 +31,7 @@ if ($result->num_rows > 0) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
     <link href="../stylesheet/settings.css" rel="stylesheet">
+    <link rel="icon" href="../assets/logo.png" type="image/png" />
     <title>Settings</title>
   </head>
 

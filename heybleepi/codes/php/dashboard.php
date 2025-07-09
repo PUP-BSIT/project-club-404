@@ -257,7 +257,7 @@ function timeAgo($datetime) {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Home • Heybleepi</title>
-
+    <link rel="icon" href="../assets/logo.png" type="image/png" />
     <link rel="stylesheet" href="../stylesheet/dashboard.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
