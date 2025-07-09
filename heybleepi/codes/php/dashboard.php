@@ -256,7 +256,7 @@ function timeAgo($datetime) {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>HEYBLEEPI! – Social Media Dashboard</title>
+    <title>Home • Heybleepi</title>
 
     <link rel="stylesheet" href="../stylesheet/dashboard.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />

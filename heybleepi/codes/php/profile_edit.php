@@ -170,7 +170,7 @@ $update->close();
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Edit Your Profile!</title>
+    <title>Edit Profile • Heybleepi</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand&display=swap" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="../stylesheet/profile_edit.css" />
