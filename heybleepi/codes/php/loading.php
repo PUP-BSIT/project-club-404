@@ -60,7 +60,7 @@ if (!isset($_SESSION['id'])) {
 </head>
 <body>
   <div class="loading-wrapper">
-    <img src="./assets/logo-heybleepi-rb.png" alt="HEYBLEEPI Logo" class="loading-logo">
+    <img src="../assets/logo-heybleepi-rb.png" alt="HEYBLEEPI Logo" class="loading-logo">
   </div>
   <div class="loading-text"><strong>Heybleepi</strong> by Club-404</div>
 
