@@ -632,7 +632,7 @@ function timeAgo($datetime) {
                     <ul class="dropdown hidden">
                       <li><button class="btn--sm btn-edit-post" data-id="<?= $post['post_id'] ?>">Edit Post</button></li>
                       <li>
-                        <button type="button" class="btn-delete-post" data-id="<?= $post['id'] ?>">Delete Post</button>
+                        <button type="button" class="btn-delete-post" data-id="<?= $post['post_id'] ?>">Delete Post</button>
                       </li>
                     </ul>
                   </div>
