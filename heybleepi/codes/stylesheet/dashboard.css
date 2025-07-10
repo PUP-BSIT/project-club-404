@@ -938,11 +938,11 @@ html {
   border: 1px solid var(--glass-border);
   width: 42em;
   border-radius: 20px;
-  background-color: var(--card-bg);
+  background-color: #202124;
   margin-left: 1em;
-  margin-top: 2em;
+  margin-top: 4em;
   backdrop-filter: blur(30px);
-  height: 37em;
+  height: 33em;
 }
 
 .create-post-preview h1 {
@@ -960,6 +960,7 @@ html {
   align-items: center;
   gap: 1em;
   margin-bottom: 20px;
+  margin-top: 50px;
 }
 
 .post-preview-overlay {
@@ -975,10 +976,11 @@ html {
 .material-symbols-outlined {
   background-color: #333;
   border-radius: 9999px;
-  margin-top: 10px;
+  margin-top: 16px;
   margin-left: 25em;
   padding: 3px;
   cursor: pointer;
+  position: fixed;
 }
 
 .material-symbols-outlined:hover {
@@ -1000,7 +1002,7 @@ html {
   border: 1px solid var(--glass-border);
   width: 50vw;
   border-radius: 20px;
-  background-color: var(--card-bg);
+  background-color: #202124;
   margin-top: 2em;
   backdrop-filter: blur(30px);
   height: 35em;
@@ -1044,7 +1046,6 @@ html {
   display: flex;
   flex-wrap: wrap;
   gap: 1.5rem;
-  margin-top: 52px;
 }
 
 .share-to-other {
@@ -1809,6 +1810,13 @@ html {
 
 .show {
   display: block;
+}
+
+.location-container {
+  background: #202124;
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 40px;
 }
 
 /* like animation placeholder */
@@ -2825,7 +2833,7 @@ body.page {
   position: absolute;
   top: 18px;
   right: 18px;
-  font-size: 30px;
+  font-size: 22px;
   color: #fff;
   background: rgba(0, 0, 0, 0.18);
   border-radius: 50%;

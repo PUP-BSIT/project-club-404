@@ -416,11 +416,10 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
+  background: #202124;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 20px 50px;
+  padding: 35px 35px;
   position: fixed;
   z-index: 1;
   top: 35%;
@@ -434,7 +433,7 @@ body {
 #logout_question .logout-buttons {
   display: flex;
   flex-direction: row;
-  gap: 3em;
+  gap: 1em;
 }
 
 .hide-logout-question {
@@ -450,8 +449,8 @@ body {
   background-color: #f44336;
   color: white;
   border: none;
-  border-radius: 9999px;
-  padding: 10px;
+  border-radius: 6px;
+  padding: 10px 20px;
   cursor: pointer;
   transition: background-color 0.5s;
 }
@@ -461,33 +460,32 @@ body {
 }
 
 .cancel-btn {
-  background-color: white;
-  color: black;
-  border: none;
-  border-radius: 9999px;
-  padding: 10px;
+  background-color: transparent;
+  color: white;
+  border: 1px solid #888;
+  border-radius: 6px;
+  padding: 10px 24px;
   cursor: pointer;
   transition: background-color 0.5s;
 }
 
 .cancel-btn:hover {
-  background-color: rgb(185, 185, 185);
+  background-color: rgb(255, 255, 255);
+  color: black
 }
 
 .delete-acc-prompt {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
+  background: #202124;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 20px 50px;
   position: fixed;
   z-index: 1;
   top: 35%;
-  left: 23%;
-  gap: 1em;
+  left: 29%;
 }
 
 .delete-acc-prompt h2 {
@@ -497,15 +495,15 @@ body {
 .delete-acc-buttons {
   display: flex;
   flex-direction: row;
-  gap: 3em;
+  gap: 1em;
 }
 
 .delete-btn {
   background-color: #f44336;
   color: white;
   border: none;
-  border-radius: 9999px;
-  padding: 10px;
+  border-radius: 6px;
+  padding: 10px 24px;
   cursor: pointer;
   transition: background-color 0.5s;
 }
@@ -1199,7 +1197,7 @@ body {
 
   .show-logout-question {
     width: auto;
-    left: 280px;
+    left: 350px;
   }
 
   .delete-acc-prompt {
@@ -1230,7 +1228,7 @@ body {
   }
 
   .show-logout-question {
-    width: auto;
-    left: 450px;
+    width: 25vw;
+    left: 460px;
   }
 }

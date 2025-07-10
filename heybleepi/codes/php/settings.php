@@ -39,7 +39,8 @@ if ($result->num_rows > 0) {
     <!-- Logout & Delete Account Prompt -->
     <div id="logout_prompt" class="hide-overlay">
       <div id="logout_question" class="show-logout-question">
-        <h2>You're about to log out. Continue?</h2>
+        <h3>Log out</h3>
+        <p>Are you sure you want to logout?</p>
         <div class="logout-buttons">
           <form>
             <button 
@@ -62,7 +63,8 @@ if ($result->num_rows > 0) {
 
     <div id="delete_acc" class="hide-delete-acc-prompt">
       <div class="delete-acc-prompt">
-        <h2>⚠️ Deleting your account is permanent. This cannot be undone.</h2>
+        <h3>Delete Account</h3>
+        <p>⚠️ Deleting your account is permanent. This cannot be undone.</p>
         <div class="delete-acc-buttons">
           <form> <!--to test delete account php-->
             <button 
