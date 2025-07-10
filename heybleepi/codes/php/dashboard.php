@@ -422,7 +422,7 @@ function timeAgo($datetime) {
               <div id="create_post_preview" class="create-post-preview">
                 <span
                   id="close_preview_btn"
-                  class="material-symbols-outlined"
+                  class="material-symbols-outlined create"
                   onClick="closeCreatePostPreview();">close</span>
                 <form
                   method="POST"
@@ -482,15 +482,9 @@ function timeAgo($datetime) {
                   </div>
 
                   <div class="styled-hr"></div>
-
-                  <!-- Other social media -->
-                  <div class="share-options">
-                    <a href="#" class="share-to-other">Share to DevHive</a>
-                    <a href="#" class="share-to-other">Share to Hershive</a>
-                  </div>
                 </form>
               </div>
-              <div>
+              <div class="location-container">
                 <!-- Location Text Preview -->
                 <div class="create-post-location-preview" id="locationTextPreview" style="display: none;">
                   📍 <span id="locationNamePreview">Selected location</span>
@@ -516,7 +510,7 @@ function timeAgo($datetime) {
               <div class="share-post-preview">
                 <span
                   id="close_shared_preview_btn"
-                  class="material-symbols-outlined"
+                  class="material-symbols-outlined share"
                   onClick="closeSharePostPreview()">close</span>
                 <form method="POST" action="share_post.php" class="preview-form">
                   <h1>Share Post</h1>
@@ -571,8 +565,45 @@ function timeAgo($datetime) {
                       <input type="hidden" name="share_post_id" id="share_post_id_external">
                     
                       <div class="share-options">
-                        <button type="submit" name="share_to_other" value="devhive" class="share-to-other">Share to DevHive</button>
-                        <button type="submit" name="share_to_other" value="hershive" class="share-to-other">Share to Hershive</button>
+                        <button 
+                          type="submit" 
+                          name="share_to_other" 
+                          value="devhive" 
+                          class="share-to-other"
+                          <?php if (!isset($_SESSION['oauth_provider']) || !isset($_SESSION['oauth_token_devhive'])): ?>
+                            disabled 
+                            title="No token"
+                            style="color: #8f9585; 
+                            cursor: not-allowed; 
+                            pointer-events: none;" 
+                          <?php endif; ?>
+                        >
+                          <?php if (!isset($_SESSION['oauth_provider']) || !isset($_SESSION['oauth_token_devhive'])): ?>
+                            Share to DevHive (No Token)
+                          <?php else: ?>
+                            Share to DevHive
+                          <?php endif; ?>
+                        </button>
+
+                        <button 
+                          type="submit" 
+                          name="share_to_other" 
+                          value="hershive" 
+                          class="share-to-other"
+                          <?php if (!isset($_SESSION['oauth_provider']) || !isset($_SESSION['oauth_token_hershive'])): ?>
+                            disabled 
+                            title="No token"
+                            style="color: #8f9585; 
+                            cursor: not-allowed; 
+                            pointer-events: none;" 
+                          <?php endif; ?>
+                          >
+                          <?php if (!isset($_SESSION['oauth_provider']) || !isset($_SESSION['oauth_token_hershive'])): ?>
+                            Share to Hershive (No Token)
+                          <?php else: ?>
+                            Share to Hershive
+                          <?php endif; ?>
+                        </button>
                       </div>
                   </form>
               </div>
