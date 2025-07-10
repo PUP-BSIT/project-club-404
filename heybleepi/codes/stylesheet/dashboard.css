@@ -2404,15 +2404,15 @@ a.create-album-btn:hover {
 
 .comment-dropdown {
   position: absolute;
-  right: 0;
-  top: 28px;
+  right: 9px;
+  top: 15px;
   background: #23242a;
   border: 1px solid var(--glass-border);
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   list-style: none;
-  padding: 0.5rem 0;
-  min-width: 120px;
+  padding: 0.1rem 0;
+  min-width: 76px;
   z-index: 100;
   overflow: hidden;
 }
@@ -2429,7 +2429,7 @@ a.create-album-btn:hover {
   color: white;
   text-align: left;
   width: 100%;
-  padding: 8px 16px;
+  padding: 5px 16px;
   font-size: 0.95rem;
   cursor: pointer;
   transition: background 0.2s;
