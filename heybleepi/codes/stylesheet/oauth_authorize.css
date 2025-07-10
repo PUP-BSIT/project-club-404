@@ -1,21 +1,22 @@
 body {
-  background: linear-gradient(135deg, #1a2236 0%, #232946 100%);
-  font-family: 'Inter', Arial, sans-serif;
+  background: #0f111a;
+  font-family: 'Quicksand', sans-serif;
   margin: 0;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #fff;
 }
 
 .main-container {
   max-width: 400px;
   width: 100%;
   margin: 3rem auto;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(24, 25, 28, 0.9);
   border-radius: 18px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-  padding: 2.5rem 2rem 2rem 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  padding: 2.5rem 2rem 2rem;
   position: relative;
 }
 
@@ -23,9 +24,7 @@ body {
   display: flex;
   align-items: center;
   gap: 1rem;
-  background: transparent;
   margin-bottom: 2rem;
-  font-family: 'Quicksand', sans-serif;
 }
 
 .oauth-mascot {
@@ -33,16 +32,15 @@ body {
   height: 48px;
   border-radius: 12px;
   object-fit: cover;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .oauth-title {
-  font-family: 'Quicksand', cursive, Arial, sans-serif;
   font-size: 1.5rem;
   color: #fff;
   margin: 0;
   font-weight: 700;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
 }
 
 .mascot {
@@ -51,68 +49,68 @@ body {
   border-radius: 50%;
   margin-bottom: 0.5rem;
   object-fit: cover;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-.main-text h1, h3 {
+.main-text h1,
+.main-text h3 {
   margin: 0.5rem 0;
   color: #fff;
   font-weight: 700;
-  letter-spacing: 1px;
-  margin-bottom: 2.5rem;
   text-align: center;
+  margin-bottom: 1.5rem;
 }
 
 .main-text p {
   color: #c9d1e6;
   margin-bottom: 1.5rem;
+  text-align: center;
+  font-size: 0.95rem;
 }
 
 .form-section {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 1rem;
 }
 
 .input-group {
   position: relative;
   display: flex;
   align-items: center;
-  margin-bottom: 1.2rem;
-  min-height: 48px;
+  margin-bottom: 0.75rem;
 }
 
 .input-icon {
   position: absolute;
   left: 1rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: #999;
   font-size: 1rem;
   pointer-events: none;
 }
 
 .form-input::placeholder {
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .form-input {
   width: 100%;
   padding: 0.875rem 1rem 0.75rem 2.5rem;
-  background-color: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
   color: white;
-  outline: none;
   font-size: 0.875rem;
-  font-family: 'Quicksand', sans-serif;
 }
 
 .form-input:focus {
-  box-shadow: 0 0 0 2px rgba(138, 111, 223, 0.5);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(79, 138, 255, 0.4);
 }
 
 .form-input:-webkit-autofill {
-  background-color: rgba(255, 255, 255, 0.05) !important;
-  -webkit-box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important;
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  -webkit-box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.04) inset !important;
   -webkit-text-fill-color: #fff !important;
   transition: background-color 5000s ease-in-out 0s;
 }
@@ -120,46 +118,45 @@ body {
 .auth-button {
   width: 100%;
   padding: 0.75rem;
-  background-image: linear-gradient(to right, #8A6FDF, #FF9EE5);
-  color: white;
-  font-weight: 500;
+  background-image: #fff;
+  color: #151313;
+  font-weight: 600;
   border-radius: 8px;
   cursor: pointer;
-  transition: opacity 0.3s ease;
+  transition: background 0.3s ease, opacity 0.3s ease;
   border: none;
-  margin-top: 1rem;
+  font-size: 0.95rem;
 }
 
 .auth-button:hover {
-  opacity: 0.8;
+  opacity: 0.85;
 }
 
 /* Deny button override */
 .deny-auth-button {
-  width: 94%;
+  width: 100%;
   padding: 0.75rem;
-  background: linear-gradient(to right, #c00, #a00);
+  background: linear-gradient(to right, #d00000, #7b0000);
   color: white;
-  font-weight: 500;
+  font-weight: 600;
   border-radius: 8px;
   cursor: pointer;
   transition: opacity 0.3s ease;
   border: none;
-  font-family: 'Quicksand', sans-serif;
-  display: block;
+  font-size: 0.95rem;
   text-align: center;
   text-decoration: none;
 }
 
 .deny-auth-button:hover {
-  opacity: 0.8;
+  opacity: 0.85;
 }
 
 .button-group {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
 }
 
 /* Password hide/show */
@@ -168,18 +165,11 @@ body {
   right: 1rem;
   background: none;
   border: none;
-  color: #b0b8d1;
-  font-size: 1.3rem;
+  color: #aaa;
+  font-size: 1.2rem;
   cursor: pointer;
   outline: none;
   display: flex;
   align-items: center;
   padding: 0;
-}
-
-.input-group {
-  position: relative;
-  display: flex;
-  align-items: center;
-  margin-bottom: 0.5rem;
 }
