@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'configuration.php';
+require_once __DIR__ . '/configuration.php';
 
 if (!isset($_SESSION['id'])) {
   http_response_code(401);

@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'configuration.php';
+require_once __DIR__ . 'configuration.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['post_id'], $_POST['new_content'])) {
   $post_id = intval($_POST['post_id']);
@@ -14,6 +14,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['post_id'], $_POST['ne
   }
 }
 
-header("Location: profile.php");
+header("Location: /profile");
 exit();
 ?>

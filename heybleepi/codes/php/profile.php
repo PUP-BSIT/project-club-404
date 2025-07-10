@@ -1,10 +1,10 @@
 <?php
 session_start();
-require_once 'configuration.php';
+require_once __DIR__ . '/configuration.php'; 
 
 // Check if user is logged in
 if (!isset($_SESSION['username'])) {
-  header("Location: index.php");
+  header("Location: /");
   exit();
 }
 
@@ -75,7 +75,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   if (isset($_POST['post_content']) && $userId == $_SESSION['id']) {
     $post_content = trim($_POST['post_content']);
     $location = $_POST['location'] ?? null;
-    $upload_dir = "uploads/";
+    $upload_dir = __DIR__ . '/uploads/';
     if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
 
     // Insert post first to get post_id
@@ -119,9 +119,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     // Redirect to correct profile
     if ($userId == $_SESSION['id']) {
-      header("Location: profile.php");
+      header("Location: /profile");
     } else {
-      header("Location: profile.php?user=" . urlencode($user['user_name']));
+      header("Location: /profile?user=" . urlencode($user['user_name']));
     }
     exit();
   }
@@ -155,9 +155,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     // Redirect to correct profile
     if ($userId == $_SESSION['id']) {
-      header("Location: profile.php");
+      header("Location: /profile");
     } else {
-      header("Location: profile.php?user=" . urlencode($user['user_name']));
+      header("Location: /profile?user=" . urlencode($user['user_name']));
     }
     exit();
   }
@@ -198,7 +198,7 @@ function getAlbumCover($albumId, $conn) {
   $stmt->bind_result($path);
   $stmt->fetch();
   $stmt->close();
-  return $path ? $path : '../assets/profile/default.png';
+  return $path ? $path : '/assets/profile/default.png';
 }
 
 // Fetch all user images and videos for tabs
@@ -296,10 +296,10 @@ function timeAgo($datetime) {
   <head>
     <meta charset="UTF-8" />
     <title>Heybleepi • <?php echo htmlspecialchars($user['user_name']); ?>'s Profile</title>
-    <link rel="icon" href="../assets/logo.png" type="image/png" />
+    <link rel="icon" href="/heybleepi-production/heybleepi/codes/assets/logo.png" type="image/png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="../stylesheet/dashboard.css" />
+    <link rel="stylesheet" href="/heybleepi-production/heybleepi/codes/stylesheet/dashboard.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=close" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -321,7 +321,7 @@ function timeAgo($datetime) {
     <aside class="sidebar sidebar--icononly">
       <!-- Logo at the top -->
       <div class="sidebar-logo">
-        <img src="../assets/logo-hb.png" alt="HEYBLEEPI Logo" style="width:36px;height:36px;">
+        <img src="/heybleepi-production/heybleepi/codes/assets/logo-hb.png" alt="HEYBLEEPI Logo" style="width:36px;height:36px;">
       </div>
 
       <nav class="sidebar-nav">
@@ -347,7 +347,7 @@ function timeAgo($datetime) {
             <span class="sidebar-badge"></span>
           <?php endif; ?>
         </a>
-        <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'active' : '' ?>" href="profile.php?user_id=<?= $_SESSION['id']?>" title="Profile">
+        <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'profile' ? 'active' : '' ?>" href="/profile?user_id=<?= $_SESSION['id']?>" title="Profile">
           <i class="ri-user-line"></i>
         </a>
       </nav>
@@ -404,9 +404,9 @@ function timeAgo($datetime) {
     <main class="profile-container">
       <!-- Banner + Profile info -->
       <div class="profile-top glass">
-        <img class="banner-img" src="../assets/profile/<?= htmlspecialchars($user['profile_cover'] ?? 'banner.jpg') ?>" alt="Banner" />
+        <img class="banner-img" src="/heybleepi-production/heybleepi/codes/assets/profile/<?= htmlspecialchars($user['profile_cover'] ?? 'banner.jpg') ?>" alt="Banner" />
         <div class="profile-info-bar">
-          <img class="avatar avatar--sm2" src="../assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'default.png') ?>" alt="">
+          <img class="avatar avatar--sm2" src="/heybleepi-production/heybleepi/codes/assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'default.png') ?>" alt="">
           <div class="user-basic-info">
             <h2><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></h2>
             <p>@<?= htmlspecialchars($user['user_name']) ?></p>
@@ -509,9 +509,9 @@ function timeAgo($datetime) {
                 $query->fetch();
                 $query->close();
 
-                $postAvatarPath = '../assets/profile/' . ($profilePicture ?? 'default.png');
+                $postAvatarPath = '/heybleepi-production/heybleepi/codes/assets/profile/' . ($profilePicture ?? 'default.png');
                 if (!file_exists($postAvatarPath)) {
-                  $postAvatarPath = '../assets/profile/default.png';
+                  $postAvatarPath = '/heybleepi-production/heybleepi/codes/assets/profile/default.png';
                 }
               ?>
               <img class="avatar avatar--sm" src="<?= $postAvatarPath ?>" alt="Profile">
@@ -556,7 +556,7 @@ function timeAgo($datetime) {
                   onClick="closeCreatePostPreview()">close</span>
                 <form
                   method="POST"
-                  action="profile.php"
+                  action="/profile"
                   enctype="multipart/form-data"
                   class="preview-form">
                   <h1>Create Post</h1>
@@ -759,7 +759,7 @@ function timeAgo($datetime) {
 
             <article class="glass post">
               <header class="post-header">
-                <img class="avatar avatar--sm" src="../assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'default.png') ?>" alt="User Avatar">
+                <img class="avatar avatar--sm" src="/heybleepi-production/heybleepi/codes/assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'default.png') ?>" alt="User Avatar">
                 <div class="poster-meta" style="display: flex; align-items: center; gap: 8px;">
                   <h4 style="margin:0; font-size:1.08em;"><?= htmlspecialchars($post['first_name'] . ' ' . $post['last_name']) ?></h4>
                   <span title="Posted at:  <?= date("F j, Y g:i A", strtotime($post['created_at']))?>" class="post-time" style="color:#aaa; font-size:0.98em;">
@@ -927,7 +927,7 @@ function timeAgo($datetime) {
 
                <!-- COMMENTS SECTION -->
               <div id="comment-form-<?= $post['post_id'] ?>" class="hidden" style="margin-top:10px;">
-                <form method="POST" action="profile.php">
+                <form method="POST" action="/profile">
                   <input type="hidden" name="comment_post_id" value="<?= $post['post_id'] ?>">
                   <input type="text" name="comment_text" placeholder="Write a comment…" required style="width: 100%; padding: 8px;">
                   <button type="submit" class="btn btn--primary btn--sm" style="margin-top:5px;">Comment</button>
@@ -1025,10 +1025,10 @@ function timeAgo($datetime) {
                     $profilePic = !empty($follower['profile_picture']) ? $follower['profile_picture'] : 'default.png';
                   ?>
                   <li style="display:flex;align-items:center;gap:12px;margin-bottom:12px;margin-left: 20px;">
-                    <img class="avatar avatar--sm" src="../assets/profile/<?= htmlspecialchars($profilePic) ?>" alt="">
+                    <img class="avatar avatar--sm" src="/heybleepi-production/heybleepi/codes/assets/profile/<?= htmlspecialchars($profilePic) ?>" alt="">
                     <div>
                       <a class="poster-name" 
-                        href="profile.php?user=<?=$follower['user_name']?>&user_id=<?=$follower['id']?>">
+                        href="/profile?user=<?=$follower['user_name']?>&user_id=<?=$follower['id']?>">
                         <?= htmlspecialchars($follower['first_name'] . ' ' . $follower['last_name']) ?>
                       </a>
                       <div style="font-size:0.85em;color:#aaa;">@<?= htmlspecialchars($follower['user_name']) ?></div>
@@ -1045,10 +1045,10 @@ function timeAgo($datetime) {
                     $profilePic = !empty($user['profile_picture']) ? $user['profile_picture'] : 'default.png';
                   ?>
                   <li style="display:flex;align-items:center;gap:12px;margin-bottom:12px;margin-left: 20px;">
-                    <img class="avatar avatar--sm" src="../assets/profile/<?= htmlspecialchars($profilePic) ?>" alt="">
+                    <img class="avatar avatar--sm" src="/heybleepi-production/heybleepi/codes/assets/profile/<?= htmlspecialchars($profilePic) ?>" alt="">
                     <div>
                       <a class="poster-name" 
-                        href="profile.php?user=<?=$user['user_name']?>&user_id=<?=$user['id']?>">
+                        href="/profile?user=<?=$user['user_name']?>&user_id=<?=$user['id']?>">
                         <?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?>
                       </a>
                       <div style="font-size:0.85em;color:#aaa;">@<?= htmlspecialchars($user['user_name']) ?></div>
@@ -1132,13 +1132,13 @@ function timeAgo($datetime) {
 
             input.value = postId;
 
-            form.action = "delete_post_profile.php";
+            form.action = "delete_post_profile";
 
             modal.classList.remove('hidden');
           });
         });
     </script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="../script/dashboard.js"></script>
+    <script src="/heybleepi-production/heybleepi/codes/script/dashboard.js"></script>
   </body>
 </html>

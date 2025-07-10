@@ -3,7 +3,7 @@ session_start();
 
 // Redirect if user is not logged in
 if (!isset($_SESSION['id'])) {
-    header("Location: /index");
+    header("Location: /");
     exit();
 }
 ?>

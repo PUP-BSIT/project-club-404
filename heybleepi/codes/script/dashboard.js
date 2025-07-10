@@ -254,61 +254,157 @@ document.querySelectorAll('.share-button').forEach(button => {
   });
 });
 
-// Edit comment for dashboard
-document.addEventListener('DOMContentLoaded', function () {
-  document.querySelectorAll('.btn-edit-comment-dashboard').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      const commentDiv = btn.closest('.comment');
-      const commentId = btn.getAttribute('data-id');
-      const commentTextSpan = commentDiv.querySelector('.comment-text');
-      const oldText = commentTextSpan.textContent;
+// Submit comment
+document.querySelectorAll('.comment-form').forEach(form => {
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const postId = form.dataset.postId;
+    const input = form.querySelector('input[name="comment_text"]');
+    const text = input.value.trim();
+    if (!text) return;
 
-      // Prevent multiple edit forms
-      if (commentDiv.querySelector('form')) return;
+    fetch('add_comment_dashboard.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `comment_post_id=${postId}&comment_text=${encodeURIComponent(text)}`
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        const commentsDiv = form.nextElementSibling;
+        const newDiv = document.createElement('div');
+        newDiv.className = 'comment';
+        newDiv.dataset.commentId = data.comment.id;
+        newDiv.style.marginBottom = '8px';
 
-      // Create edit form
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = 'edit_comment_dashboard.php';
-      form.style.display = 'inline';
-      form.innerHTML = `
-        <input type="hidden" name="comment_id" value="${commentId}">
-        <input type="text" name="comment_text" value="${oldText}" required style="width:60%;">
-        <button type="submit" class="btn btn--primary btn--sm">Save</button>
-        <button type="button" class="btn btn--secondary btn--sm btn-cancel-edit">Cancel</button>
-      `;
+        let html = `
+          <strong>${data.comment.user_name}:</strong>
+          <span class="comment-text">${data.comment.text}</span>
+          <small style="color:gray;"> – ${data.comment.commented_at}</small>
+        `;
 
-      // Hide old text and buttons
-      commentTextSpan.style.display = 'none';
-      btn.style.display = 'none';
-      const deleteBtn = commentDiv.querySelector('.btn-delete-comment-dashboard');
-      if (deleteBtn) deleteBtn.style.display = 'none';
+        // Only show 3 dots if it's the current user's comment
+        if (data.comment.user_id == data.current_user_id) {
+          html += `
+            <div class="comment-options">
+              <button class="icon-btn toggle-comment-options" aria-label="Options">
+                <i class="ri-more-fill"></i>
+              </button>
+              <ul class="comment-dropdown hidden">
+                <li><button class="btn-edit-comment-dashboard" data-id="${data.comment.id}">Edit</button></li>
+                <li><button class="btn-delete-comment-dashboard" data-id="${data.comment.id}">Delete</button></li>
+              </ul>
+            </div>
+          `;
+        }
 
-      commentDiv.appendChild(form);
+        newDiv.innerHTML = html;
+        commentsDiv.appendChild(newDiv);
+        input.value = '';
 
-      // Cancel button logic
-      form.querySelector('.btn-cancel-edit').onclick = function () {
-        form.remove();
-        commentTextSpan.style.display = '';
-        btn.style.display = '';
-        if (deleteBtn) deleteBtn.style.display = '';
-      };
+        const countSpan = document.getElementById(`comment-count-${postId}`);
+        if (countSpan) {
+          let count = parseInt(countSpan.textContent) || 0;
+          countSpan.textContent = count + 1;
+        }
+      }
     });
   });
 });
 
-// Delete comment for dashboard
-document.querySelectorAll('.btn-delete-comment-dashboard').forEach(function (btn) {
-  btn.addEventListener('click', function () {
-    if (!confirm('Are you sure you want to delete this comment?')) return;
-    const commentId = btn.getAttribute('data-id');
+// Edit comment (event delegation)
+document.addEventListener('click', e => {
+  if (e.target.classList.contains('btn-edit-comment-dashboard')) {
+    const btn = e.target;
+    const commentDiv = btn.closest('.comment');
+    const commentId = btn.dataset.id;
+    const textSpan = commentDiv.querySelector('.comment-text');
+    const oldText = textSpan.textContent;
+
+    // Prevent duplicate form
+    if (commentDiv.querySelector('form')) return;
+
     const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = 'delete_comment_dashboard.php';
-    form.innerHTML = `<input type="hidden" name="comment_id" value="${commentId}">`;
-    document.body.appendChild(form);
-    form.submit();
-  });
+    form.innerHTML = `
+      <input type="text" value="${oldText}" style="width:60%;">
+      <button type="submit" class="btn btn--primary btn--sm">Save</button>
+      <button type="button" class="btn btn--secondary btn--sm btn-cancel-edit">Cancel</button>
+    `;
+
+    // Hide text & buttons
+    textSpan.style.display = 'none';
+    btn.style.display = 'none';
+    const delBtn = commentDiv.querySelector('.btn-delete-comment-dashboard');
+    if (delBtn) delBtn.style.display = 'none';
+
+    commentDiv.appendChild(form);
+
+    form.addEventListener('submit', ev => {
+      ev.preventDefault();
+      const newText = form.querySelector('input').value.trim();
+      if (!newText) return;
+
+      fetch('edit_comment_dashboard.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `comment_id=${commentId}&comment_text=${encodeURIComponent(newText)}`
+      })
+      .then(res => res.text())
+      .then(resp => {
+        if (resp === 'updated') {
+          textSpan.textContent = newText;
+          form.remove();
+          textSpan.style.display = '';
+          btn.style.display = '';
+          if (delBtn) delBtn.style.display = '';
+        } else {
+          alert("Error updating comment.");
+        }
+      });
+    });
+
+    form.querySelector('.btn-cancel-edit').onclick = () => {
+      form.remove();
+      textSpan.style.display = '';
+      btn.style.display = '';
+      if (delBtn) delBtn.style.display = '';
+    };
+  }
+});
+
+// Delete comment dynamically
+document.addEventListener('click', e => {
+  if (e.target.classList.contains('btn-delete-comment-dashboard')) {
+    const btn = e.target;
+    const commentId = btn.dataset.id;
+    if (!confirm('Are you sure to delete this comment?')) return;
+
+    fetch('delete_comment_dashboard.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `comment_id=${commentId}`
+    })
+    .then(res => res.text())
+    .then(resp => {
+      if (resp === 'deleted') {
+        btn.closest('.comment').remove();
+      } else {
+        alert("Error deleting comment.");
+      }
+    });
+  }
+});
+
+// Toggle 3 dots (for new & old comments)
+document.addEventListener('click', function(e) {
+  const toggleBtn = e.target.closest('.toggle-comment-options');
+  if (toggleBtn) {
+    const dropdown = toggleBtn.nextElementSibling;
+    dropdown.classList.toggle('hidden');
+    e.stopPropagation();
+  } else {
+    document.querySelectorAll('.comment-dropdown').forEach(dd => dd.classList.add('hidden'));
+  }
 });
 
 // EDIT AND DELETE POST (DASHBOARD & PROFILE)
@@ -337,7 +433,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Detect current page (dashboard or profile)
       const isDashboard = window.location.pathname.includes("dashboard.php");
-      const actionURL = isDashboard ? "edit_post_dashboard.php" : "edit_post_profile.php";
+      const actionURL = isDashboard ? "edit_post_dashboard.php" : "edit_post_profile";
 
 
       // Prevent duplicate form
@@ -1326,7 +1422,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const postId = button.dataset.id;
       deleteInput.value = postId;
 
-      form.action = "delete_post_dashboard.php";
+      form.action = "delete_post_dashboard";
 
       // Show the modal
       modal.classList.remove('hidden');
