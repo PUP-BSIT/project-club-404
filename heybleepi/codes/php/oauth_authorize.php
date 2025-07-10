@@ -103,7 +103,7 @@ if (!isset($_SESSION['user_id'])) {
   <body>
     <div class="main-container">
       <div class="oauth-header">
-        <img src="../assets/heybleepi-mascot.jpg" alt="HeyBleepi Mascot" class="mascot">
+        <img src="../assets/logo-heybleepi-rb.png" alt="HeyBleepi Mascot" class="mascot">
         <h3 class="oauth-title">Sign in using HEYBLEEPI</h3>
       </div>
       <div class="main-text">
