@@ -1,9 +1,9 @@
 <?php
 session_start();
-require_once 'configuration.php';
+require_once __DIR__ . '/configuration.php';
 
 if (!isset($_SESSION['username'])) {
-  header("Location: index.php");
+  header("Location: /");
   exit();
 }
 
@@ -52,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['post_content'])) {
   $user_id = $_SESSION['id'];
   $post_content = trim($_POST['post_content']);
   $location = $_POST['location'] ?? null;
-  $upload_dir = "uploads/";
+  $upload_dir = __DIR__ . '/uploads/';
   if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
 
   $stmt = $conn->prepare("INSERT INTO posts (user_id, content, location) VALUES (?, ?, ?)");
@@ -93,7 +93,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['post_content'])) {
     }
   }
 
-  header("Location: dashboard.php");
+  header("Location: /dashboard");
   exit();
 }
 
@@ -128,7 +128,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['share_post_id'], $_PO
     $notifStmt->close();
   }
 
-  header("Location: dashboard.php");
+  header("Location: /dashboard");
   exit();
 }
 
@@ -178,7 +178,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['like_post_id'])) {
   }
 
   $check->close();
-  header("Location: dashboard.php");
+  header("Location: /dashboard");
   exit();
 }
 
@@ -209,7 +209,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['comment_post_id'], $_
     }
   }
 
-  header("Location: dashboard.php");
+  header("Location: /dashboard");
   exit();
 }
 
@@ -257,8 +257,8 @@ function timeAgo($datetime) {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Home • Heybleepi</title>
-    <link rel="icon" href="../assets/logo.png" type="image/png" />
-    <link rel="stylesheet" href="../stylesheet/dashboard.css" />
+    <link rel="icon" href="/heybleepi-production/heybleepi/codes/assets/logo.png" type="image/png" />
+    <link rel="stylesheet" href="/heybleepi-production/heybleepi/codes/stylesheet/dashboard.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
@@ -273,7 +273,7 @@ function timeAgo($datetime) {
         <h3>Log out</h3>
         <p>Are you sure you want to logout?</p>
         <div class="modal-actions">
-          <a href="logout.php" class="btn-danger" style="text-decoration: none;">Log out</a>
+          <a href="/logout" class="btn-danger" style="text-decoration: none;">Log out</a>
           <button type="button" class="btn-cancel" onclick="closeLogoutModal()">Cancel</button>
         </div>
       </div>
@@ -285,7 +285,7 @@ function timeAgo($datetime) {
         <aside class="sidebar sidebar--icononly">
           <!-- Logo at the top -->
           <div class="sidebar-logo">
-            <img src="../assets/logo-hb.png" alt="HEYBLEEPI Logo" style="width:36px;height:36px;">
+            <img src="/heybleepi-production/heybleepi/codes/assets/logo-hb.png" alt="HEYBLEEPI Logo" style="width:36px;height:36px;">
           </div>
 
           <nav class="sidebar-nav">
@@ -302,7 +302,7 @@ function timeAgo($datetime) {
                 <span class="badge" id="notification_count"><?= $unread_count ?></span>
               <?php endif; ?>
             </a>
-            <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'dashboard.php' ? 'active' : '' ?>" href="dashboard.php" title="Home">
+            <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'dashboard' ? 'active' : '' ?>" href="/dashboard" title="Home">
               <i class="ri-home-4-line"></i>
             </a>
             <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'messages.php' ? 'active' : '' ?>" href="messages.php" title="Messages">
@@ -311,7 +311,7 @@ function timeAgo($datetime) {
                 <span class="sidebar-badge"></span>
               <?php endif; ?>
             </a>
-            <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'active' : '' ?>" href="profile.php?user_id=<?= $_SESSION['id']?>" title="Profile">
+            <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'profile' ? 'active' : '' ?>" href="/profile?user_id=<?= $_SESSION['id']?>" title="Profile">
               <i class="ri-user-line"></i>
             </a>
           </nav>
@@ -645,11 +645,11 @@ function timeAgo($datetime) {
           <?php while ($post = $posts->fetch_assoc()): ?>
             <article class="glass post">
               <header class="post-header">
-                <a href="profile.php?user=<?= urlencode($post['user_name']) ?>&user_id=<?= $post['id']?>">
-                  <img class="avatar avatar--sm" src="../assets/profile/<?= htmlspecialchars($post['profile_picture'] ?? 'default.png') ?>" alt="">
+                <a href="/profile?user=<?= urlencode($post['user_name']) ?>&user_id=<?= $post['id']?>">
+                  <img class="avatar avatar--sm" src="/heybleepi-production/heybleepi/codes/assets/profile/<?= htmlspecialchars($post['profile_picture'] ?? 'default.png') ?>" alt="">
                 </a>
                 <div class="poster-meta">
-                  <a href="profile.php?user=<?= urlencode($post['user_name']) ?>&user_id=<?= $post['id']?>" class="poster-name" style="display:inline;">
+                  <a href="/profile?user=<?= urlencode($post['user_name']) ?>&user_id=<?= $post['id']?>" class="poster-name" style="display:inline;">
                     <?= htmlspecialchars($post['first_name'] . ' ' . $post['last_name']) ?>
                   </a>
                   <span title="Posted at: <?= date("F j, Y g:i A", strtotime($post['created_at']))?>" class="post-time" style="color:#aaa; font-size:0.98em; margin-left:8px;">
@@ -923,6 +923,6 @@ function timeAgo($datetime) {
     </script>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="../script/dashboard.js"></script>
+    <script src="/heybleepi-production/heybleepi/codes/script/dashboard.js"></script>
   </body>
 </html>

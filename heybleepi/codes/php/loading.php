@@ -67,7 +67,7 @@ if (!isset($_SESSION['id'])) {
 
   <script>
     setTimeout(() => {
-      window.location.href = '/heybleepi-production/heybleepi/codes/php/dashboard.php';
+      window.location.href = '/dashboard';
     }, 2000);
   </script>
 </body>
