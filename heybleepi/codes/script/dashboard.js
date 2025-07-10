@@ -207,7 +207,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const icon = this.querySelector("i");
       const countSpan = this.querySelector("span");
 
-      fetch("like_toggle.php", {
+      fetch("/heybleepi-production/heybleepi/codes/php/like_toggle.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `post_id=${postId}`
