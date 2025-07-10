@@ -3,11 +3,10 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-//session_start();
-require_once 'configuration.php';
+require_once __DIR__ . '/configuration.php'; 
 
 function redirectWithMessage($message, $type = "error") {
-    header("Location: index.php?message=" . urlencode($message) . "&type=" . $type);
+    header("Location: /index?message=" . urlencode($message) . "&type=" . $type);
     exit();
 }
 
@@ -35,8 +34,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['register'])) {
     $stmt->bind_param("sssssss", $username, $fname, $mname, $lname, $email, $birthdate, $password);
 
     if ($stmt->execute()) {
-        // Optional: redirect to login form instead of auto-login
-        header("Location: index.php?registration=success");
+        // ✅ Absolute redirect
+        header("Location: /index?registration=success");
         exit();
     } else {
         redirectWithMessage("Error: " . $stmt->error);
@@ -71,7 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
             $_SESSION['avatar'] = $user['profile_picture'] ?? 'default.png';
             $_SESSION['isloginok'] = true;
 
-            header("Location: loading.php");
+            header("Location: /loading");
             exit();
         } else {
             redirectWithMessage("Invalid password.");

@@ -3,7 +3,7 @@ session_start();
 
 // Redirect if user is not logged in
 if (!isset($_SESSION['id'])) {
-    header("Location: index.php");
+    header("Location: /index");
     exit();
 }
 ?>
@@ -13,8 +13,8 @@ if (!isset($_SESSION['id'])) {
 <head>
   <meta charset="UTF-8">
   <title>Heybleepi</title>
-  <link rel="icon" href="../assets/logo.png" type="image/png" />
-  <link rel="stylesheet" href="../stylesheet/dashboard.css">
+  <link rel="icon" href="/heybleepi-production/heybleepi/codes/assets/logo.png" type="image/png" />
+  <link rel="stylesheet" href="/heybleepi-production/heybleepi/codes/stylesheet/dashboard.css">
   <style>
        body {
       margin: 0;
@@ -61,13 +61,13 @@ if (!isset($_SESSION['id'])) {
 </head>
 <body>
   <div class="loading-wrapper">
-    <img src="../assets/logo-heybleepi-rb.png" alt="HEYBLEEPI Logo" class="loading-logo">
+    <img src="/heybleepi-production/heybleepi/codes/assets/logo-heybleepi-rb.png" alt="HEYBLEEPI Logo" class="loading-logo">
   </div>
   <div class="loading-text"><strong>Heybleepi</strong> by Club-404</div>
 
   <script>
     setTimeout(() => {
-      window.location.href = 'dashboard.php';
+      window.location.href = '/heybleepi-production/heybleepi/codes/php/dashboard.php';
     }, 2000);
   </script>
 </body>

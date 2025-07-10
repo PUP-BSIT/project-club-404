@@ -1,12 +1,13 @@
 <?php
 session_start();
-require_once 'users.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/heybleepi-production/heybleepi/codes/php/users.php';
+
 
 $message = '';
 $messageType = '';
 $activeTab = 'login'; // Default tab
 if(isset($_SESSION['isloginok']) && $_SESSION['isloginok'] === true) {
-    header('Location: loading.php');
+    header('Location: /loading');
     exit();
 }
 
@@ -39,13 +40,13 @@ if (isset($_GET['message'])) {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>HeyBleepi • Connect in the Galaxy</title>
-    <link rel="icon" href="../assets/logo.png" type="image/png" />
+    <link rel="icon" href="/heybleepi-production/heybleepi/codes/assets/logo.png" type="image/png" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="../stylesheet/form_style.css" />
+    <link rel="stylesheet" href="/heybleepi-production/heybleepi/codes/stylesheet/form_style.css" />
   </head>
 
   <body>
@@ -59,7 +60,7 @@ if (isset($_GET['message'])) {
               <h1 class="heading">HeyBleepi</h1>
               <p class="subheading">Connect with friends across the galaxy</p>
               <div class="image-container">
-                <img src="../assets/heybleepi-mascot.jpg" alt="HeyBleepi Cat Mascot" class="mascot" />
+                <img src="/heybleepi-production/heybleepi/codes/assets/heybleepi-mascot.jpg" alt="HeyBleepi Cat Mascot" class="mascot" />
               </div>
               <p class="description">
                 Join thousands of space explorers connecting across the universe
@@ -86,7 +87,7 @@ if (isset($_GET['message'])) {
               <?php endif; ?>
 
               <!-- Login form -->
-              <form id="login-form" class="form-section <?php echo $activeTab === 'register' ? 'hidden' : ''; ?>" method="POST" action="index.php">
+              <form id="login-form" class="form-section <?php echo $activeTab === 'register' ? 'hidden' : ''; ?>" method="POST" action="/heybleepi-production/heybleepi/codes/php/index.php">
                 <div class="input-group">
                   <i class="ri-mail-line input-icon"></i>
                   <input type="email" name="email" placeholder="Email" class="form-input" 
@@ -107,7 +108,7 @@ if (isset($_GET['message'])) {
                     <span class="checkmark"></span>
                     <span>Remember me</span>
                   </label>
-                  <a href="forgot_password.php" class="link">Forgot password?</a>
+                  <a href="/heybleepi-production/heybleepi/codes/php/forgot_password.php" class="link">Forgot password?</a>
                 </div>
 
                 <button type="submit" name="login" class="auth-button">Login</button>
@@ -119,19 +120,19 @@ if (isset($_GET['message'])) {
                 </div>
 
                 <div class="social-connection">
-                    <a href="oauth_login.php?provider=devhive" class="account-btn">
-                      <img src="../assets/connected_accounts/devhive.jpg" alt="Devhive logo">
+                    <a href="/heybleepi-production/heybleepi/codes/php/oauth_login.php?provider=devhive" class="account-btn">
+                      <img src="/heybleepi-production/heybleepi/codes/assets/connected_accounts/devhive.jpg" alt="Devhive logo">
                       Devhive
                     </a>
-                    <a href="oauth_login.php?provider=hershive" class="account-btn">
-                      <img src="../assets/connected_accounts/hershell.png" alt="Hershell logo">
+                    <a href="/heybleepi-production/heybleepi/codes/php/oauth_login.php?provider=hershive" class="account-btn">
+                      <img src="/heybleepi-production/heybleepi/codes/assets/connected_accounts/hershell.png" alt="Hershell logo">
                       Hershell
                     </a>
                 </div>
               </form>
 
               <!-- Register form -->
-              <form id="register-form" class="form-section <?php echo $activeTab === 'login' ? 'hidden' : ''; ?>" method="POST" action="index.php">
+              <form id="register-form" class="form-section <?php echo $activeTab === 'login' ? 'hidden' : ''; ?>" method="POST" action="/heybleepi-production/heybleepi/codes/php/index.php">
                 <div class="input-group">
                   <i class="ri-user-line input-icon"></i>
                   <input type="text" name="username" placeholder="Username (must be unique)" class="form-input" 
@@ -196,6 +197,6 @@ if (isset($_GET['message'])) {
       </div>
     </div>
 
-    <script src="../script/form_script.js"></script>
+    <script src="/heybleepi-production/heybleepi/codes/script/form_script.js"></script>
   </body>
 </html>
