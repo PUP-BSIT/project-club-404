@@ -353,7 +353,7 @@ function timeAgo($datetime) {
         <div id="sidebarMoreMenu" class="sidebar-more-menu hidden">
           <ul>
             <li>
-              <a href="/settings"><i class="ri-settings-4-line"></i> Settings</a>
+              <a href="/heybleepi-production/heybleepi/codes/php/settings.php"><i class="ri-settings-4-line"></i> Settings</a>
             </li>
             <li>
               <button onclick="openLogoutModal()" class="sidebar-more-menu-btn logout">
