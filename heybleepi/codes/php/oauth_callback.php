@@ -207,5 +207,5 @@ $_SESSION['last_name'] = $user['last_name'];
 $_SESSION['full_name'] = $user['first_name'] . ' ' . $user['last_name'];
 $_SESSION['isAllowed'] = 'allowed_to_share';
 
-header('Location: dashboard.php');
+header('Location: loading.php');
 exit;
