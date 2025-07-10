@@ -433,7 +433,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Detect current page (dashboard or profile)
       const isDashboard = window.location.pathname.includes("/dashboard");
-      const actionURL = isDashboard ? "edit_post_dashboard.php" : "edit_post_profile";
+      const actionURL = isDashboard ? "/edit_post_dashboard" : "/edit_post_profile";
 
 
       // Prevent duplicate form

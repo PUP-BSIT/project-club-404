@@ -338,7 +338,7 @@ function timeAgo($datetime) {
             <span class="badge" id="notification_count"><?= $unread_count ?></span>
           <?php endif; ?>
         </a>
-        <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'dashboard.php' ? 'active' : '' ?>" href="dashboard.php" title="Home">
+        <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'dashboard' ? 'active' : '' ?>" href="/dashboard" title="Home">
           <i class="ri-home-4-line"></i>
         </a>
         <a class="sidebar-icon-link <?= basename($_SERVER['PHP_SELF']) === 'messages.php' ? 'active' : '' ?>" href="messages.php" title="Messages">
