@@ -1,10 +1,10 @@
 <?php
 session_start();
-require_once 'configuration.php';
+require_once __DIR__ . '/configuration.php';
 
 // Ensure user is logged in
 if (!isset($_SESSION['username'])) {
-  header("Location: index.php");
+  header("Location: /");
   exit();
 }
 
@@ -30,8 +30,8 @@ if ($result->num_rows > 0) {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
-    <link href="../stylesheet/settings.css" rel="stylesheet">
-    <link rel="icon" href="../assets/logo.png" type="image/png" />
+    <link href="/heybleepi-production/heybleepi/codes/stylesheet/settings.css" rel="stylesheet">
+    <link rel="icon" href="/heybleepi-production/heybleepi/codes/assets/logo.png" type="image/png" />
     <title>Settings</title>
   </head>
 
@@ -46,7 +46,7 @@ if ($result->num_rows > 0) {
             <button 
               type="button"
               class="buttons logout-btn"
-              onClick="window.location.href='logout.php'">
+              onClick="window.location.href='/logout'">
                 Logout
             </button>
           </form>
@@ -95,7 +95,7 @@ if ($result->num_rows > 0) {
     <!-- Navigation: Acc Info, Privacy Settings, Logout-->
     <div id="navigation">
       <div class=logo-container>
-        <img src="../assets/logo-hb.png" style="width: 80px; height: 80px;"/>
+        <img src="/heybleepi-production/heybleepi/codes/assets/logo-hb.png" style="width: 80px; height: 80px;"/>
       </div>
 
       <div id="buttons_container">
@@ -115,7 +115,7 @@ if ($result->num_rows > 0) {
            <span class="material-symbols-outlined">security</span>
         </button>
 
-        <a href="dashboard.php" class="back-to-dashboard" title="Back to dashboard">
+        <a href="/dashboard" class="back-to-dashboard" title="Back to dashboard">
           <span class="material-symbols-outlined">
             home
           </span>
@@ -285,6 +285,6 @@ if ($result->num_rows > 0) {
     </div>
     <!-- End of Section -->
 
-    <script src="../script/settings.js"></script>
+    <script src="/heybleepi-production/heybleepi/codes/script/settings.js"></script>
   </body>
 </html>

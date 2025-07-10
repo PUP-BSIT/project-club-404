@@ -11,7 +11,7 @@ let textInfo = document.querySelector('#text_info');
 // change this from delete_account.php endpoint to web domain
 const deleteEndpointLocation = "delete_account.php" 
 // change this from update_settings.php endpoint to web domain
-const updateEndpointLocation = "update_settings.php"; 
+const updateEndpointLocation = "/update_settings"; 
 // change this from update_password.php endpoint to web domain
 const updatePasswordEndpoint = "update_password.php";
 
@@ -82,7 +82,7 @@ function deleteAccount(id) {
     alert(responseText);
     
     if (responseText == "Account deletion success, see you again!") {
-        window.location.href = "index.php"; // logout.
+        window.location.href = "/"; // logout.
     }
     
   })

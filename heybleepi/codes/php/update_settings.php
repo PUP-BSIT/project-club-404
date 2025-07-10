@@ -1,9 +1,9 @@
 <?php
 session_start();
-require_once 'configuration.php';
+require_once __DIR__ . '/configuration.php';
 
 if (!isset($_SESSION['username'])) {
-  header("Location: index.php");
+  header("Location: /");
   exit();
 }
 

@@ -353,7 +353,7 @@ function timeAgo($datetime) {
         <div id="sidebarMoreMenu" class="sidebar-more-menu hidden">
           <ul>
             <li>
-              <a href="settings.php"><i class="ri-settings-4-line"></i> Settings</a>
+              <a href="/settings"><i class="ri-settings-4-line"></i> Settings</a>
             </li>
             <li>
               <button onclick="openLogoutModal()" class="sidebar-more-menu-btn logout">
@@ -379,9 +379,9 @@ function timeAgo($datetime) {
                 $query->fetch();
                 $query->close();
               
-                $postAvatarPath = '../assets/profile/' . ($profilePicture ?? 'default.png');
+                $postAvatarPath = '/heybleepi-production/heybleepi/codes/assets/profile/' . ($profilePicture ?? 'default.png');
                 if (!file_exists($postAvatarPath)) {
-                  $postAvatarPath = '../assets/profile/default.png';
+                  $postAvatarPath = '/heybleepi-production/heybleepi/codes/assets/profile/default.png';
                 }
               ?>
               <img class="avatar avatar--sm" src="<?= $postAvatarPath ?>" alt="Profile">
