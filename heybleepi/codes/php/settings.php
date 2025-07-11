@@ -103,6 +103,7 @@ if ($result->num_rows > 0) {
           type="button"
           id="acct_info_btn"
           onClick="switchToAccountInformation()"
+          class="focus"
           title="Account Information">
             <span class="material-symbols-outlined">manage_accounts</span>
         </button>
@@ -111,11 +112,15 @@ if ($result->num_rows > 0) {
           type="button"
           id="privacy_settings_btn"
           onClick="switchToPrivacySettings()"
+          class=""
           title="Privacy and Security">
            <span class="material-symbols-outlined">security</span>
         </button>
 
-        <a href="dashboard.php" class="back-to-dashboard" title="Back to dashboard">
+        <a href="dashboard.php" 
+          id="back_to_dashboard_btn"
+          class="back-to-dashboard" 
+          title="Back to dashboard">
           <span class="material-symbols-outlined">
             home
           </span>

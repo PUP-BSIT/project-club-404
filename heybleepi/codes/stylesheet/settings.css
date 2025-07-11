@@ -87,13 +87,13 @@ body {
   margin: 230px 0 0 0;
 }
 
-#buttons_container button {
+#buttons_container button, .back-to-dashboard {
   background-color: transparent;
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  color: white;
+  color: rgba(138, 138, 138, 0.7);
   font-weight: 500;
   transition: background 0.2s;
 }
@@ -103,6 +103,10 @@ body {
 #buttons_container .back-to-dashboard:hover {
   background: rgba(255, 255, 255, 0.15);
   font-weight: bold;
+}
+
+#buttons_container .back-to-dashboard:hover {
+  color: white;
 }
 
 /* Logout Button */
@@ -531,7 +535,7 @@ body {
 }
 
 .back-to-dashboard {
-  color: white;
+  color: rgba(255, 255, 255, 0.2);
   text-decoration: none;
   padding: 10px 20px;
 }
@@ -566,6 +570,10 @@ body {
 
 .hidden {
   display: none;
+}
+
+.focus {
+  color: rgba(255, 255, 255, 0.8) !important;
 }
 
 /* Mobile S */
@@ -1206,6 +1214,8 @@ body {
     left: 20%;
   }
 }
+
+
 
 @media (min-width: 1025px) {
   #navigation {
