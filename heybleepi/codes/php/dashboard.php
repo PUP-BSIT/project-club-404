@@ -484,7 +484,7 @@ function timeAgo($datetime) {
                   <div class="styled-hr"></div>
                 </form>
               </div>
-              <div class="location-container">
+              <div id="location_container" class="location-container hidden">
                 <!-- Location Text Preview -->
                 <div class="create-post-location-preview" id="locationTextPreview" style="display: none;">
                   📍 <span id="locationNamePreview">Selected location</span>

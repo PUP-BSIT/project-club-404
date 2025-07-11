@@ -78,6 +78,8 @@ $stmt->close();
       list-style: none;
       margin: 0;
       padding: 0;
+      height: 80vh;
+      overflow-y: scroll;
     }
 
     .notif-feed-item {

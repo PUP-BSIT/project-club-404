@@ -1144,6 +1144,9 @@ if (postLocationInput) {
   });
 }
 
+// Location Container
+const previewDiv = document.getElementById('location_container');
+
 // Remove location
 if (removeLocationBtn) {
   removeLocationBtn.onclick = function () {
@@ -1151,6 +1154,7 @@ if (removeLocationBtn) {
       postLocationInput.value = '';
       postLocationInput.dispatchEvent(new Event('input'));
     }
+    previewDiv.classList.add('hidden');
     document.getElementById('locationTextPreview').style.display = 'none';
   };
 }
@@ -1162,12 +1166,14 @@ window.setLocationPreview = function (locationText) {
     postLocationInput.dispatchEvent(new Event('input'));
   }
 
+  const previewDiv = document.getElementById('location_container');
   const previewText = document.getElementById('locationTextPreview');
   const previewName = document.getElementById('locationNamePreview');
 
   if (previewText && previewName) {
     previewName.textContent = locationText;
     previewText.style.display = 'flex'; // make visible
+    previewDiv.classList.remove('hidden');
   }
 };
 
@@ -1205,10 +1211,12 @@ function closeCreatePostPreview() {
   const closeBtn = document.querySelector("#close_preview_btn");
   const previewOverlay = document.querySelector("#post_preview_overlay");
   const mainTextArea = document.querySelector(".create-post-input");
+  const previewDiv = document.getElementById('location_container');
 
   if (closeBtn) {
     previewOverlay.classList.add("hidden");
     mainTextArea.disabled = false;
+    previewDiv.classList.add('hidden');
   }
 
 }
