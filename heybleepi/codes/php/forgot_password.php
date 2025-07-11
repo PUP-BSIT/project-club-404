@@ -57,6 +57,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <title>Heybleepi • Forgot Password</title>
   <link rel="stylesheet" href="../stylesheet/forgot_password.css" />
   <link rel="icon" href="../assets/logo.png" type="image/png" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 </head>
 <body>
   <div id="stars-container">
@@ -65,6 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h2 class="heading">Reset Your Password</h2>
         <form method="POST">
           <div class="input-group">
+            <i class="ri-mail-line input-icon"></i>
             <input 
               type="email" 
               name="email" 
