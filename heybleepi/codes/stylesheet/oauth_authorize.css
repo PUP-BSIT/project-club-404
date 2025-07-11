@@ -165,6 +165,19 @@ body {
   margin-top: 1.5rem;
 }
 
+.change-account .switch-account {
+ background: transparent;
+ color: #fff;
+ text-decoration: underline;
+ border: none;
+ cursor: pointer;
+}
+
+.change-account {
+ display: flex;
+ justify-content: flex-end;
+}
+
 /* Password hide/show */
 .input-toggle {
   position: absolute;

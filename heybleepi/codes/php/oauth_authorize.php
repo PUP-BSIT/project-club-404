@@ -70,6 +70,12 @@ if (isset($_POST['deny'])) {
   exit;
 }
 
+if (isset($_POST['switch-account'])) {
+    session_unset();
+    session_destroy();
+    session_start(); // Restart session
+}
+
 // Login 
 if (!isset($_SESSION['user_id'])) {
   if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['password'])) {
@@ -166,6 +172,9 @@ if (!isset($_SESSION['user_id'])) {
 </head>
 <body>
   <div class="main-container">
+      <form method="post" class="change-account">
+        <button type="submit" name="switch-account" class="switch-account">Login with another account</button> 
+      </form>
     <div class="oauth-header">
       <img src="../assets/logo-heybleepi-rb.png" alt="HeyBleepi Mascot" class="mascot">
       <h3 class="oauth-title">Sign in using HEYBLEEPI</h3>
