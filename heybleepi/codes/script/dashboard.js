@@ -122,83 +122,6 @@ function attachDynamicListeners() {
   });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  // Delete
-  document.querySelectorAll(".btn-delete-comment").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const commentId = btn.dataset.id;
-      fetch("comment_actions.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `comment_id=${commentId}&action=delete`
-      })
-        .then(res => res.text())
-        .then(resp => {
-          if (resp === "deleted") {
-            btn.closest(".comment").remove();
-          }
-        });
-    });
-  });
-});
-
-// Edit comment for profile
-document.addEventListener('DOMContentLoaded', function () {
-  document.querySelectorAll('.btn-edit-comment').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      const commentDiv = btn.closest('.comment');
-      const commentId = btn.getAttribute('data-id');
-      const commentTextSpan = commentDiv.querySelector('span');
-      const oldText = commentTextSpan.textContent;
-
-      // Prevent multiple edit forms
-      if (commentDiv.querySelector('form')) return;
-
-      // Create edit form
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = 'edit_comment_profile.php';
-      form.style.display = 'inline';
-      form.innerHTML = `
-        <input type="hidden" name="comment_id" value="${commentId}">
-        <input type="text" name="comment_text" value="${oldText}" required style="width:60%;">
-        <button type="submit" class="btn btn--primary btn--sm">Save</button>
-        <button type="button" class="btn btn--secondary btn--sm btn-cancel-edit">Cancel</button>
-      `;
-
-      // Hide old text and buttons
-      commentTextSpan.style.display = 'none';
-      btn.style.display = 'none';
-      const deleteBtn = commentDiv.querySelector('.btn-delete-comment');
-      if (deleteBtn) deleteBtn.style.display = 'none';
-
-      commentDiv.appendChild(form);
-
-      // Cancel button logic
-      form.querySelector('.btn-cancel-edit').onclick = function () {
-        form.remove();
-        commentTextSpan.style.display = '';
-        btn.style.display = '';
-        if (deleteBtn) deleteBtn.style.display = '';
-      };
-    });
-  });
-});
-
-// Delete comment for profile
-document.querySelectorAll('.btn-delete-comment').forEach(function (btn) {
-  btn.addEventListener('click', function () {
-    if (!confirm('Are you sure you want to delete this comment?')) return;
-    const commentId = btn.getAttribute('data-id');
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = 'delete_comment_profile.php';
-    form.innerHTML = `<input type="hidden" name="comment_id" value="${commentId}">`;
-    document.body.appendChild(form);
-    form.submit();
-  });
-});
-
 // Like
 document.addEventListener("DOMContentLoaded", function () {
   document.querySelectorAll(".like-button").forEach(button => {
@@ -254,61 +177,285 @@ document.querySelectorAll('.share-button').forEach(button => {
   });
 });
 
-// Edit comment for dashboard
-document.addEventListener('DOMContentLoaded', function () {
-  document.querySelectorAll('.btn-edit-comment-dashboard').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      const commentDiv = btn.closest('.comment');
-      const commentId = btn.getAttribute('data-id');
-      const commentTextSpan = commentDiv.querySelector('.comment-text');
-      const oldText = commentTextSpan.textContent;
+// === COMMENT SUBMIT HANDLER (works for dashboard & profile) ===
+document.querySelectorAll('.comment-form').forEach(form => {
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const postId = form.dataset.postId;
+    const context = form.dataset.context; // "dashboard" or "profile"
+    const input = form.querySelector('input[name="comment_text"]');
+    const text = input.value.trim();
+    if (!text) return;
 
-      // Prevent multiple edit forms
-      if (commentDiv.querySelector('form')) return;
+    let url = (context === 'dashboard') ? 'add_comment_dashboard.php' :
+              (context === 'profile') ? 'add_comment_profile.php' : '';
+    if (!url) { console.error('Unknown context'); return; }
 
-      // Create edit form
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = 'edit_comment_dashboard.php';
-      form.style.display = 'inline';
-      form.innerHTML = `
-        <input type="hidden" name="comment_id" value="${commentId}">
-        <input type="text" name="comment_text" value="${oldText}" required style="width:60%;">
-        <button type="submit" class="btn btn--primary btn--sm">Save</button>
-        <button type="button" class="btn btn--secondary btn--sm btn-cancel-edit">Cancel</button>
-      `;
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `comment_post_id=${postId}&comment_text=${encodeURIComponent(text)}`
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        const commentsDiv = form.nextElementSibling;
+        const newDiv = document.createElement('div');
+        newDiv.className = 'comment';
+        newDiv.dataset.commentId = data.comment.id;
+        newDiv.style.marginBottom = '8px';
 
-      // Hide old text and buttons
-      commentTextSpan.style.display = 'none';
-      btn.style.display = 'none';
-      const deleteBtn = commentDiv.querySelector('.btn-delete-comment-dashboard');
-      if (deleteBtn) deleteBtn.style.display = 'none';
+        let html = `
+          <strong>${data.comment.user_name}:</strong>
+          <span class="comment-text">${data.comment.text}</span>
+          <small style="color:gray;"> – ${data.comment.commented_at}</small>
+        `;
 
-      commentDiv.appendChild(form);
+        if (data.comment.user_id == data.current_user_id) {
+          html += `
+            <div class="comment-options">
+              <button class="icon-btn toggle-comment-options" aria-label="Options">
+                <i class="ri-more-fill"></i>
+              </button>
+              <ul class="comment-dropdown hidden">
+                <li><button class="btn-edit-comment-${context}" data-id="${data.comment.id}">Edit</button></li>
+                <li><button class="btn-delete-comment-${context}" data-id="${data.comment.id}">Delete</button></li>
+              </ul>
+            </div>
+          `;
+        }
 
-      // Cancel button logic
-      form.querySelector('.btn-cancel-edit').onclick = function () {
-        form.remove();
-        commentTextSpan.style.display = '';
-        btn.style.display = '';
-        if (deleteBtn) deleteBtn.style.display = '';
-      };
+        newDiv.innerHTML = html;
+        commentsDiv.appendChild(newDiv);
+        input.value = '';
+
+        const countSpan = document.getElementById(`comment-count-${postId}`);
+        if (countSpan) {
+          let count = parseInt(countSpan.textContent) || 0;
+          countSpan.textContent = count + 1;
+        }
+      }
     });
   });
 });
 
-// Delete comment for dashboard
-document.querySelectorAll('.btn-delete-comment-dashboard').forEach(function (btn) {
-  btn.addEventListener('click', function () {
-    if (!confirm('Are you sure you want to delete this comment?')) return;
-    const commentId = btn.getAttribute('data-id');
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = 'delete_comment_dashboard.php';
-    form.innerHTML = `<input type="hidden" name="comment_id" value="${commentId}">`;
-    document.body.appendChild(form);
-    form.submit();
+
+// === EDIT COMMENT HANDLER (dashboard & profile) ===
+document.addEventListener('click', e => {
+  let btn, context, url;
+  if (e.target.classList.contains('btn-edit-comment-dashboard')) {
+    btn = e.target; context = 'dashboard'; url = 'edit_comment_dashboard.php';
+  } else if (e.target.classList.contains('btn-edit-comment-profile')) {
+    btn = e.target; context = 'profile'; url = 'edit_comment_profile.php';
+  } else {
+    return;
+  }
+
+  const commentDiv = btn.closest('.comment');
+  const commentId = btn.dataset.id;
+  const textSpan = commentDiv.querySelector('.comment-text');
+  const oldText = textSpan.textContent;
+
+  if (commentDiv.querySelector('form')) return; // prevent duplicate form
+
+  const form = document.createElement('form');
+  form.innerHTML = `
+    <input type="text" value="${oldText}" style="width:60%;">
+    <button type="submit" class="btn btn--primary btn--sm">Save</button>
+    <button type="button" class="btn btn--secondary btn--sm btn-cancel-edit">Cancel</button>
+  `;
+
+  textSpan.style.display = 'none';
+  btn.style.display = 'none';
+  const delBtn = commentDiv.querySelector(`.btn-delete-comment-${context}`);
+  if (delBtn) delBtn.style.display = 'none';
+
+  commentDiv.appendChild(form);
+
+  form.addEventListener('submit', ev => {
+    ev.preventDefault();
+    const newText = form.querySelector('input').value.trim();
+    if (!newText) return;
+
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `comment_id=${commentId}&comment_text=${encodeURIComponent(newText)}`
+    })
+    .then(res => res.text())
+    .then(resp => {
+      if (resp === 'updated') {
+        textSpan.textContent = newText;
+        form.remove();
+        textSpan.style.display = '';
+        btn.style.display = '';
+        if (delBtn) delBtn.style.display = '';
+      } else {
+        alert('Error updating comment.');
+      }
+    });
   });
+
+  form.querySelector('.btn-cancel-edit').onclick = () => {
+    form.remove();
+    textSpan.style.display = '';
+    btn.style.display = '';
+    if (delBtn) delBtn.style.display = '';
+  };
+});
+
+
+// === DELETE COMMENT HANDLER (dashboard & profile) ===
+let commentIdToDelete = null;
+let deleteContext = null;
+let postIdToDeleteFrom = null;
+
+document.addEventListener('click', e => {
+  if (e.target.classList.contains('btn-delete-comment-dashboard')) {
+    e.preventDefault();
+    commentIdToDelete = e.target.dataset.id;
+    deleteContext = 'dashboard';
+
+    const commentDiv = e.target.closest('.comment');
+    postIdToDeleteFrom = commentDiv?.dataset.postId;
+
+    document.getElementById('deleteCommentId').value = commentIdToDelete;
+    document.getElementById('deleteCommentModal').classList.remove('hidden');
+  } else if (e.target.classList.contains('btn-delete-comment-profile')) {
+    e.preventDefault();
+    commentIdToDelete = e.target.dataset.id;
+    deleteContext = 'profile';
+
+    const commentDiv = e.target.closest('.comment');
+    postIdToDeleteFrom = commentDiv?.dataset.postId;
+
+    document.getElementById('deleteCommentIdProfile').value = commentIdToDelete;
+    document.getElementById('deleteCommentModalProfile').classList.remove('hidden');
+  }
+});
+
+//Cancel Buttons
+document.getElementById('cancelDeleteComment')?.addEventListener('click', e => {
+  e.preventDefault();
+  document.getElementById('deleteCommentModal').classList.add('hidden');
+});
+
+document.getElementById('cancelDeleteCommentProfile')?.addEventListener('click', e => {
+  e.preventDefault();
+  document.getElementById('deleteCommentModalProfile').classList.add('hidden');
+});
+
+//Delete dashboard comment
+document.getElementById('deleteComment')?.addEventListener('submit', e => {
+  e.preventDefault();
+  if (!commentIdToDelete || deleteContext !== 'dashboard') return;
+
+  fetch('delete_comment_dashboard.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `comment_id=${commentIdToDelete}`
+  })
+  .then(res => res.text())
+  .then(resp => {
+    if (resp === 'deleted') {
+      const deletedCommentDiv = document.querySelector(`.comment[data-comment-id="${commentIdToDelete}"]`);
+
+      const postId = deletedCommentDiv?.dataset.postId;
+
+      deletedCommentDiv?.remove();
+
+      if (postId) {
+        console.log('Try decrement for postId:', postId);
+        const countSpan = document.getElementById(`comment-count-${postId}`);
+        if (countSpan) {
+          let count = parseInt(countSpan.textContent) || 0;
+          countSpan.textContent = Math.max(0, count - 1);
+        }
+      }
+
+      commentIdToDelete = null;
+      deleteContext = null;
+      document.getElementById('deleteCommentModal').classList.add('hidden');
+    } else {
+      alert('Error deleting comment.');
+    }
+  });
+});
+
+//Delete profile comment
+document.getElementById('deleteCommentProfile')?.addEventListener('submit', e => {
+  e.preventDefault();
+  if (!commentIdToDelete || deleteContext !== 'profile') return;
+
+  fetch('delete_comment_profile.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `comment_id=${commentIdToDelete}`
+  })
+  .then(res => res.text())
+  .then(resp => {
+    if (resp === 'deleted') {
+      const deletedCommentDiv = document.querySelector(`.comment[data-comment-id="${commentIdToDelete}"]`);
+
+      const postId = deletedCommentDiv?.dataset.postId;
+
+      deletedCommentDiv?.remove();
+
+      if (postId) {
+        const countSpan = document.getElementById(`comment-count-${postId}`);
+        if (countSpan) {
+          let count = parseInt(countSpan.textContent) || 0;
+          countSpan.textContent = Math.max(0, count - 1);
+        }
+      }
+
+      commentIdToDelete = null;
+      deleteContext = null;
+      document.getElementById('deleteCommentModalProfile').classList.add('hidden');
+    } else {
+      alert('Error deleting comment.');
+    }
+  });
+});
+
+// function removeCommentAndUpdateCount() {
+//   const commentDiv = document.querySelector(`.comment[data-comment-id="${commentIdToDelete}"]`);
+//   commentDiv?.remove();
+
+//   if (postIdToDeleteFrom) {
+//     const countSpan = document.getElementById(`comment-count-${postIdToDeleteFrom}`);
+//     if (countSpan) {
+//       let count = parseInt(countSpan.textContent) || 0;
+//       count = Math.max(0, count - 1);
+//       countSpan.textContent = count;
+//     }
+//   }
+// }
+
+// function resetDeleteState() {
+//   commentIdToDelete = null;
+//   deleteContext = null;
+//   postIdToDeleteFrom = null;
+// }
+
+
+// === TOGGLE COMMENT OPTIONS DROPDOWN (3 dots) ===
+document.addEventListener('click', function(e) {
+  const toggleBtn = e.target.closest('.toggle-comment-options');
+  if (toggleBtn) {
+    e.preventDefault();
+    document.querySelectorAll('.comment-dropdown').forEach(dd => {
+      const relatedDropdown = toggleBtn.parentElement.querySelector('.comment-dropdown');
+      if (dd !== relatedDropdown) dd.classList.add('hidden');
+    });
+    const dropdown = toggleBtn.parentElement.querySelector('.comment-dropdown');
+    dropdown?.classList.toggle('hidden');
+    return;
+  }
+
+  if (!e.target.closest('.comment-dropdown')) {
+    document.querySelectorAll('.comment-dropdown').forEach(dd => dd.classList.add('hidden'));
+  }
 });
 
 // EDIT AND DELETE POST (DASHBOARD & PROFILE)
@@ -514,24 +661,6 @@ document.addEventListener("DOMContentLoaded", function () {
       resultsContainer.innerHTML = "";
       resultsContainer.classList.remove("visible");
     }
-  });
-});
-
-// Dropdown toggle option for comment
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.toggle-comment-options').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const dropdown = btn.closest('.comment-options').querySelector('.comment-dropdown');
-      document.querySelectorAll('.comment-dropdown').forEach(d => {
-        if (d !== dropdown) d.classList.add('hidden');
-      });
-      dropdown.classList.toggle('hidden');
-    });
-  });
-
-  document.addEventListener('click', () => {
-    document.querySelectorAll('.comment-dropdown').forEach(d => d.classList.add('hidden'));
   });
 });
 
