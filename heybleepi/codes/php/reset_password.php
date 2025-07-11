@@ -71,6 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['reset_user_id'])) 
       <?php if ($showForm): ?>
       <form method="POST" class="form-section hidden">
         <div class="input-group">
+          <i class="ri-lock-line input-icon"></i>
           <input 
             type="password"
             id = "password"
@@ -80,6 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['reset_user_id'])) 
           <i class="ri-eye-line toggle-password" toggle="#password"></i>
         </div>
         <div class="input-group">
+          <i class="ri-lock-line input-icon"></i>
           <input 
             type="password"
             id="confirm_password"
