@@ -691,9 +691,46 @@ function timeAgo($datetime) {
                     <input type="hidden" name="share_post_id" id="share_post_id_external">
                   
                     <div class="share-options">
-                      <button type="submit" name="share_to_other" value="devhive" class="share-to-other">Share to DevHive</button>
-                      <button type="submit" name="share_to_other" value="hershive" class="share-to-other">Share to Hershive</button>
-                    </div>
+                        <button 
+                          type="submit" 
+                          name="share_to_other" 
+                          value="devhive" 
+                          class="share-to-other"
+                          <?php if (!isset($_SESSION['oauth_provider']) || !isset($_SESSION['oauth_token_devhive'])): ?>
+                            disabled 
+                            title="No token"
+                            style="color: #8f9585; 
+                            cursor: not-allowed; 
+                            pointer-events: none;" 
+                          <?php endif; ?>
+                        >
+                          <?php if (!isset($_SESSION['oauth_provider']) || !isset($_SESSION['oauth_token_devhive'])): ?>
+                            Share to DevHive (No Token)
+                          <?php else: ?>
+                            Share to DevHive
+                          <?php endif; ?>
+                        </button>
+
+                        <button 
+                          type="submit" 
+                          name="share_to_other" 
+                          value="hershive" 
+                          class="share-to-other"
+                          <?php if (!isset($_SESSION['oauth_provider']) || !isset($_SESSION['oauth_token_hershive'])): ?>
+                            disabled 
+                            title="No token"
+                            style="color: #8f9585; 
+                            cursor: not-allowed; 
+                            pointer-events: none;" 
+                          <?php endif; ?>
+                          >
+                          <?php if (!isset($_SESSION['oauth_provider']) || !isset($_SESSION['oauth_token_hershive'])): ?>
+                            Share to Hershive (No Token)
+                          <?php else: ?>
+                            Share to Hershive
+                          <?php endif; ?>
+                        </button>
+                      </div>
                 </form>
               </div>
             </div>
