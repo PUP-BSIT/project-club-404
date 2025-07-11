@@ -3,6 +3,7 @@ let privacySettings= document.querySelector('#privacy_settings_container');
 let section = document.querySelector('#section'); 
 let accountInformationBtn = document.querySelector('#acct_info_btn');
 let privacySettingsBtn = document.querySelector('#privacy_settings_btn');
+let backToDashboardBtn = document.querySelector('#back_to_dashboard_btn');
 let logoutPrompt = document.querySelector('#logout_prompt');
 let deleteAccPrompt = document.querySelector('#delete_acc');
 let smallModal = document.querySelector('#small_modal_container');
@@ -18,8 +19,10 @@ const updatePasswordEndpoint = "update_password.php";
 function switchToAccountInformation() {
   privacySettings.classList.add('hide-privacy-settings');
   privacySettings.classList.remove('show-privacy-settings');
+  accountInformationBtn.classList.add('focus');
   accountInformation.classList.remove('hide-account-info');
   accountInformation.classList.add('show-account-info');
+  privacySettingsBtn.classList.remove('focus');
 
   accountInformationBtn.disabled = true;
   privacySettingsBtn.disabled = false;
@@ -28,8 +31,10 @@ function switchToAccountInformation() {
 function switchToPrivacySettings() {
   accountInformation.classList.add('hide-account-info');
   accountInformation.classList.remove('show-account-info');
+  accountInformationBtn.classList.remove('focus');
   privacySettings.classList.remove('hide-privacy-settings');
   privacySettings.classList.add('show-privacy-settings');
+  privacySettingsBtn.classList.add('focus');
 
   accountInformationBtn.disabled = false;
   privacySettingsBtn.disabled = true;
