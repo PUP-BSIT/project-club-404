@@ -38,7 +38,7 @@ if (isset($_GET['message'])) {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>HeyBleepi • Connect in the Galaxy</title>
+    <title>Heybleepi</title>
     <link rel="icon" href="../assets/logo.png" type="image/png" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -57,12 +57,12 @@ if (isset($_GET['message'])) {
             <!-- Left panel -->
             <div class="left-panel">
               <h1 class="heading">HeyBleepi</h1>
-              <p class="subheading">Connect with friends across the galaxy</p>
+              <p class="subheading">Say hey. Drop a bleep.</p>
               <div class="image-container">
-                <img src="../assets/heybleepi-mascot.jpg" alt="HeyBleepi Cat Mascot" class="mascot" />
+                <img src="../assets/logo-heybleepi-rb.png" alt="HeyBleepi Logo" class="mascot" />
               </div>
               <p class="description">
-                Join thousands of space explorers connecting across the universe
+                Join the conversation and bleep your thoughts into the feed.
               </p>
             </div>
 
@@ -120,11 +120,11 @@ if (isset($_GET['message'])) {
 
                 <div class="social-connection">
                     <a href="oauth_login.php?provider=devhive" class="account-btn">
-                      <img src="../assets/connected_accounts/devhive.jpg" alt="Devhive logo">
+                      <img src="../assets/connected_accounts/devhive.png" alt="Devhive logo">
                       Devhive
                     </a>
                     <a href="oauth_login.php?provider=hershive" class="account-btn">
-                      <img src="../assets/connected_accounts/hershell.png" alt="Hershell logo">
+                      <img src="../assets/connected_accounts/hershell.png" alt="Hershive logo">
                       Hershell
                     </a>
                 </div>
