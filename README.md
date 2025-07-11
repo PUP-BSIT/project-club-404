@@ -1,7 +1,7 @@
 <div align="center">
   <img width="100%" src="./heybleepi/readme_cover.png" alt="HeyBleeepi Cover"/>
 
-  <p><strong>🌠 𝗕𝗘𝗬𝗢𝗡𝗗 𝗦𝗧𝗔𝗥𝗦, 𝗪𝗘 𝗦𝗛𝗔𝗥𝗘 𝗦𝗧𝗢𝗥𝗜𝗘𝗦. ✨</strong></p>
+  <p><strong>💬 𝗦𝗮𝘆 𝗵𝗲𝘆. 𝗗𝗿𝗼𝗽 𝗮 𝗯𝗹𝗲𝗲𝗽.</strong></p>
   <hr/>
 </div>
 
