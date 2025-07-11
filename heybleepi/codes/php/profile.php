@@ -612,15 +612,9 @@ function timeAgo($datetime) {
                   </div>
 
                   <div class="styled-hr"></div>
-
-                  <!-- Other social media -->
-                  <div class="share-options">
-                    <a href="#" class="share-to-other">Share to DevHive</a>
-                    <a href="#" class="share-to-other">Share to Hershive</a>
-                  </div>
                 </form>
               </div>
-              <div>
+              <div id="location_container" class="location-container hidden">
                 <!-- Location Text Preview -->
                 <div class="create-post-location-preview" id="locationTextPreview" style="display: none;">
                   📍 <span id="locationNamePreview">Selected location</span>
