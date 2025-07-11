@@ -21,6 +21,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['register'])) {
     $birthdate = $_POST['birthdate'];
     $password  = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
+    // Check for existing email
+    $stmt = $conn->prepare("SELECT 1 FROM users WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $stmt->store_result();
+    if ($stmt->num_rows > 0) {
+        redirectWithMessage("Email already taken!");
+    }
+
     // Check for existing username
     $stmt = $conn->prepare("SELECT 1 FROM users WHERE user_name = ?");
     $stmt->bind_param("s", $username);

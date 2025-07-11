@@ -298,7 +298,7 @@ $update->close();
 
           <!-- Profile Section -->
           <div class="profile-picture">
-            <img id="profile_image" src="../assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'rawr.png') ?>" alt="Profile Picture" />
+            <img id="profile_image" src="../assets/profile/<?= htmlspecialchars($user['profile_picture'] ?? 'default.png') ?>" alt="Profile Picture" />
             <label for="file_input" class="change-profile-image">+</label>
             <input type="file" name="file_input" id="file_input" accept="image/*" hidden />
             <h2>Edit Profile</h2>

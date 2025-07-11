@@ -319,7 +319,7 @@ $conn->close();
         <div>
           <div class="comment-box">
             <div class="comment-header">
-              <img src="../assets/profile/<?= htmlspecialchars($row['profile_picture'] ?? 'rawr.png') ?>"
+              <img src="../assets/profile/<?= htmlspecialchars($row['profile_picture'] ?? 'default.png') ?>"
                 alt="Avatar" class="avatar avatar--sm" />
               <div class="preview-text">
                 <h4><?= htmlspecialchars($row['user_name']) ?></h4>
