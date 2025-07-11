@@ -99,6 +99,10 @@ if (!isset($_SESSION['user_id'])) {
     <link rel="icon" href="../assets/logo.png" type="image/png" />
     <link rel="stylesheet" href="../stylesheet/oauth_authorize.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   </head>
   <body>
     <div class="main-container">
@@ -163,7 +167,7 @@ if (!isset($_SESSION['user_id'])) {
 <body>
   <div class="main-container">
     <div class="oauth-header">
-      <img src="../assets/heybleepi-mascot.jpg" alt="HeyBleepi Mascot" class="mascot">
+      <img src="../assets/logo-heybleepi-rb.png" alt="HeyBleepi Mascot" class="mascot">
       <h3 class="oauth-title">Sign in using HEYBLEEPI</h3>
     </div>
     <div class="main-text">
