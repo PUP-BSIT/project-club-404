@@ -37,7 +37,7 @@ $unreadMessages = $unreadMsgResult ? $unreadMsgResult->fetch_assoc()['unread'] :
   <style>
     .search-feed-container {
       max-width: 600px;
-      margin: 100px 430px 40px auto;
+      margin: 100px auto 40px auto;
       background: #18191c;
       border-radius: 18px;
       box-shadow: 0 4px 24px rgba(0,0,0,0.18);
