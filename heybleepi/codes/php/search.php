@@ -86,6 +86,7 @@ $unreadMessages = $unreadMsgResult ? $unreadMsgResult->fetch_assoc()['unread'] :
       padding: 18px 24px;
       border-bottom: 1px solid #23242a;
       color: #fff;
+      justify-content: center;
     }
     .search-feed-item:last-child {
       border-bottom: none;
