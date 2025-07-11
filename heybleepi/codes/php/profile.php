@@ -883,10 +883,15 @@ function timeAgo($datetime) {
                   </form>
 
                   <!-- Comment toggle -->
-                  <button class="icon-btn" onclick="document.getElementById('comment-form-<?= $post['post_id'] ?>').classList.toggle('hidden')">
+                  <?php
+                    // Get comment count for this post
+                    $commentCountRes = $conn->query("SELECT COUNT(*) AS total FROM comments WHERE post_id = {$post['post_id']}");
+                    $commentCount = $commentCountRes ? $commentCountRes->fetch_assoc()['total'] : 0;
+                    ?>
+                    <button class="icon-btn" onclick="document.getElementById('comment-form-<?= $post['post_id'] ?>').classList.toggle('hidden')">
                     <i class="ri-chat-1-line"></i>
-                    <span><?= $countComments['total'] ?></span>
-                  </button>
+                    <span id="comment-count-<?= $post['post_id'] ?>"><?= $commentCount ?></span>
+                    </button>
 
                   <!-- Get the post creator name -->
                   <?php
@@ -927,21 +932,26 @@ function timeAgo($datetime) {
 
                <!-- COMMENTS SECTION -->
               <div id="comment-form-<?= $post['post_id'] ?>" class="hidden" style="margin-top:10px;">
-                <form method="POST" action="profile.php">
+                <form method="POST" class="comment-form" data-post-id="<?= $post['post_id'] ?>" data-context="profile">
                   <input type="hidden" name="comment_post_id" value="<?= $post['post_id'] ?>">
                   <input type="text" name="comment_text" placeholder="Write a comment…" required style="width: 100%; padding: 8px;">
                   <button type="submit" class="btn btn--primary btn--sm" style="margin-top:5px;">Comment</button>
                 </form>
 
                 <!-- Load existing comments -->
-                <div style="margin-top:10px;">
+                <div class="comments-list" style="margin-top:10px;">
                   <?php
-                    $comments = $conn->query("SELECT comments.*, users.first_name, users.last_name FROM comments JOIN users ON comments.user_id = users.id WHERE post_id = {$post['post_id']} ORDER BY commented_at ASC");
+                    $comments = $conn->query("SELECT comments.*, users.first_name, users.last_name
+                                              FROM comments
+                                              JOIN users
+                                              ON comments.user_id = users.id
+                                              WHERE post_id = {$post['post_id']}
+                                              ORDER BY commented_at ASC");
                     while ($comment = $comments->fetch_assoc()):
                   ?>
-                    <div class="comment" style="margin-bottom: 8px;">
+                    <div class="comment" data-comment-id="<?= $comment['id'] ?>" data-post-id="<?= $post['post_id'] ?>" style="margin-bottom: 8px;">
                       <strong><?= htmlspecialchars($comment['first_name'] . ' ' . $comment['last_name']) ?>:</strong>
-                      <span><?= htmlspecialchars($comment['comment_text']) ?></span>
+                      <span class="comment-text"><?= htmlspecialchars($comment['comment_text']) ?></span>
                       <small style="color:gray;"> – <?= date("M d, g:i A", strtotime($comment['commented_at'])) ?></small>
 
                       <?php if ($comment['user_id'] == $_SESSION['id']): ?>
@@ -950,11 +960,10 @@ function timeAgo($datetime) {
                             <i class="ri-more-fill"></i>
                           </button>
                           <ul class="comment-dropdown hidden">
-                            <li><button class="btn--sm btn-edit-comment" data-id="<?= $comment['id'] ?>">Edit</button></li>
-                            <li><button class="btn--sm btn-delete-comment" data-id="<?= $comment['id'] ?>">Delete</button></li>
+                            <li><button class="btn--sm btn-edit-comment-profile" data-id="<?= $comment['id'] ?>">Edit</button></li>
+                            <li><button class="btn--sm btn-delete-comment-profile" data-id="<?= $comment['id'] ?>">Delete</button></li>
                           </ul>
                         </div>
-
                       <?php endif; ?>
                     </div>
                   <?php endwhile; ?>
@@ -1096,6 +1105,22 @@ function timeAgo($datetime) {
       </div>
     </div>
 
+    <!-- Delete Comment Modal -->
+    <div id="deleteCommentModalProfile" class="modals hidden">
+      <div class="modals-content">
+        <h3>Delete Comment</h3>
+        <p>Are you sure you want to delete this comment?</p>
+        <form id="deleteCommentProfile" method="POST" action="delete_comment_profile.php">
+          <input type="hidden" name="comment_id" id="deleteCommentIdProfile">
+          <div class="modals-actions">
+            <button type="submit" id="confirmDeleteComment" class="btn-delete">Delete</button>
+          <button type="button" id="cancelDeleteCommentProfile" class="btn-cancel">Cancel</button>
+          </div>
+        </form>
+        </div>
+      </div>
+    </div>
+
     <script>
       // Tab switching logic
       const tabs = document.querySelectorAll('#profileTabs .tab');
@@ -1140,5 +1165,8 @@ function timeAgo($datetime) {
     </script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="../script/dashboard.js"></script>
+    <script>
+      const CURRENT_USER_ID = <?= json_encode($_SESSION['id']) ?>;
+    </script>
   </body>
 </html>

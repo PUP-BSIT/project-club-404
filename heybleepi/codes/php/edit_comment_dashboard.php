@@ -2,18 +2,19 @@
 session_start();
 require_once 'configuration.php';
 
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['comment_id'], $_POST['comment_text'])) {
-    $commentId = intval($_POST['comment_id']);
-    $newText = trim($_POST['comment_text']);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $comment_id = intval($_POST['comment_id']);
+    $comment_text = trim($_POST['comment_text']);
+    $user_id = $_SESSION['id'];
 
-    if (!empty($newText)) {
-        $stmt = $conn->prepare("UPDATE comments SET comment_text = ? WHERE id = ? AND user_id = ?");
-        $stmt->bind_param("sii", $newText, $commentId, $_SESSION['id']);
-        $stmt->execute();
-        $stmt->close();
+    if ($comment_id && $comment_text) {
+        $stmt = $conn->prepare("UPDATE comments SET comment_text=? WHERE id=? AND user_id=?");
+        $stmt->bind_param("sii", $comment_text, $comment_id, $user_id);
+        if ($stmt->execute()) {
+            echo "updated";
+            exit;
+        }
     }
-
-    header("Location: dashboard.php");
-    exit();
 }
+echo "error";
 ?>
