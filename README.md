@@ -70,6 +70,6 @@ To explore without registering:
 
 ---
 
-## ▶️ Presentation YT Hyp
+## ▶️ Presentation YT Hyperlink
 
 - [CLUB-404 Presentation](https://www.youtube.com/watch?v=rSyduT_HUN0)
